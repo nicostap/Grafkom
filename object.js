@@ -116,6 +116,14 @@ class Object {
     }
   }
 
+  scale(kx, ky, kz) {
+    glMatrix.vec3.multiply(this.origin, this.origin, [kx, ky, kz]);
+    glMatrix.mat4.scale(this.SCALEMATRIX, this.SCALEMATRIX, [kx, ky, kz]);
+    for (let i = 0; i < this.child.length; i++) {
+      this.child[i].scale(kx, ky, kz);
+    }
+  }
+
   setUniform4(PROJMATRIX, VIEWMATRIX) {
     let MOVEMATRIX = glMatrix.mat4.create();
     glMatrix.mat4.multiply(MOVEMATRIX, this.INIT_SCALEMATRIX, MOVEMATRIX);

@@ -128,9 +128,9 @@ function main() {
     child_cube.addChild(grandchild_cube, 1.3, -3, 0.7);
 
     // Transform the combined object
-    // cube.scale(0.5, 0.5, 0.5);
-    // cube.rotate(0.6, 0.5, 0.9);
-    // cube.translate(0, -1, 0);
+    cube.scale(0.5, 0.5, 0.5);
+    cube.rotate(0.6, 0.5, 0.9);
+    cube.translate(-3, 0, 0);
 
     // Drawing
     GL.clearColor(0.0, 0.0, 0.0, 0.0);
