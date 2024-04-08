@@ -50,48 +50,13 @@ function main() {
     var VIEWMATRIX = glMatrix.mat4.create();
     glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, 0, -5]);
 
-    // OBJECT
-    var object_vertex = [
-        -1, -1, -1, 1, 1, 0,
-        1, -1, -1, 1, 1, 0,
-        1, 1, -1, 1, 1, 0,
-        -1, 1, -1, 1, 1, 0,
-        -1, -1, 1, 0, 0, 1,
-        1, -1, 1, 0, 0, 1,
-        1, 1, 1, 0, 0, 1,
-        -1, 1, 1, 0, 0, 1,
-        -1, -1, -1, 0, 1, 1,
-        -1, 1, -1, 0, 1, 1,
-        -1, 1, 1, 0, 1, 1,
-        -1, -1, 1, 0, 1, 1,
-        1, -1, -1, 1, 0, 0,
-        1, 1, -1, 1, 0, 0,
-        1, 1, 1, 1, 0, 0,
-        1, -1, 1, 1, 0, 0,
-        -1, -1, -1, 1, 0, 1,
-        -1, -1, 1, 1, 0, 1,
-        1, -1, 1, 1, 0, 1,
-        1, -1, -1, 1, 0, 1,
-        -1, 1, -1, 0, 1, 0,
-        -1, 1, 1, 0, 1, 0,
-        1, 1, 1, 0, 1, 0,
-        1, 1, -1, 0, 1, 0
-    ];
-    var object_faces = [
-        0, 1, 2,
-        0, 2, 3,
-        4, 5, 6,
-        4, 6, 7,
-        8, 9, 10,
-        8, 10, 11,
-        12, 13, 14,
-        12, 14, 15,
-        16, 17, 18,
-        16, 18, 19,
-        20, 21, 22,
-        20, 22, 23];
+    // GEOMETRY
+    var red_cylinder = GEO.createCylinder(1.1, 2, 360, [1, 0, 0]);
+    var blue_sphere = GEO.createSphere(1.1, 20, [0, 0, 1]);
+    var white_sphere = GEO.createSphere(1.0, 60, [1, 1, 1]);
+    var green_cube = GEO.createBox(2, 2, 2, [0, 1, 0]);
 
-    // Shader
+    // SHADER
     var shader_vertex_source = `
       attribute vec3 position;
       attribute vec3 color;
@@ -111,18 +76,18 @@ function main() {
       }`;
 
     // Creating the parts
-    var body = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var left_leg = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var right_leg = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var left_foot = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var right_foot = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var left_knee = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var right_knee = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var head =  new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var left_eye = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var right_eye = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var left_hand = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var right_hand = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var body = new Object3D(red_cylinder.vertices, red_cylinder.faces, shader_vertex_source, shader_fragment_source);
+    var left_leg = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
+    var right_leg = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
+    var left_foot = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
+    var right_foot = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
+    var left_knee = new Object3D(blue_sphere.vertices, blue_sphere.faces, shader_vertex_source, shader_fragment_source);
+    var right_knee = new Object3D(blue_sphere.vertices, blue_sphere.faces, shader_vertex_source, shader_fragment_source);
+    var head =  new Object3D(blue_sphere.vertices, blue_sphere.faces, shader_vertex_source, shader_fragment_source);
+    var left_eye = new Object3D(white_sphere.vertices, white_sphere.faces, shader_vertex_source, shader_fragment_source);
+    var right_eye = new Object3D(white_sphere.vertices, white_sphere.faces, shader_vertex_source, shader_fragment_source);
+    var left_hand = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
+    var right_hand = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
 
     // Setting the parts location
     left_leg.setLocalScale(0.3, 1.5, 0.3);
@@ -165,7 +130,7 @@ function main() {
 
     // Transform the combined object
     body.scale(0.5, 0.5, 0.5);
-    body.translate(0.0, 0.0, -5.0);
+    body.translate(0.0, 0.0, -2.0);
 
     // Making the animations
     var animations = [];
