@@ -110,37 +110,92 @@ function main() {
       gl_FragColor = vec4(vColor, 1.);
       }`;
 
-    // Object creating
-    var cube = new Object([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var child_cube = new Object([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
-    var grandchild_cube = new Object([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    // Creating the parts
+    var body = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var left_leg = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var right_leg = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var left_foot = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var right_foot = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var left_knee = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var right_knee = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var head =  new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var left_eye = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var right_eye = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var left_hand = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
+    var right_hand = new Object3D([...object_vertex], [...object_faces], shader_vertex_source, shader_fragment_source);
 
-    // Designing the object
-    child_cube.setScale(0.5, 1.5, 0.5);
-    child_cube.setRotation(0, 0, 0.5);
-    child_cube.setPosition(0.7, -2, 0);
-    grandchild_cube.setScale(1, 0.1, 0.2);
-    grandchild_cube.setRotation(0, 0, 0.5);
-    grandchild_cube.setPosition(1.3, -3, 0.7);
+    // Setting the parts location
+    left_leg.setLocalScale(0.3, 1.5, 0.3);
+    left_leg.setLocalTranslation(0.7, 1.8, 0);
+    right_leg.setLocalScale(0.3, 1.5, 0.3);
+    right_leg.setLocalTranslation(-0.7, 1.8, 0);
+    left_foot.setLocalScale(0.3, 1.5, 0.3);
+    left_foot.setLocalTranslation(0.7, 4.9, 0);
+    right_foot.setLocalScale(0.3, 1.5, 0.3);
+    right_foot.setLocalTranslation(-0.7, 4.9, 0);
+    left_knee.setLocalScale(0.5, 0.5, 0.5);
+    left_knee.setLocalTranslation(0.7, 3.6, 0);
+    right_knee.setLocalScale(0.5, 0.5, 0.5);
+    right_knee.setLocalTranslation(-0.7, 3.6, 0);
+    head.setLocalScale(0.7, 0.7, 0.7);
+    head.setLocalTranslation(0, -1.7, 0);
+    left_eye.setLocalScale(0.1, 0.3, 0.1);
+    left_eye.setLocalTranslation(0.3, -2.0, 0.8);
+    right_eye.setLocalScale(0.1, 0.3, 0.1);
+    right_eye.setLocalTranslation(-0.3, -2.0, 0.8);
+    left_hand.setLocalScale(0.3, 1.5, 0.3);
+    left_hand.setLocalTranslation(1.3, 0.2, 0);
+    left_hand.setLocalRotation(0, 0, -0.3);
+    right_hand.setLocalScale(0.3, 1.5, 0.3);
+    right_hand.setLocalTranslation(-1.3, 0.2, 0);
+    right_hand.setLocalRotation(0, 0, 0.3);
 
-    // Linking the objects and add point of origin
-    cube.addChild(child_cube, 0, -0.5, 0);
-    child_cube.addChild(grandchild_cube, 1.3, -3, 0.7);
+    // Linking the parts along with point of origin (if not set, point of origin is part's local translation)
+    body.addChild(left_leg, 0, 0, 0);
+    body.addChild(right_leg, 0, 0, 0);
+    body.addChild(left_hand, 0, 0, 0);
+    body.addChild(right_hand, 0, 0, 0);
+    body.addChild(head);
+    left_leg.addChild(left_foot, 0.7, 3.6, 0);
+    left_leg.addChild(left_knee);
+    right_leg.addChild(right_foot, -0.7, 3.6, 0);   
+    right_leg.addChild(right_knee);
+    head.addChild(left_eye);
+    head.addChild(right_eye);
 
     // Transform the combined object
-    cube.scale(0.5, 0.5, 0.5);
-    cube.rotate(0.6, 0.5, 0.9);
-    cube.translate(-3, 0, 0);
+    body.scale(0.5, 0.5, 0.5);
+    body.translate(0.0, 0.0, -5.0);
 
+    // Making the animations
+    var animations = [];
+    animations.push(new Animate(body, 2000.0, 8000.0, MoveType.Translate, 0.0, 0.0, 5.0));
+
+    animations.push(new Animate(left_leg, 2000.0, 3500.0, MoveType.Rotate, 30.0, 0.0, 0.0));
+    animations.push(new Animate(right_leg, 2000.0, 3500.0, MoveType.Rotate, -30.0, 0.0, 0.0));
+    animations.push(new Animate(left_foot, 2000.0, 3500.0, MoveType.Rotate, -30.0, 0.0, 0.0));
+    animations.push(new Animate(right_foot, 2000.0, 3500.0, MoveType.Rotate, 30.0, 0.0, 0.0));1
+
+    animations.push(new Animate(left_leg, 3500.0, 6500.0, MoveType.Rotate, -60.0, 0.0, 0.0));
+    animations.push(new Animate(right_leg, 3500.0, 6500.0, MoveType.Rotate, 60.0, 0.0, 0.0));
+    animations.push(new Animate(left_foot, 3500.0, 6500.0, MoveType.Rotate, 60.0, 0.0, 0.0));
+    animations.push(new Animate(right_foot, 3500.0, 6500.0, MoveType.Rotate, -60.0, 0.0, 0.0));1
+
+    animations.push(new Animate(left_leg, 6500.0, 8000.0, MoveType.Rotate, 30.0, 0.0, 0.0));
+    animations.push(new Animate(right_leg, 6500.0, 8000.0, MoveType.Rotate, -30.0, 0.0, 0.0));
+    animations.push(new Animate(left_foot, 6500.0, 8000.0, MoveType.Rotate, -30.0, 0.0, 0.0));
+    animations.push(new Animate(right_foot, 6500.0, 8000.0, MoveType.Rotate, 30.0, 0.0, 0.0));1
+    
     // Drawing
     GL.clearColor(0.0, 0.0, 0.0, 0.0);
     GL.enable(GL.DEPTH_TEST);
     GL.depthFunc(GL.LEQUAL);
     GL.clearDepth(1.0);
 
-    var time_prev = 0;
+    var time_prev = 0.0;
     var animate = function (time) {
         var dt = (time - time_prev);
+        time_prev = time;
         if (!drag) {
             dX *= AMORTIZATION, dY *= AMORTIZATION;
             THETA += dX, PHI += dY;
@@ -154,14 +209,13 @@ function main() {
         GL.viewport(0, 0, CANVAS.width, CANVAS.height);
         GL.clear(GL.COLOR_BUFFER_BIT | GL.D_BUFFER_BIT);
 
-        // Moving & Rotating the objects 
-        cube.rotate(0.01, 0, 0);
-        child_cube.rotate(0, 0.02, 0);
-        grandchild_cube.rotate(0, 0, 0.5);
-        cube.translate(0, 0.1 * Math.sin(time * Math.PI / 360.0), 0);
+        // Running the animations
+        for(let animation of animations) {
+            animation.run(time, dt);
+        }
 
-        cube.setUniform4(PROJMATRIX, VIEWMATRIX);
-        cube.draw();
+        body.setUniform4(PROJMATRIX, VIEWMATRIX);
+        body.draw();
 
         GL.flush();
         window.requestAnimationFrame(animate);

@@ -1,6 +1,6 @@
 var GL;
 
-class Object {
+class Object3D {
   object_vertex = [];
   OBJECT_VERTEX = GL.createBuffer();
   object_faces = [];
@@ -146,18 +146,19 @@ class Object {
     }
   }
 
-  setPosition(x, y, z) {
+  setLocalTranslation(x, y, z) {
     glMatrix.mat4.fromTranslation(this.INIT_TRANSMATRIX, [x, y, z]);
   }
 
-  setRotation(ax, ay, az) {
+  setLocalRotation(ax, ay, az) {
+    glMatrix.mat4.identity(this.INIT_ROTATEMATRIX);
     glMatrix.mat4.rotateX(this.INIT_ROTATEMATRIX, this.INIT_ROTATEMATRIX, ax);
     glMatrix.mat4.rotateY(this.INIT_ROTATEMATRIX, this.INIT_ROTATEMATRIX, ay);
     glMatrix.mat4.rotateZ(this.INIT_ROTATEMATRIX, this.INIT_ROTATEMATRIX, az);
   }
 
-  setScale(kx, ky, kz) {
-    glMatrix.mat4.scale(this.INIT_SCALEMATRIX, this.INIT_SCALEMATRIX, [kx, ky, kz]);
+  setLocalScale(kx, ky, kz) {
+    glMatrix.mat4.fromScaling(this.INIT_SCALEMATRIX, [kx, ky, kz]);
   }
 
   draw() {
@@ -173,7 +174,7 @@ class Object {
     }
   }
 
-  addChild(object, ox, oy, oz) {
+  addChild(object, ox = this.INIT_TRANSMATRIX[12], oy  = this.INIT_TRANSMATRIX[13], oz  = this.INIT_TRANSMATRIX[14]) {
     object.parent = this;
     object.origin = [ox, oy, oz];
     this.child.push(object);
