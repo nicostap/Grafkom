@@ -107,7 +107,7 @@ function main() {
         floor.setUniform4(PROJMATRIX, VIEWMATRIX);
 
         // Some logic
-        if(bicycle.main.TRANSMATRIX[12] >= 100.0) bicycle.main.translate(-200, 0, 0);
+        if(bicycle.main.TRANSMATRIX[12] >= 150.0) bicycle.main.translate(-300, 0, 0);
         else bicycle.main.translate(0.5, 0, 0);
 
         bicycle.main.draw();
