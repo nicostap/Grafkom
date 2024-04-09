@@ -1,5 +1,5 @@
 function main() {
-    var CANVAS = document.getElementById("your_canvas");
+    CANVAS = document.getElementById("your_canvas");
     CANVAS.width = window.innerWidth;
     CANVAS.height = window.innerHeight;
 
@@ -46,111 +46,37 @@ function main() {
 
     // MATRIX
     var PROJMATRIX = glMatrix.mat4.create();
-    glMatrix.mat4.perspective(PROJMATRIX, 17, CANVAS.width / CANVAS.height, 1, 100);
     var VIEWMATRIX = glMatrix.mat4.create();
-    glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, 0, -5]);
+    glMatrix.mat4.perspective(PROJMATRIX, GEO.rad(90), CANVAS.width / CANVAS.height, 1, 400);
 
-    // GEOMETRY
-    var red_cylinder = GEO.createCylinder(1.1, 2, 360, [1, 0, 0]);
-    var blue_sphere = GEO.createSphere(1.1, 20, [0, 0, 1]);
-    var white_sphere = GEO.createSphere(1.0, 60, [1, 1, 1]);
-    var green_cube = GEO.createBox(2, 2, 2, [0, 1, 0]);
-
-    // SHADER
-    var shader_vertex_source = `
-      attribute vec3 position;
-      attribute vec3 color;
-      uniform mat4 Pmatrix;
-      uniform mat4 Vmatrix;
-      uniform mat4 Mmatrix;
-      varying vec3 vColor;
-      void main(void) {
-      gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.0);
-      vColor = color;
-      }`;
-    var shader_fragment_source = `
-      precision mediump float;
-      varying vec3 vColor;
-      void main(void) {
-      gl_FragColor = vec4(vColor, 1.);
-      }`;
-
-    // Creating the parts
-    var body = new Object3D(red_cylinder.vertices, red_cylinder.faces, shader_vertex_source, shader_fragment_source);
-    var left_leg = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
-    var right_leg = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
-    var left_foot = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
-    var right_foot = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
-    var left_knee = new Object3D(blue_sphere.vertices, blue_sphere.faces, shader_vertex_source, shader_fragment_source);
-    var right_knee = new Object3D(blue_sphere.vertices, blue_sphere.faces, shader_vertex_source, shader_fragment_source);
-    var head =  new Object3D(blue_sphere.vertices, blue_sphere.faces, shader_vertex_source, shader_fragment_source);
-    var left_eye = new Object3D(white_sphere.vertices, white_sphere.faces, shader_vertex_source, shader_fragment_source);
-    var right_eye = new Object3D(white_sphere.vertices, white_sphere.faces, shader_vertex_source, shader_fragment_source);
-    var left_hand = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
-    var right_hand = new Object3D(green_cube.vertices, green_cube.faces, shader_vertex_source, shader_fragment_source);
-
-    // Setting the parts location
-    left_leg.setLocalScale(0.3, 1.5, 0.3);
-    left_leg.setLocalTranslation(0.7, 1.8, 0);
-    right_leg.setLocalScale(0.3, 1.5, 0.3);
-    right_leg.setLocalTranslation(-0.7, 1.8, 0);
-    left_foot.setLocalScale(0.3, 1.5, 0.3);
-    left_foot.setLocalTranslation(0.7, 4.9, 0);
-    right_foot.setLocalScale(0.3, 1.5, 0.3);
-    right_foot.setLocalTranslation(-0.7, 4.9, 0);
-    left_knee.setLocalScale(0.5, 0.5, 0.5);
-    left_knee.setLocalTranslation(0.7, 3.6, 0);
-    right_knee.setLocalScale(0.5, 0.5, 0.5);
-    right_knee.setLocalTranslation(-0.7, 3.6, 0);
-    head.setLocalScale(0.7, 0.7, 0.7);
-    head.setLocalTranslation(0, -1.7, 0);
-    left_eye.setLocalScale(0.1, 0.3, 0.1);
-    left_eye.setLocalTranslation(0.3, -2.0, 0.8);
-    right_eye.setLocalScale(0.1, 0.3, 0.1);
-    right_eye.setLocalTranslation(-0.3, -2.0, 0.8);
-    left_hand.setLocalScale(0.3, 1.5, 0.3);
-    left_hand.setLocalTranslation(1.3, 0.2, 0);
-    left_hand.setLocalRotation(0, 0, -0.3);
-    right_hand.setLocalScale(0.3, 1.5, 0.3);
-    right_hand.setLocalTranslation(-1.3, 0.2, 0);
-    right_hand.setLocalRotation(0, 0, 0.3);
-
-    // Linking the parts along with point of origin (if not set, point of origin is part's local translation)
-    body.addChild(left_leg, 0, 0, 0);
-    body.addChild(right_leg, 0, 0, 0);
-    body.addChild(left_hand, 0, 0, 0);
-    body.addChild(right_hand, 0, 0, 0);
-    body.addChild(head);
-    left_leg.addChild(left_foot, 0.7, 3.6, 0);
-    left_leg.addChild(left_knee);
-    right_leg.addChild(right_foot, -0.7, 3.6, 0);   
-    right_leg.addChild(right_knee);
-    head.addChild(left_eye);
-    head.addChild(right_eye);
-
-    // Transform the combined object
-    body.scale(0.5, 0.5, 0.5);
-    body.translate(0.0, 0.0, -2.0);
+    // Making the objects
+    var bicycle = createCharacter_1();
 
     // Making the animations
+    var bicycleLoop = new AnimationList([
+        new Animate(bicycle.frontWheel, 0, 800, MoveType.Rotate, 0, 0, -375),
+        new Animate(bicycle.backWheel, 0, 800, MoveType.Rotate, 0, 0, -375),
+        new Animate(bicycle.gear, 0, 800, MoveType.Rotate, 0, 0, -375),
+        new Animate(bicycle.rightPedal, 0, 800, MoveType.Rotate, 0, 0, 375),
+        new Animate(bicycle.leftPedal, 0, 800, MoveType.Rotate, 0, 0, 375),
+
+        new Animate(bicycle.leftThigh, 0, 200, MoveType.Rotate, 0, 0, 10),
+        new Animate(bicycle.leftThigh, 200, 400, MoveType.Rotate, 0, 0, 25),
+        new Animate(bicycle.leftThigh, 400, 600, MoveType.Rotate, 0, 0, -10),
+        new Animate(bicycle.leftThigh, 600, 800, MoveType.Rotate, 0, 0, -25),
+        new Animate(bicycle.leftLeg, 0, 400, MoveType.Rotate, 0, 0, -65),
+        new Animate(bicycle.leftLeg, 400, 800, MoveType.Rotate, 0, 0, 65),
+        new Animate(bicycle.rightThigh, 0, 200, MoveType.Rotate, 0, 0, -10),
+        new Animate(bicycle.rightThigh, 200, 400, MoveType.Rotate, 0, 0, -25),
+        new Animate(bicycle.rightThigh, 400, 600, MoveType.Rotate, 0, 0, 10),
+        new Animate(bicycle.rightThigh, 600, 800, MoveType.Rotate, 0, 0, 25),
+        new Animate(bicycle.rightLeg, 0, 400, MoveType.Rotate, 0, 0, 65),
+        new Animate(bicycle.rightLeg, 400, 800, MoveType.Rotate, 0, 0, -65),
+    ], 0, 800, true);
+
     var animations = [];
-    animations.push(new Animate(body, 2000.0, 8000.0, MoveType.Translate, 0.0, 0.0, 5.0));
+    animations.push(bicycleLoop);
 
-    animations.push(new Animate(left_leg, 2000.0, 3500.0, MoveType.Rotate, 30.0, 0.0, 0.0));
-    animations.push(new Animate(right_leg, 2000.0, 3500.0, MoveType.Rotate, -30.0, 0.0, 0.0));
-    animations.push(new Animate(left_foot, 2000.0, 3500.0, MoveType.Rotate, -30.0, 0.0, 0.0));
-    animations.push(new Animate(right_foot, 2000.0, 3500.0, MoveType.Rotate, 30.0, 0.0, 0.0));1
-
-    animations.push(new Animate(left_leg, 3500.0, 6500.0, MoveType.Rotate, -60.0, 0.0, 0.0));
-    animations.push(new Animate(right_leg, 3500.0, 6500.0, MoveType.Rotate, 60.0, 0.0, 0.0));
-    animations.push(new Animate(left_foot, 3500.0, 6500.0, MoveType.Rotate, 60.0, 0.0, 0.0));
-    animations.push(new Animate(right_foot, 3500.0, 6500.0, MoveType.Rotate, -60.0, 0.0, 0.0));1
-
-    animations.push(new Animate(left_leg, 6500.0, 8000.0, MoveType.Rotate, 30.0, 0.0, 0.0));
-    animations.push(new Animate(right_leg, 6500.0, 8000.0, MoveType.Rotate, -30.0, 0.0, 0.0));
-    animations.push(new Animate(left_foot, 6500.0, 8000.0, MoveType.Rotate, -30.0, 0.0, 0.0));
-    animations.push(new Animate(right_foot, 6500.0, 8000.0, MoveType.Rotate, 30.0, 0.0, 0.0));1
-    
     // Drawing
     GL.clearColor(0.0, 0.0, 0.0, 0.0);
     GL.enable(GL.DEPTH_TEST);
@@ -167,7 +93,7 @@ function main() {
         }
 
         VIEWMATRIX = glMatrix.mat4.create();
-        glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, 0, -5]);
+        glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, 0, -30]);
         glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, PHI);
         glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, THETA);
 
@@ -175,12 +101,13 @@ function main() {
         GL.clear(GL.COLOR_BUFFER_BIT | GL.D_BUFFER_BIT);
 
         // Running the animations
-        for(let animation of animations) {
+        for (let animation of animations) {
             animation.run(time, dt);
         }
 
-        body.setUniform4(PROJMATRIX, VIEWMATRIX);
-        body.draw();
+        // Updating and drawing the objects
+        bicycle.main.setUniform4(PROJMATRIX, VIEWMATRIX);
+        bicycle.main.draw();
 
         GL.flush();
         window.requestAnimationFrame(animate);

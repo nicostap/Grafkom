@@ -1,4 +1,7 @@
 var GEO = {
+    rad: function(deg) {
+        return deg * Math.PI / 180.0;
+    },
     createBox: function (width, length, height, color) {
         var hw = width / 2.0;
         var hl = length / 2.0;
@@ -100,6 +103,84 @@ var GEO = {
         }
         return { vertices: vertices, faces: faces };
     },
+    createHyperboloidOneSheet: function (radius, height, poly, color) {
+        let sectorCount = poly;
+        let stackCount = poly;
+
+        let x, y, z, xz;
+        let sectorStep = 2 * Math.PI / sectorCount;
+        let stackStep = Math.PI / stackCount;
+        let sectorAngle, stackAngle;
+        let vertices = [];
+        for (let i = 0; i <= stackCount; ++i) {
+            stackAngle = Math.PI / 2 - i * stackStep;
+            xz = radius * Math.cosh(stackAngle);
+            y = height * Math.sinh(stackAngle);
+            for (let j = 0; j <= sectorCount; ++j) {
+                sectorAngle = j * sectorStep;
+                x = xz * Math.cos(sectorAngle);
+                z = xz * Math.sin(sectorAngle);
+                vertices.push(x);
+                vertices.push(y);
+                vertices.push(z);
+                vertices.push(...color);
+            }
+        }
+        let k1, k2;
+        var faces = [];
+        for (let i = 0; i < stackCount; ++i) {
+            k1 = i * (sectorCount + 1);
+            k2 = k1 + sectorCount + 1;
+            for (let j = 0; j < sectorCount; ++j, ++k1, ++k2) {
+                faces.push(k1);
+                faces.push(k2);
+                faces.push(k1 + 1);
+                faces.push(k1 + 1);
+                faces.push(k2);
+                faces.push(k2 + 1);
+            }
+        }
+        return { vertices: vertices, faces: faces };
+    },
+    createEllipticParaboloid: function (radius, height, poly, color) {
+        let sectorCount = poly;
+        let stackCount = poly;
+
+        let x, y, z, xz;
+        let sectorStep = 2 * Math.PI / sectorCount;
+        let stackStep = Math.PI / stackCount;
+        let sectorAngle, stackAngle;
+        let vertices = [];
+        for (let i = 0; i <= stackCount; ++i) {
+            stackAngle = Math.PI / 2 - i * stackStep;
+            xz = radius * Math.sqrt(stackAngle);
+            y = height * -stackAngle;
+            for (let j = 0; j <= sectorCount; ++j) {
+                sectorAngle = j * sectorStep;
+                x = xz * Math.cos(sectorAngle);
+                z = xz * Math.sin(sectorAngle);
+                vertices.push(x);
+                vertices.push(y);
+                vertices.push(z);
+                vertices.push(...color);
+            }
+        }
+        let k1, k2;
+        var faces = [];
+        for (let i = 0; i < stackCount; ++i) {
+            k1 = i * (sectorCount + 1);
+            k2 = k1 + sectorCount + 1;
+            for (let j = 0; j < sectorCount; ++j, ++k1, ++k2) {
+                faces.push(k1);
+                faces.push(k2);
+                faces.push(k1 + 1);
+                faces.push(k1 + 1);
+                faces.push(k2);
+                faces.push(k2 + 1);
+            }
+        }
+        return { vertices: vertices, faces: faces };
+    },
     createCurve: function (controlPoints, m, degree) {
         var curves = [];
         var knotVector = []
@@ -151,82 +232,27 @@ var GEO = {
         }
         return curves;
     },
-    createHyperboloidOneSheet: function (radius, height, poly, color) {
-        let sectorCount = poly;
-        let stackCount = poly;
-
-        let x, y, z, xz;
-        let sectorStep = 2 * Math.PI / sectorCount;
-        let stackStep = Math.PI / stackCount;
-        let sectorAngle, stackAngle;
+    combineLines: function(color, ...lines) {
         let vertices = [];
-        for (let i = 0; i <= stackCount; ++i) {
-            stackAngle = Math.PI / 2 - i * stackStep;
-            xz = radius * Math.cosh(stackAngle);
-            y = height * Math.sinh(stackAngle);
-            for (let j = 0; j <= sectorCount; ++j) {
-                sectorAngle = j * sectorStep;
-                x = xz * Math.cos(sectorAngle);
-                z = xz * Math.sin(sectorAngle);
-                vertices.push(x);
-                vertices.push(y);
-                vertices.push(z);
+        for(let i = 0; i < lines[0].length / 3; i++) {
+            for(let j = 0; j < lines.length; j++) {
+                vertices.push(lines[j][i * 3]);
+                vertices.push(lines[j][i * 3 + 1]);
+                vertices.push(lines[j][i * 3 + 2]);
                 vertices.push(...color);
             }
         }
-        let k1, k2;
-        var faces = [];
-        for (let i = 0; i < stackCount; ++i) {
-            k1 = i * (sectorCount + 1);
-            k2 = k1 + sectorCount + 1;
-            for (let j = 0; j < sectorCount; ++j, ++k1, ++k2) {
-                faces.push(k1);
-                faces.push(k2);
-                faces.push(k1 + 1);
-                faces.push(k1 + 1);
-                faces.push(k2);
-                faces.push(k2 + 1);
+        let faces = [];
+        for(let i = 0; i < lines[0].length / 3 - 1; i++) {
+            for(let j = 0; j < lines.length; j++) {
+                faces.push(i * lines.length + j);
+                faces.push(i * lines.length + (j + 1) % lines.length);
+                faces.push((i + 1) * lines.length + j);
+                faces.push((i + 1) * lines.length + j);
+                faces.push((i + 1) * lines.length + (j + 1) % lines.length);
+                faces.push(i * lines.length + (j + 1) % lines.length);
             }
         }
         return { vertices: vertices, faces: faces };
-    },
-    createEllipticParaboloid: function (radius, poly, color) {
-        let sectorCount = poly;
-        let stackCount = poly;
-
-        let x, y, z, xz;
-        let sectorStep = 2 * Math.PI / sectorCount;
-        let stackStep = Math.PI / stackCount;
-        let sectorAngle, stackAngle;
-        let vertices = [];
-        for (let i = 0; i <= stackCount; ++i) {
-            stackAngle = Math.PI / 2 - i * stackStep;
-            xz = radius * Math.sqrt(stackAngle);
-            y = -stackAngle;
-            for (let j = 0; j <= sectorCount; ++j) {
-                sectorAngle = j * sectorStep;
-                x = xz * Math.cos(sectorAngle);
-                z = xz * Math.sin(sectorAngle);
-                vertices.push(x);
-                vertices.push(y);
-                vertices.push(z);
-                vertices.push(...color);
-            }
-        }
-        let k1, k2;
-        var faces = [];
-        for (let i = 0; i < stackCount; ++i) {
-            k1 = i * (sectorCount + 1);
-            k2 = k1 + sectorCount + 1;
-            for (let j = 0; j < sectorCount; ++j, ++k1, ++k2) {
-                faces.push(k1);
-                faces.push(k2);
-                faces.push(k1 + 1);
-                faces.push(k1 + 1);
-                faces.push(k2);
-                faces.push(k2 + 1);
-            }
-        }
-        return { vertices: vertices, faces: faces };
-    },
+    }
 }

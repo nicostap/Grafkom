@@ -1,10 +1,29 @@
 var GL;
 
+// SHADER
+var default_shader_vertex_source = `
+    attribute vec3 position;
+    attribute vec3 color;
+    uniform mat4 Pmatrix;
+    uniform mat4 Vmatrix;
+    uniform mat4 Mmatrix;
+    varying vec3 vColor;
+    void main(void) {
+        gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.0);
+        vColor = color;
+    }`;
+var default_shader_fragment_source = `
+    precision mediump float;
+    varying vec3 vColor;
+    void main(void) {
+        gl_FragColor = vec4(vColor, 1.);
+    }`;
+
 class Object3D {
-  object_vertex = [];
-  OBJECT_VERTEX = GL.createBuffer();
-  object_faces = [];
-  OBJECT_FACES = GL.createBuffer();
+  object_vertex;
+  OBJECT_VERTEX;
+  object_faces;
+  OBJECT_FACES;
 
   // Local transformation
   INIT_SCALEMATRIX = glMatrix.mat4.create();
@@ -45,12 +64,21 @@ class Object3D {
   _color;
   _position;
 
-  constructor(object_vertex, object_faces, shader_vertex_source, shader_fragment_source) {
+  constructor(object_vertex, object_faces, shader_vertex_source = null, shader_fragment_source = null) {
     this.object_vertex = object_vertex;
     this.object_faces = object_faces;
-    this.shader_vertex_source = shader_vertex_source;
-    this.shader_fragment_source = shader_fragment_source;
 
+    if(shader_vertex_source == null) this.shader_vertex_source = default_shader_vertex_source;
+    else this.shader_vertex_source = shader_vertex_source;
+    if(shader_fragment_source == null) this.shader_fragment_source = default_shader_fragment_source;
+    else this.shader_fragment_source = shader_fragment_source;
+
+    this.initialize();
+  }
+
+  initialize() {
+    this.OBJECT_VERTEX = GL.createBuffer();
+    this.OBJECT_FACES = GL.createBuffer();
     this.shader_vertex = this.compile_shader(this.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
     this.shader_fragment = this.compile_shader(this.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
     this.SHADER_PROGRAM = GL.createProgram();
@@ -70,10 +98,7 @@ class Object3D {
     GL.enableVertexAttribArray(this._position);
 
     GL.useProgram(this.SHADER_PROGRAM);
-    this.initialize();
-  }
 
-  initialize() {
     GL.bindBuffer(GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
     GL.bufferData(GL.ARRAY_BUFFER,
       new Float32Array(this.object_vertex),
@@ -174,7 +199,7 @@ class Object3D {
     }
   }
 
-  addChild(object, ox = this.INIT_TRANSMATRIX[12], oy  = this.INIT_TRANSMATRIX[13], oz  = this.INIT_TRANSMATRIX[14]) {
+  addChild(object, ox = object.INIT_TRANSMATRIX[12], oy  = object.INIT_TRANSMATRIX[13], oz  = object.INIT_TRANSMATRIX[14]) {
     object.parent = this;
     object.origin = [ox, oy, oz];
     this.child.push(object);
