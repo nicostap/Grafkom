@@ -54,22 +54,25 @@ function main() {
     var floor = createFloor();
 
     // Placing objects
-    bicycle.main.translate(-100, 12.6, 0);
+    bicycle.main.translate(0, 12.6, 0);
+    bicycle.main.rotate(0, GEO.rad(180), 0);
 
     // Making the animations
     var bicycleLoop = new AnimationList([
-        new Animate(bicycle.frontWheel, 0, 800, MoveType.Rotate, 0, 0, -360),
-        new Animate(bicycle.backWheel, 0, 800, MoveType.Rotate, 0, 0, -360),
-        new Animate(bicycle.gear, 0, 800, MoveType.Rotate, 0, 0, -360),
-        new Animate(bicycle.rightPedal, 0, 800, MoveType.Rotate, 0, 0, 360),
-        new Animate(bicycle.leftPedal, 0, 800, MoveType.Rotate, 0, 0, 360),
-        new Animate(bicycle.leftThigh, 0, 400, MoveType.Rotate, 0, 0, -30),
-        new Animate(bicycle.leftThigh, 400, 800, MoveType.Rotate, 0, 0, 30),
-        new Animate(bicycle.rightThigh, 0, 400, MoveType.Rotate, 0, 0, -30),
-        new Animate(bicycle.rightThigh, 400, 800, MoveType.Rotate, 0, 0, 30),
-        new Animate(bicycle.body, 0, 400, MoveType.Translate, 0, 0.8, 0),
-        new Animate(bicycle.body, 400, 800, MoveType.Translate, 0, -0.8, 0),
-    ], 0, 800, true);
+        new Animate(bicycle.frontWheel, 0, 2000, MoveType.Rotate, 0, 0, -360),
+        new Animate(bicycle.backWheel, 0, 2000, MoveType.Rotate, 0, 0, -360),
+        new Animate(bicycle.gear, 0, 2000, MoveType.Rotate, 0, 0, -360),
+        new Animate(bicycle.rightPedal, 0, 2000, MoveType.Rotate, 0, 0, 360),
+        new Animate(bicycle.leftPedal, 0, 2000, MoveType.Rotate, 0, 0, 360),
+        new Animate(bicycle.leftLeg, 0, 1000, MoveType.Rotate, 0, 0, -50),
+        new Animate(bicycle.leftLeg, 1000, 2000, MoveType.Rotate, 0, 0, 50),
+        new Animate(bicycle.rightLeg, 0, 1000, MoveType.Rotate, 0, 0, 50),
+        new Animate(bicycle.rightLeg, 1000, 2000, MoveType.Rotate, 0, 0, -50),
+        new Animate(bicycle.leftThigh, 0, 1000, MoveType.Rotate, 0, 0, 80),
+        new Animate(bicycle.leftThigh, 1000, 2000, MoveType.Rotate, 0, 0, -80),
+        new Animate(bicycle.rightThigh, 0, 1000, MoveType.Rotate, 0, 0, -85),
+        new Animate(bicycle.rightThigh, 1000, 2000, MoveType.Rotate, 0, 0, 85),
+    ], 0, 2000, true);
 
     var animations = [];
     animations.push(bicycleLoop);
@@ -92,7 +95,7 @@ function main() {
         VIEWMATRIX = glMatrix.mat4.create();
         glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, PHI);
         glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, THETA);
-        glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -30, -40]);
+        glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [-bicycle.main.TRANSMATRIX[12] + 30, -20, -30]);
 
         GL.viewport(0, 0, CANVAS.width, CANVAS.height);
         GL.clear(GL.COLOR_BUFFER_BIT | GL.D_BUFFER_BIT);
@@ -107,8 +110,8 @@ function main() {
         floor.setUniform4(PROJMATRIX, VIEWMATRIX);
 
         // Some logic
-        if(bicycle.main.TRANSMATRIX[12] >= 150.0) bicycle.main.translate(-300, 0, 0);
-        else bicycle.main.translate(0.5, 0, 0);
+        if(bicycle.main.TRANSMATRIX[12] <= -75.0) bicycle.main.translate(150, 0, 0);
+        else bicycle.main.translate(-0.3, 0, 0);
 
         bicycle.main.draw();
         floor.draw();

@@ -15,83 +15,52 @@ function createCharacter_1() {
     var greyCylinder = GEO.createCylinder(1, 1, 20, [0.7, 0.7, 0.7]);
     var greyHyperbola = GEO.createEllipticParaboloid(1.0, 1.0, 20, [0.1, 0.1, 0.1]);
 
-    var body_part_1 = new Object3D(
-        [...redBox.vertices],
-        [...redBox.faces],
-    );
+    var body_part_1 = new Object3D(redBox.vertices, redBox.faces);
     body_part_1.setLocalScale(0.5, 8.0, 1);
     body_part_1.setLocalRotation(0, 0, GEO.rad(10));
     body_part_1.setLocalTranslation(-6, -4.5, 0);
     bicycleBody.addChild(body_part_1);
-    var body_part_2 = new Object3D(
-        [...redBox.vertices],
-        [...redBox.faces],
-    );
+    var body_part_2 = new Object3D(redBox.vertices,redBox.faces);
     body_part_2.setLocalScale(0.3, 7.5, 1);
     body_part_2.setLocalRotation(0, 0, GEO.rad(120));
     body_part_2.setLocalTranslation(-9, -6.1, 0);
     bicycleBody.addChild(body_part_2);
-    var body_part_3 = new Object3D(
-        [...redBox.vertices],
-        [...redBox.faces],
-    );
+    var body_part_3 = new Object3D(redBox.vertices,redBox.faces);
     body_part_3.setLocalScale(0.4, 9.4, 1);
     body_part_3.setLocalRotation(0, 0, GEO.rad(-40));
     body_part_3.setLocalTranslation(-9.6, -4.5, 0);
     bicycleBody.addChild(body_part_3);
-    var body_part_4 = new Object3D(
-        [...redBox.vertices],
-        [...redBox.faces],
-    );
+    var body_part_4 = new Object3D(redBox.vertices, redBox.faces);
     body_part_4.setLocalScale(0.4, 7.5, 1);
     body_part_4.setLocalRotation(0, 0, GEO.rad(87));
     body_part_4.setLocalTranslation(-8.9, -8.3, 0);
     bicycleBody.addChild(body_part_4);
-    var body_part_5 = new Object3D(
-        [...redBox.vertices],
-        [...redBox.faces],
-    );
+    var body_part_5 = new Object3D(redBox.vertices,redBox.faces);
     body_part_5.setLocalScale(0.5, 13, 1);
     body_part_5.setLocalRotation(0, 0, GEO.rad(-45));
     body_part_5.setLocalTranslation(-0.7, -3.9, 0);
     bicycleBody.addChild(body_part_5);
-    var frontPivot = new Object3D(
-        [...redBox.vertices],
-        [...redBox.faces],
-    );
+    var frontPivot = new Object3D(redBox.vertices, redBox.faces);
     frontPivot.setLocalScale(0.5, 12, 1);
     frontPivot.setLocalRotation(0, 0, GEO.rad(18));
     frontPivot.setLocalTranslation(5, -2.2, 0);
     bicycleBody.addChild(frontPivot, 3.5, 5, 0);
-
-    var body_part_7 = new Object3D(
-        [...greyBox.vertices],
-        [...greyBox.faces],
-    );
+    var body_part_7 = new Object3D(greyBox.vertices, greyBox.faces);
     body_part_7.setLocalScale(0.4, 3, 0.4);
     body_part_7.setLocalRotation(0, 0, GEO.rad(10));
     body_part_7.setLocalTranslation(-6.8, 0.2, 0);
     bicycleBody.addChild(body_part_7);
-    var handleRoot = new Object3D(
-        [...greyBox.vertices],
-        [...greyBox.faces],
-    );
+    var handleRoot = new Object3D(greyBox.vertices, greyBox.faces);
     handleRoot.setLocalScale(0.4, 1.0, 0.4);
     handleRoot.setLocalRotation(0, 0, GEO.rad(18));
     handleRoot.setLocalTranslation(2.9, 4, 0);
     frontPivot.addChild(handleRoot);
-    var body_part_9 = new Object3D(
-        [...greyBox.vertices],
-        [...greyBox.faces],
-    );
+    var body_part_9 = new Object3D(greyBox.vertices, greyBox.faces);
     body_part_9.setLocalScale(0.4, 1, 0.4);
     body_part_9.setLocalRotation(0, 0, GEO.rad(-25));
     body_part_9.setLocalTranslation(2.9, 4.9, 0);
     handleRoot.addChild(body_part_9);
-    var body_part_10 = new Object3D(
-        [...greyBox.vertices],
-        [...greyBox.faces],
-    );
+    var body_part_10 = new Object3D(greyBox.vertices, greyBox.faces);
     body_part_10.setLocalScale(0.4, 0.6, 0.4);
     body_part_10.setLocalRotation(0, 0, GEO.rad(5));
     body_part_10.setLocalTranslation(3.1, 5.6, 0);
@@ -192,24 +161,24 @@ function createCharacter_1() {
     gear.addChild(pedalRoot);
     var pedalRoot = new Object3D(darkGreyCylinder.vertices, darkGreyCylinder.faces);
     pedalRoot.setLocalScale(0.2, 1.5, 0.2);
-    pedalRoot.setLocalRotation(0, 0, GEO.rad(90));
-    pedalRoot.setLocalTranslation(-4.7, -8.5, 2.1);
+    pedalRoot.setLocalRotation(0, 0, GEO.rad(180));
+    pedalRoot.setLocalTranslation(-5.4, -7.9, 2.1);
     gear.addChild(pedalRoot);
     var pedalRoot = new Object3D(darkGreyCylinder.vertices, darkGreyCylinder.faces);
     pedalRoot.setLocalScale(0.2, 1.5, 0.2);
-    pedalRoot.setLocalRotation(0, 0, GEO.rad(90));
-    pedalRoot.setLocalTranslation(-6, -8.5, -2.1);
+    pedalRoot.setLocalRotation(0, 0, GEO.rad(180));
+    pedalRoot.setLocalTranslation(-5.4, -9.1, -2.1);
     gear.addChild(pedalRoot);
 
     var rightPedal = new Object3D(greyHyperbola.vertices, greyHyperbola.faces);
     rightPedal.setLocalScale(1, 1.2, 0.5);
     rightPedal.setLocalRotation(GEO.rad(90), 0, 0);
-    rightPedal.setLocalTranslation(-4, -8.5, 4.2);
+    rightPedal.setLocalTranslation(-5.4, -7.15, 4.2);
     gear.addChild(rightPedal);
     var leftPedal = new Object3D(greyHyperbola.vertices, greyHyperbola.faces);
     leftPedal.setLocalScale(1, 1.2, 0.5);
     leftPedal.setLocalRotation(GEO.rad(-90), 0, 0);
-    leftPedal.setLocalTranslation(-6.7, -8.5, -4.2);
+    leftPedal.setLocalTranslation(-5.4, -9.85, -4.2);
     gear.addChild(leftPedal);
 
     tmp = GEO.combineLines(
@@ -242,50 +211,53 @@ function createCharacter_1() {
 
     var body = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
     body.setLocalScale(3.0, 8.0, 3.0);
-    body.setLocalRotation(0, 0, GEO.rad(-22));
-    body.setLocalTranslation(-5.4, 8, 0);
+    body.setLocalRotation(0, 0, GEO.rad(-12));
+    body.setLocalTranslation(-5, 8, 0);
     bicycleBody.addChild(body);
     var butt = new Object3D(whiteSphere.vertices, whiteSphere.faces);
-    butt.setLocalScale(3.0, 2.0, 3.0);
+    butt.setLocalScale(4.6, 3.0, 4.6);
     butt.setLocalRotation(0, 0, GEO.rad(-15));
-    butt.setLocalTranslation(-7, 4, 0);
+    butt.setLocalTranslation(-6, 4.2, 0);
     body.addChild(butt);
     var shoulder = new Object3D(whiteSphere.vertices, whiteSphere.faces);
-    shoulder.setLocalScale(3.0, 2.0, 3.0);
+    shoulder.setLocalScale(3.5, 2.0, 3.5);
     shoulder.setLocalRotation(0, 0, GEO.rad(-15));
-    shoulder.setLocalTranslation(-3.7, 12, 0);
+    shoulder.setLocalTranslation(-4, 12, 0);
     body.addChild(shoulder);
     var tail = new Object3D(whiteSphere.vertices, whiteSphere.faces);
     tail.setLocalScale(2, 1, 1);
-    tail.setLocalRotation(0, 0, 0);
+    tail.setLocalRotation(0, 0, GEO.rad(-30));
     tail.setLocalTranslation(-10.5, 4, 0);
     butt.addChild(tail);
 
-    var leftThigh = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    leftThigh.setLocalScale(0.7, 5, 0.7);
-    leftThigh.setLocalTranslation(-6.5, 1, 2);
-    butt.addChild(leftThigh, -7, 4, 0);
-    var rightThigh = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    rightThigh.setLocalScale(0.7, 5, 0.7);
-    rightThigh.setLocalTranslation(-6.5, 1, -2);
-    butt.addChild(rightThigh, -7, 4, 0);
-    var leftLeg = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    leftLeg.setLocalScale(0.7, 5.5, 0.7);
-    leftLeg.setLocalTranslation(-6.5, -4.3, 2);
-    leftThigh.addChild(leftLeg, -6.5, -2.8, 2);
-    var rightLeg = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    rightLeg.setLocalScale(0.7, 5.5, 0.7);
-    rightLeg.setLocalTranslation(-6.5, -4.3, -2);
-    rightThigh.addChild(rightLeg, -6.5, -2.8, -2);
-
     var leftFoot = new Object3D(blackParaboloid.vertices, blackParaboloid.faces);
     leftFoot.setLocalScale(1, 0.8, 1);
-    leftFoot.setLocalTranslation(-6.5, -6.8, 2);
-    leftLeg.addChild(leftFoot);
+    leftFoot.setLocalTranslation(-5.4, -8.2, -2);
+    leftPedal.addChild(leftFoot);
     var rightFoot = new Object3D(blackParaboloid.vertices, blackParaboloid.faces);
     rightFoot.setLocalScale(1, 0.8, 1);
-    rightFoot.setLocalTranslation(-6.5, -6.8, -2);
-    rightLeg.addChild(rightFoot);
+    rightFoot.setLocalTranslation(-5.4, -5.5, 2);
+    rightPedal.addChild(rightFoot);
+
+    var leftLeg = new Object3D(blackCylinder.vertices, blackCylinder.faces);
+    leftLeg.setLocalScale(0.7, 7, 0.7);
+    leftLeg.setLocalTranslation(-5.4, -5.7, -2);
+    leftFoot.addChild(leftLeg, -5.4, -8.8, -2);
+    var rightLeg = new Object3D(blackCylinder.vertices, blackCylinder.faces);
+    rightLeg.setLocalScale(0.7, 7, 0.7);
+    rightLeg.setLocalRotation(0, 0, GEO.rad(-50));
+    rightLeg.setLocalTranslation(-3.1, -3.7, 2);
+    rightFoot.addChild(rightLeg, -5.4, -6.1, 2);
+
+    var leftThigh = new Object3D(blackCylinder.vertices, blackCylinder.faces);
+    leftThigh.setLocalScale(0.7, 6.7, 0.7);
+    leftThigh.setLocalTranslation(-5.4, 0.5, -2);
+    leftLeg.addChild(leftThigh, -5.4, -2.7, -2);
+    var rightThigh = new Object3D(blackCylinder.vertices, blackCylinder.faces);
+    rightThigh.setLocalScale(0.7, 6.7, 0.7);
+    rightThigh.setLocalRotation(0, 0, GEO.rad(45));
+    rightThigh.setLocalTranslation(-3.1, 0.5, 2);
+    rightLeg.addChild(rightThigh, -0.4, -1.7, 2);
 
     var leftForeArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
     leftForeArm.setLocalScale(0.7, 6, 0.7);
@@ -374,9 +346,6 @@ function createCharacter_1() {
     teeth.setLocalRotation(GEO.rad(20), 0, GEO.rad(90));
     teeth.setLocalTranslation(0.01, 13.2, -1);
     mouth.addChild(teeth);
-
-    leftThigh.rotate(GEO.rad(-20), 0, GEO.rad(30));
-    rightThigh.rotate(GEO.rad(20), 0, GEO.rad(30));
 
     return {
         main: bicycleBody,

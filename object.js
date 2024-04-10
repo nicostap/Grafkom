@@ -10,15 +10,32 @@ class Object3D {
     uniform mat4 Vmatrix;
     uniform mat4 Mmatrix;
     varying vec3 vColor;
+
+    varying vec3 v_position;
+    
     void main(void) {
         gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.0);
         vColor = color;
+
+        // For fog
+        v_position = (Vmatrix * Mmatrix * vec4(position, 1.)).xyz;
     }`;
   static default_shader_fragment_source = `
     precision mediump float;
     varying vec3 vColor;
+
+    vec4 u_fogColor = vec4(5. / 255., 13. / 255., 62. / 255., 1.);
+    float u_fogNear = 0.1;
+    float u_fogFar = 300.;
+    varying vec3 v_position;
+
     void main(void) {
-        gl_FragColor = vec4(vColor, 1.);
+        vec4 color = vec4(vColor, 1.);
+
+        float fogDistance = length(v_position);
+        float fogAmount = smoothstep(u_fogNear, u_fogFar, fogDistance);
+
+        gl_FragColor = mix(color, u_fogColor, fogAmount);
     }`;
 
   object_vertex;

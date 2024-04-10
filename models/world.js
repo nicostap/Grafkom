@@ -1,70 +1,73 @@
 function createFloor() {
-    var greenCylinder = GEO.createCylinder(1.0, 1.0, 20, [0.5, 1.0, 0.5]);
-    var redBox = GEO.createBox(1.0, 1.0, 1.0, [1, 0, 0]);
-    var blackBox = GEO.createBox(1.0, 1.0, 1.0, [0, 0, 0]);
-    var yellowPrism = GEO.createCylinder(1.0, 1.0, 3, [1, 1, 0]);
-    var greenPrism = GEO.createCylinder(1.0, 1.0, 3, [0, 0.4, 0]);
+    var greenCube = GEO.createCylinder(1.0, 1.0, 20, [0.3, 0.6, 0.3]);
 
-    var floor = new Object3D(greenCylinder.vertices, greenCylinder.faces);
-    floor.setLocalScale(500.0, 0.1, 500.0);
+    var floor = new Object3D(greenCube.vertices, greenCube.faces);
+    floor.setLocalScale(1000.0, 0.1, 1000.0);
     floor.setLocalTranslation(0, 0, 0);
 
-    var barn = new Object3D(redBox.vertices, redBox.faces);
-    barn.setLocalScale(50.0, 80.0, 80.0);
-    barn.setLocalTranslation(150.0, 25.0, 0);
-    floor.addChild(barn);
-    var door = new Object3D(blackBox.vertices, blackBox.faces);
-    door.setLocalScale(0.1, 40.0, 30.0);
-    door.setLocalTranslation(125, 17.5, 0);
-    barn.addChild(door);
-    var window = new Object3D(blackBox.vertices, blackBox.faces);
-    window.setLocalScale(0.1, 30.0, 8.0);
-    window.setLocalTranslation(125, 30, 27.5);
-    barn.addChild(window);
-    var window = new Object3D(blackBox.vertices, blackBox.faces);
-    window.setLocalScale(0.1, 30.0, 8.0);
-    window.setLocalTranslation(125, 30, -27.5);
-    barn.addChild(window);
-    var roof = new Object3D(yellowPrism.vertices, yellowPrism.faces);
-    roof.setLocalScale(60, 80, 60);
-    roof.setLocalRotation(0, 0, GEO.rad(90));
-    roof.setLocalTranslation(150, 80, 0);
-    barn.addChild(roof);
+    // Random grass generator
+    var grassVertices = [
+        -1, 0, 0, 0, 0.3, 0,
+        0, 0, 1, 0, 0.3, 0,
+        1, 0, 0, 0, 0.3, 0,
+        0, 1, 0, 0, 0.5, 0
+    ];
+    var grassFaces = [
+        0, 1, 2,
+        0, 1, 3,
+        0, 2, 3,
+        1, 2, 3
+    ]
 
-    // Help arsitek
-    var barn = new Object3D(redBox.vertices, redBox.faces);
-    barn.setLocalScale(50.0, 80.0, 80.0);
-    barn.setLocalTranslation(-150.0, 25.0, 0);
-    floor.addChild(barn);
-    var door = new Object3D(blackBox.vertices, blackBox.faces);
-    door.setLocalScale(0.1, 40.0, 30.0);
-    door.setLocalTranslation(-125, 17.5, 0);
-    barn.addChild(door);
-    var window = new Object3D(blackBox.vertices, blackBox.faces);
-    window.setLocalScale(0.1, 30.0, 8.0);
-    window.setLocalTranslation(-125, 30, 27.5);
-    barn.addChild(window);
-    var window = new Object3D(blackBox.vertices, blackBox.faces);
-    window.setLocalScale(0.1, 30.0, 8.0);
-    window.setLocalTranslation(-125, 30, -27.5);
-    barn.addChild(window);
-    var roof = new Object3D(yellowPrism.vertices, yellowPrism.faces);
-    roof.setLocalScale(60, 80, 60);
-    roof.setLocalRotation(0, 0, GEO.rad(90));
-    roof.setLocalTranslation(-150, 80, 0);
-    barn.addChild(roof);
+    // Object instancing
+    var grassInstance = instanceRandomizer(grassVertices, grassFaces, 0, 0, 150, 300, 10, 10);
+    var grass = new Object3D(grassInstance.vertices, grassInstance.faces);
+    grass.translate(0, 0.2, 0);
+    grass.scale(1, 3, 1);
+    floor.addChild(grass);
 
-    // Random grass generator (Model perlu diganti)
-    // To do pakai instaced rendering biar bisa banyak
-    for (let i = 0; i < 5; i++) {
-        for (let j = 0; j < 5; j++) {
-            var grass = new Object3D(greenPrism.vertices, greenPrism.faces);
-            grass.setLocalScale(5 * Math.random() + 3, 0.1, 2);
-            grass.setLocalRotation(GEO.rad(90), GEO.rad(90), 0);
-            grass.setLocalTranslation((i + Math.random()) * 60 - 150, 2.5, (j + Math.random()) * 60 - 150);
-            floor.addChild(grass);
-        }
-    }
+    // For repeating grasses
+    var grass = new Object3D(grassInstance.vertices, grassInstance.faces);
+    grass.translate(-150, 0.2, 0);
+    grass.scale(1, 3, 1);
+    floor.addChild(grass);
+    var grass = new Object3D(grassInstance.vertices, grassInstance.faces);
+    grass.translate(150, 0.2, 0);
+    grass.scale(1, 3, 1);
+    floor.addChild(grass);
 
     return floor;
+}
+
+function instanceRandomizer(vertices, faces, centerX, centerZ, length, width, divisorX, divisorZ) {
+    let vertexCount = vertices.length / 6;
+    let faceCount = faces.length / 3;
+    for (let i = 0; i < divisorX; i++) {
+        for (let j = 0; j < divisorZ; j++) {
+            let offsetX = (i + Math.random()) * length / divisorX - length / 2 + centerX;
+            let scaleY = 0.5 + Math.random() * 2.0;
+            let offsetZ = (j + Math.random()) * width / divisorZ - width / 2 + centerZ;
+            for(let k = 0; k < vertexCount; k++) {
+                let vertexIndex = k * 6;
+                vertices.push(
+                    vertices[vertexIndex] + offsetX,
+                    vertices[vertexIndex + 1] * scaleY,
+                    vertices[vertexIndex + 2] + offsetZ,
+                    vertices[vertexIndex + 3],
+                    vertices[vertexIndex + 4],
+                    vertices[vertexIndex + 5]
+                );
+            }
+            let offsetIndex = ((i * 10) + j + 1) * vertexCount;
+            for(let k = 0; k < faceCount; k++) {
+                let faceIndex = k * 3;
+                faces.push(
+                    offsetIndex + faces[faceIndex],
+                    offsetIndex + faces[faceIndex + 1],
+                    offsetIndex + faces[faceIndex + 2]
+                );
+            }
+        }
+    }
+    return {vertices: vertices, faces: faces};
 }
