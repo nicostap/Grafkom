@@ -26,7 +26,7 @@ class Object3D {
 
     vec4 u_fogColor = vec4(5. / 255., 13. / 255., 62. / 255., 1.);
     float u_fogNear = 0.1;
-    float u_fogFar = 300.;
+    float u_fogFar = 240.;
     varying vec3 v_position;
 
     void main(void) {
@@ -221,6 +221,31 @@ class Object3D {
     object.parent = this;
     object.origin = [ox, oy, oz];
     this.child.push(object);
+  }
+
+  // Warning : Do not use for modelling
+  // Child's local transformation can not be automatically adjusted to parent's future change
+  clone() {
+    var object = new Object3D(this.object_vertex, this.object_faces, this.shader_vertex_source, this.shader_fragment_source);
+    object.INIT_SCALEMATRIX = glMatrix.mat4.clone(this.INIT_SCALEMATRIX);
+    object.INIT_ROTATEMATRIX = glMatrix.mat4.clone(this.INIT_ROTATEMATRIX);
+    object.INIT_TRANSMATRIX = glMatrix.mat4.clone(this.INIT_TRANSMATRIX);
+
+    object.SCALEMATRIX = glMatrix.mat4.clone(this.SCALEMATRIX);
+    object.ROTATEMATRICES = [];
+    for(let i = 0; i < this.ROTATEMATRICES.length; i++) {
+      object.ROTATEMATRICES.push(glMatrix.mat4.clone(this.ROTATEMATRICES[i]));
+    }
+    object.TRANSMATRIX = glMatrix.mat4.clone(this.TRANSMATRIX);
+
+    object.origin = [this.origin[0], this.origin[1], this.origin[2]];
+
+    for(let i = 0; i < this.child.length; i++) {
+      let newChild = this.child[i].clone();
+      object.child.push(newChild);
+      newChild.parent = object;
+    }
+    return object;
   }
 }
 

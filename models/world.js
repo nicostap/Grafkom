@@ -20,7 +20,7 @@ function createFloor() {
     ]
 
     // Object instancing
-    var grassInstance = instanceRandomizer(grassVertices, grassFaces, 0, 0, 150, 300, 10, 10);
+    var grassInstance = instanceRandomiser(grassVertices, grassFaces, 0, 0, 100, 300, 10, 10);
     var grass = new Object3D(grassInstance.vertices, grassInstance.faces);
     grass.translate(0, 0.2, 0);
     grass.scale(1, 3, 1);
@@ -28,18 +28,47 @@ function createFloor() {
 
     // For repeating grasses
     var grass = new Object3D(grassInstance.vertices, grassInstance.faces);
-    grass.translate(-150, 0.2, 0);
+    grass.translate(-100, 0.2, 0);
     grass.scale(1, 3, 1);
     floor.addChild(grass);
     var grass = new Object3D(grassInstance.vertices, grassInstance.faces);
-    grass.translate(150, 0.2, 0);
+    grass.translate(100, 0.2, 0);
     grass.scale(1, 3, 1);
     floor.addChild(grass);
+
+    var brownHyperboloid = GEO.createHyperboloidOneSheet(1.0, 3.0, 20, [160 / 255, 82 / 255, 45 / 255]);
+    var greenParaboloid = GEO.createEllipticParaboloid(1.4, 5.0, 30, [0.1, 0.6, 0.1]);
+    var tree = new Object3D(brownHyperboloid.vertices, brownHyperboloid.faces);
+    var leaf = new Object3D(greenParaboloid.vertices, greenParaboloid.faces);
+    tree.setLocalTranslation(0, 6.5, 0);
+    leaf.setLocalTranslation(0, 50.0, 0);
+    leaf.setLocalScale(5, 5, 5);
+    tree.addChild(leaf);
+
+    var treeSide1 = randomiser(tree, floor, 0, 120, 100, 150, 1, 4);
+    var treeSide2 = randomiser(tree, floor, 0, -120, 100, 150, 1, 4);
+
+    for(let i = 0; i < treeSide1.length; i++) {
+        var newTree = treeSide1[i].clone();
+        newTree.translate(100, 0, 0);
+        floor.addChild(newTree);
+        var newTree = treeSide1[i].clone();
+        newTree.translate(-100, 0, 0);
+        floor.addChild(newTree);
+    }
+    for(let i = 0; i < treeSide2.length; i++) {
+        var newTree = treeSide2[i].clone();
+        newTree.translate(100, 0, 0);
+        floor.addChild(newTree);
+        var newTree = treeSide2[i].clone();
+        newTree.translate(-100, 0, 0);
+        floor.addChild(newTree);
+    }
 
     return floor;
 }
 
-function instanceRandomizer(vertices, faces, centerX, centerZ, length, width, divisorX, divisorZ) {
+function instanceRandomiser(vertices, faces, centerX, centerZ, length, width, divisorX, divisorZ) {
     let vertexCount = vertices.length / 6;
     let faceCount = faces.length / 3;
     for (let i = 0; i < divisorX; i++) {
@@ -47,7 +76,7 @@ function instanceRandomizer(vertices, faces, centerX, centerZ, length, width, di
             let offsetX = (i + Math.random()) * length / divisorX - length / 2 + centerX;
             let scaleY = 0.5 + Math.random() * 2.0;
             let offsetZ = (j + Math.random()) * width / divisorZ - width / 2 + centerZ;
-            for(let k = 0; k < vertexCount; k++) {
+            for (let k = 0; k < vertexCount; k++) {
                 let vertexIndex = k * 6;
                 vertices.push(
                     vertices[vertexIndex] + offsetX,
@@ -59,7 +88,7 @@ function instanceRandomizer(vertices, faces, centerX, centerZ, length, width, di
                 );
             }
             let offsetIndex = ((i * 10) + j + 1) * vertexCount;
-            for(let k = 0; k < faceCount; k++) {
+            for (let k = 0; k < faceCount; k++) {
                 let faceIndex = k * 3;
                 faces.push(
                     offsetIndex + faces[faceIndex],
@@ -69,5 +98,24 @@ function instanceRandomizer(vertices, faces, centerX, centerZ, length, width, di
             }
         }
     }
-    return {vertices: vertices, faces: faces};
+    return { vertices: vertices, faces: faces };
+}
+
+function randomiser(child, parent, centerX, centerZ, length, width, divisorX, divisorZ) {
+    let objects = [];
+    for (let i = 0; i < divisorX; i++) {
+        for (let j = 0; j < divisorZ; j++) {
+            let offsetX = (i + Math.random()) * length / divisorX - length / 2 + centerX;
+            let scaleY = 0.8 + Math.random();
+            let offsetZ = (j + Math.random()) * width / divisorZ - width / 2 + centerZ;
+            
+            let newChild = child.clone();
+            parent.addChild(newChild);
+            newChild.scale(1, scaleY, 1);
+            newChild.translate(offsetX, 0, offsetZ);
+
+            objects.push(newChild);
+        }
+    }
+    return objects;
 }
