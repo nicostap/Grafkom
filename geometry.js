@@ -7,55 +7,84 @@ var GEO = {
         var hl = length / 2.0;
         var hh = height / 2.0;
         var vertices = [
-            hw, hh, hl, ...color,
-            -hw, hh, hl, ...color,
-            hw, -hh, hl, ...color,
-            -hw, -hh, hl, ...color,
-            hw, hh, -hl, ...color,
-            -hw, hh, -hl, ...color,
-            hw, -hh, -hl, ...color,
-            -hw, -hh, -hl, ...color,
+            hw, hh, hl, 0, 0, 1, ...color,
+            -hw, hh, hl, 0, 0, 1, ...color,
+            hw, -hh, hl, 0, 0, 1, ...color,
+            -hw, -hh, hl, 0, 0, 1, ...color,
+
+            hw, hh, -hl, 0, 0, -1, ...color,
+            -hw, hh, -hl, 0, 0, -1, ...color,
+            hw, -hh, -hl, 0, 0, -1, ...color,
+            -hw, -hh, -hl, 0, 0, -1, ...color,
+
+            hw, hh, hl, 0, 1, 0, ...color,
+            -hw, hh, hl, 0, 1, 0, ...color,
+            hw, hh, -hl, 0, 1, 0, ...color,
+            -hw, hh, -hl, 0, 1, 0, ...color,
+
+            hw, -hh, hl, 0, -1, 0, ...color,
+            -hw, -hh, hl, 0, -1, 0, ...color,
+            hw, -hh, -hl, 0, -1, 0, ...color,
+            -hw, -hh, -hl, 0, -1, 0, ...color,
+
+            hw, hh, hl, 1, 0, 0, ...color,
+            hw, -hh, hl, 1, 0, 0,  ...color,
+            hw, hh, -hl, 1, 0, 0,  ...color,
+            hw, -hh, -hl, 1, 0, 0,  ...color,
+
+            -hw, hh, hl, -1, 0, 0,  ...color,
+            -hw, -hh, hl, -1, 0, 0, ...color,
+            -hw, hh, -hl, -1, 0, 0, ...color,
+            -hw, -hh, -hl, -1, 0, 0, ...color,
         ];
         var faces = [
             0, 1, 2,
             1, 2, 3,
             4, 5, 6,
             5, 6, 7,
-            0, 4, 5,
-            0, 1, 5,
-            0, 4, 6,
-            0, 2, 6,
-            2, 6, 7,
-            2, 3, 7,
-            1, 5, 7,
-            1, 3, 7,
+            8, 9, 10,
+            9, 10, 11,
+            12, 13, 14,
+            13, 14, 15,
+            16, 17, 18,
+            17, 18, 19,
+            20, 21, 22,
+            21, 22, 23,
         ];
         return { vertices: vertices, faces: faces };
     },
     createCylinder: function (radius, height, poly, color) {
         var hh = height / 2.0;
         var vertices = [];
+
         for (let i = 0; i < poly; i++) {
             let rad = i * 360 / poly * Math.PI / 180.0;
-            vertices.push(radius * Math.cos(rad), hh, radius * Math.sin(rad), ...color);
+            vertices.push(radius * Math.cos(rad), hh, radius * Math.sin(rad), 0, 1, 0, ...color);
         }
         for (let i = 0; i < poly; i++) {
             let rad = i * 360 / poly * Math.PI / 180.0;
-            vertices.push(radius * Math.cos(rad), -hh, radius * Math.sin(rad), ...color);
+            vertices.push(radius * Math.cos(rad), -hh, radius * Math.sin(rad), Math.cos(rad), 0, Math.sin(rad), ...color);
         }
-        vertices.push(
-            0, hh, 0, ...color,
-            0, -hh, 0, ...color
-        );
+        for (let i = 0; i < poly; i++) {
+            let rad = i * 360 / poly * Math.PI / 180.0;
+            vertices.push(radius * Math.cos(rad), hh, radius * Math.sin(rad), 0, -1, 0, ...color);
+        }
+        for (let i = 0; i < poly; i++) {
+            let rad = i * 360 / poly * Math.PI / 180.0;
+            vertices.push(radius * Math.cos(rad), -hh, radius * Math.sin(rad), Math.cos(rad), 0, Math.sin(rad), ...color);
+        }
+
+        vertices.push(0, hh, 0, 0, 1, 0, ...color);
+        vertices.push(0, -hh, 0, 0, -1, 0, ...color);
 
         var faces = [];
         for (let i = 0; i < poly; i++) {
-            faces.push(i, (i + 1) % poly, 2 * poly);
-            faces.push(i, (i + 1) % poly, i + poly);
+            faces.push(i, (i + 1) % poly, 4 * poly);
+            faces.push(i + 2 * poly, (i + 1) % poly + 2 * poly, i + 3 * poly);
         }
         for (let i = 0; i < poly; i++) {
-            faces.push(i + poly, (i + 1) % poly + poly, 2 * poly + 1);
-            faces.push(i + poly, (i + 1) % poly + poly, (i + 1) % poly);
+            faces.push(i + poly, (i + 1) % poly + poly, 4 * poly + 1);
+            faces.push(i + 3 * poly, (i + 1) % poly + 3 * poly, (i + 1) % poly + 2 * poly);
         }
         return { vertices: vertices, faces: faces };
     },
@@ -64,6 +93,7 @@ var GEO = {
         let stackCount = poly;
 
         let x, y, z, xy;
+        let nx, ny, nz, lengthInv = 1.0 / radius;
         let sectorStep = 2 * Math.PI / sectorCount;
         let stackStep = Math.PI / stackCount;
         let sectorAngle, stackAngle;
@@ -79,6 +109,14 @@ var GEO = {
                 vertices.push(x);
                 vertices.push(y);
                 vertices.push(z);
+
+                nx = x * lengthInv;
+                ny = y * lengthInv;
+                nz = z * lengthInv;
+                vertices.push(nx);
+                vertices.push(ny);
+                vertices.push(nz);
+
                 vertices.push(...color);
             }
         }
@@ -108,6 +146,7 @@ var GEO = {
         let stackCount = poly;
 
         let x, y, z, xz;
+        let nx, ny, nz, lengthInv = 1.0 / radius;
         let sectorStep = 2 * Math.PI / sectorCount;
         let stackStep = Math.PI / stackCount;
         let sectorAngle, stackAngle;
@@ -123,6 +162,14 @@ var GEO = {
                 vertices.push(x);
                 vertices.push(y);
                 vertices.push(z);
+
+                nx = x * lengthInv;
+                ny = y * lengthInv;
+                nz = z * lengthInv;
+                vertices.push(nx);
+                vertices.push(ny);
+                vertices.push(nz);
+
                 vertices.push(...color);
             }
         }
@@ -147,6 +194,7 @@ var GEO = {
         let stackCount = poly;
 
         let x, y, z, xz;
+        let nx, ny, nz, lengthInv = 1.0 / radius;
         let sectorStep = 2 * Math.PI / sectorCount;
         let stackStep = Math.PI / stackCount;
         let sectorAngle, stackAngle;
@@ -162,6 +210,14 @@ var GEO = {
                 vertices.push(x);
                 vertices.push(y);
                 vertices.push(z);
+
+                nx = x * lengthInv;
+                ny = y * lengthInv;
+                nz = z * lengthInv;
+                vertices.push(nx);
+                vertices.push(ny);
+                vertices.push(nz);
+
                 vertices.push(...color);
             }
         }
@@ -234,23 +290,83 @@ var GEO = {
     },
     combineLines: function (color, ...lines) {
         let vertices = [];
+        let faces = [];
+
         for (let i = 0; i < lines[0].length / 3; i++) {
             for (let j = 0; j < lines.length; j++) {
-                vertices.push(lines[j][i * 3]);
-                vertices.push(lines[j][i * 3 + 1]);
-                vertices.push(lines[j][i * 3 + 2]);
-                vertices.push(...color);
-            }
-        }
-        let faces = [];
-        for (let i = 0; i < lines[0].length / 3 - 1; i++) {
-            for (let j = 0; j < lines.length; j++) {
-                faces.push(i * lines.length + j);
-                faces.push(i * lines.length + (j + 1) % lines.length);
-                faces.push((i + 1) * lines.length + j);
-                faces.push((i + 1) * lines.length + j);
-                faces.push((i + 1) * lines.length + (j + 1) % lines.length);
-                faces.push(i * lines.length + (j + 1) % lines.length);
+                let currpoint = [
+                    lines[j][i * 3],
+                    lines[j][i * 3 + 1],
+                    lines[j][i * 3 + 2]
+                ];
+                let sidepoint = [
+                    lines[(j + 1) % lines.length][i * 3],
+                    lines[(j + 1) % lines.length][i * 3 + 1],
+                    lines[(j + 1) % lines.length][i * 3 + 2]
+                ];
+                let normal = glMatrix.vec3.create();
+                if (i != lines[0].length - 1) {
+                    let nextpoint = [
+                        lines[j][(i + 1) * 3],
+                        lines[j][(i + 1) * 3 + 1],
+                        lines[j][(i + 1) * 3 + 2]
+                    ];
+                    
+                    let currIndex = vertices.length / 9;
+                    glMatrix.vec3.cross(
+                        normal,
+                        [currpoint[0] - sidepoint[0], currpoint[1] - sidepoint[1], currpoint[2] - sidepoint[2]],
+                        [currpoint[0] - nextpoint[0], currpoint[1] - nextpoint[1], currpoint[2] - nextpoint[2]]
+                    );
+                    glMatrix.vec3.normalize(normal, normal);
+                    vertices.push(...currpoint, ...normal, ...color);
+                    vertices.push(...sidepoint, ...normal, ...color);
+                    vertices.push(...nextpoint, ...normal, ...color);
+                    faces.push(currIndex, currIndex + 1, currIndex + 2);
+
+                    currIndex = vertices.length / 9;
+                    glMatrix.vec3.cross(
+                        normal,
+                        [currpoint[0] - nextpoint[0], currpoint[1] - nextpoint[1], currpoint[2] - nextpoint[2]],
+                        [currpoint[0] - sidepoint[0], currpoint[1] - sidepoint[1], currpoint[2] - sidepoint[2]]
+                    );
+                    glMatrix.vec3.normalize(normal, normal);
+                    vertices.push(...currpoint, ...normal, ...color);
+                    vertices.push(...sidepoint, ...normal, ...color);
+                    vertices.push(...nextpoint, ...normal, ...color);
+                    faces.push(currIndex, currIndex + 1, currIndex + 2);
+                }
+                if(i != 0) {
+                    let nextpoint = [
+                        lines[(j + 1) % lines.length][(i - 1) * 3],
+                        lines[(j + 1) % lines.length][(i - 1) * 3 + 1],
+                        lines[(j + 1) % lines.length][(i - 1) * 3 + 2]
+                    ];
+
+                    let currIndex = vertices.length / 9;
+                    glMatrix.vec3.cross(
+                        normal,
+                        [sidepoint[0] - currpoint[0], sidepoint[1] - currpoint[1], sidepoint[2] - currpoint[2]],
+                        [sidepoint[0] - nextpoint[0], sidepoint[1] - nextpoint[1], sidepoint[2] - nextpoint[2]]
+                    );
+                    glMatrix.vec3.normalize(normal, normal);
+                    vertices.push(...currpoint, ...normal, ...color);
+                    vertices.push(...sidepoint, ...normal, ...color);
+                    vertices.push(...nextpoint, ...normal, ...color);
+                    faces.push(currIndex, currIndex + 1, currIndex + 2);
+
+                    currIndex = vertices.length / 9;
+                    glMatrix.vec3.cross(
+                        normal,
+                        [sidepoint[0] - nextpoint[0], sidepoint[1] - nextpoint[1], sidepoint[2] - nextpoint[2]],
+                        [sidepoint[0] - currpoint[0], sidepoint[1] - currpoint[1], sidepoint[2] - currpoint[2]],
+                    );
+                    glMatrix.vec3.normalize(normal, normal);
+                    vertices.push(...currpoint, ...normal, ...color);
+                    vertices.push(...sidepoint, ...normal, ...color);
+                    vertices.push(...nextpoint, ...normal, ...color);
+                    faces.push(currIndex, currIndex + 1, currIndex + 2);
+                }
             }
         }
         return { vertices: vertices, faces: faces };

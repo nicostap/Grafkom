@@ -1,22 +1,74 @@
 function createFloor() {
-    var greenCube = GEO.createCylinder(1.0, 1.0, 20, [0.3, 0.6, 0.3]);
+    var floorVertices = [];
+    var floorFaces = [];
 
-    var floor = new Object3D(greenCube.vertices, greenCube.faces);
+    let normal = [0, 0.5, 0];
+    for (let i = 0; i < 30; i++) {
+        for (let j = 0; j < 30; j++) {
+            let currpoint = [
+                (i - 15) * 30,
+                0,
+                (j - 15) * 30,
+            ];
+            let sidepoint = [
+                (i - 15) * 30,
+                0,
+                (j - 14) * 30,
+            ];
+            if (i != 30) {
+                let nextpoint = [
+                    (i - 14) * 30,
+                    0,
+                    (j - 15) * 30,
+                ];
+                let currIndex = floorVertices.length / 9;
+                floorVertices.push(...currpoint, ...normal, ...[0, 0.2, 0]);
+                floorVertices.push(...sidepoint, ...normal, ...[0, 0.2, 0]);
+                floorVertices.push(...nextpoint, ...normal, ...[0, 0.2, 0]);
+                floorFaces.push(currIndex, currIndex + 1, currIndex + 2);
+            }
+            if (i != 0) {
+                let nextpoint = [
+                    (i - 16) * 30,
+                    0,
+                    (j - 14) * 30,
+                ];
+                let currIndex = floorVertices.length / 9;
+                floorVertices.push(...currpoint, ...normal, ...[0, 0.2, 0]);
+                floorVertices.push(...sidepoint, ...normal, ...[0, 0.2, 0]);
+                floorVertices.push(...nextpoint, ...normal, ...[0, 0.2, 0]);
+                floorFaces.push(currIndex, currIndex + 1, currIndex + 2);
+            }
+        }
+    }
+
+    var floor = new Object3D(floorVertices, floorFaces);
     floor.setLocalScale(1000.0, 0.1, 1000.0);
     floor.setLocalTranslation(0, 0, 0);
 
     // Random grass generator
     var grassVertices = [
-        -1, 0, 0, 0, 0.3, 0,
-        0, 0, 1, 0, 0.3, 0,
-        1, 0, 0, 0, 0.3, 0,
-        0, 1, 0, 0, 0.5, 0
+        -1, 0, 0, 0, -1, 0, 0, 0.3, 0,
+        0, 0, 1, 0, -1, 0, 0, 0.3, 0,
+        1, 0, 0, 0, -1, 0, 0, 0.3, 0,
+
+        -1, 0, 0, -1, 1, 1, 0, 0.3, 0,
+        0, 0, 1, -1, 1, 1, 0, 0.3, 0,
+        0, 1, 0, -1, 1, 1, 0, 0.5, 0,
+
+        0, 0, 1, 1, 1, 1, 0, 0.3, 0,
+        1, 0, 0, 1, 1, 1, 0, 0.3, 0,
+        0, 1, 0, 1, 1, 1, 0, 0.5, 0,
+
+        -1, 0, 0, 0, 0, -1, 0, 0.3, 0,
+        1, 0, 0, 0, 0, -1, 0, 0.3, 0,
+        0, 1, 0, 0, 0, -1, 0, 0.5, 0,
     ];
     var grassFaces = [
         0, 1, 2,
-        0, 1, 3,
-        0, 2, 3,
-        1, 2, 3
+        3, 4, 5,
+        6, 7, 8,
+        9, 10, 11
     ]
 
     // Object instancing
@@ -48,7 +100,7 @@ function createFloor() {
     var treeSide1 = randomiser(tree, floor, 0, 120, 100, 150, 1, 4);
     var treeSide2 = randomiser(tree, floor, 0, -120, 100, 150, 1, 4);
 
-    for(let i = 0; i < treeSide1.length; i++) {
+    for (let i = 0; i < treeSide1.length; i++) {
         var newTree = treeSide1[i].clone();
         newTree.translate(100, 0, 0);
         floor.addChild(newTree);
@@ -56,7 +108,7 @@ function createFloor() {
         newTree.translate(-100, 0, 0);
         floor.addChild(newTree);
     }
-    for(let i = 0; i < treeSide2.length; i++) {
+    for (let i = 0; i < treeSide2.length; i++) {
         var newTree = treeSide2[i].clone();
         newTree.translate(100, 0, 0);
         floor.addChild(newTree);
@@ -69,7 +121,7 @@ function createFloor() {
 }
 
 function instanceRandomiser(vertices, faces, centerX, centerZ, length, width, divisorX, divisorZ) {
-    let vertexCount = vertices.length / 6;
+    let vertexCount = vertices.length / 9;
     let faceCount = faces.length / 3;
     for (let i = 0; i < divisorX; i++) {
         for (let j = 0; j < divisorZ; j++) {
@@ -77,17 +129,20 @@ function instanceRandomiser(vertices, faces, centerX, centerZ, length, width, di
             let scaleY = 0.5 + Math.random() * 2.0;
             let offsetZ = (j + Math.random()) * width / divisorZ - width / 2 + centerZ;
             for (let k = 0; k < vertexCount; k++) {
-                let vertexIndex = k * 6;
+                let vertexIndex = k * 9;
                 vertices.push(
                     vertices[vertexIndex] + offsetX,
                     vertices[vertexIndex + 1] * scaleY,
                     vertices[vertexIndex + 2] + offsetZ,
                     vertices[vertexIndex + 3],
                     vertices[vertexIndex + 4],
-                    vertices[vertexIndex + 5]
+                    vertices[vertexIndex + 5],
+                    vertices[vertexIndex + 6],
+                    vertices[vertexIndex + 7],
+                    vertices[vertexIndex + 8]
                 );
             }
-            let offsetIndex = ((i * 10) + j + 1) * vertexCount;
+            let offsetIndex = ((i * divisorX) + j + 1) * vertexCount;
             for (let k = 0; k < faceCount; k++) {
                 let faceIndex = k * 3;
                 faces.push(
@@ -108,7 +163,7 @@ function randomiser(child, parent, centerX, centerZ, length, width, divisorX, di
             let offsetX = (i + Math.random()) * length / divisorX - length / 2 + centerX;
             let scaleY = 0.8 + Math.random();
             let offsetZ = (j + Math.random()) * width / divisorZ - width / 2 + centerZ;
-            
+
             let newChild = child.clone();
             parent.addChild(newChild);
             newChild.scale(1, scaleY, 1);

@@ -56,8 +56,8 @@ function main() {
     // Placing objects
     bicycle.main.translate(0, 12.6, 0);
     bicycle.main.rotate(0, GEO.rad(180), 0);
-    bicycle.frontPivot.rotate(0, GEO.rad(-20), 0);
-    bicycle.body.rotate(GEO.rad(-15), 0, 0);
+    bicycle.frontPivot.rotate(0, GEO.rad(20), 0);
+    bicycle.body.rotate(GEO.rad(15), 0, 0);
 
     // Making the animations
     var bicycleLoop = new AnimationList([
@@ -74,14 +74,14 @@ function main() {
         new Animate(bicycle.leftThigh, 1000, 2000, MoveType.Rotate, 0, 0, -85),
         new Animate(bicycle.rightThigh, 0, 1000, MoveType.Rotate, 0, 0, -85),
         new Animate(bicycle.rightThigh, 1000, 2000, MoveType.Rotate, 0, 0, 85),
-        new Animate(bicycle.frontPivot, 0, 1000, MoveType.Rotate, 0, 40, 0),
-        new Animate(bicycle.frontPivot, 1000, 2000, MoveType.Rotate, 0, -40, 0),
-        new Animate(bicycle.body, 0, 1000, MoveType.Rotate, 30, 0, 0),
-        new Animate(bicycle.body, 1000, 2000, MoveType.Rotate, -30, 0, 0),
+        new Animate(bicycle.frontPivot, 0, 1000, MoveType.Rotate, 0, -40, 0),
+        new Animate(bicycle.frontPivot, 1000, 2000, MoveType.Rotate, 0, 40, 0),
+        new Animate(bicycle.body, 0, 1000, MoveType.Rotate, -30, 0, 0),
+        new Animate(bicycle.body, 1000, 2000, MoveType.Rotate, 30, 0, 0),
     ], true);
 
     // For controlling speed of animation
-    bicycleLoop.multiplySpeed(0.6);
+    bicycleLoop.multiplySpeed(1.0);
 
     var animations = [];
     animations.push(bicycleLoop);

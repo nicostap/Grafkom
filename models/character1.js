@@ -299,9 +299,21 @@ function createCharacter_1() {
     body.addChild(head);
 
     var hair = new Object3D(whiteSphere.vertices, whiteSphere.faces);
-    hair.setLocalScale(2.7, 1.5, 2.7);
+    hair.setLocalScale(2.7, 1.7, 2.7);
     hair.setLocalRotation(0, 0, GEO.rad(40));
     hair.setLocalTranslation(-2, 15.8, 0);
+    head.addChild(hair);
+
+    var hair = new Object3D(whiteSphere.vertices, whiteSphere.faces);
+    hair.setLocalScale(1.5, 1, 1.5);
+    hair.setLocalRotation(0, 0, GEO.rad(30));
+    hair.setLocalTranslation(-2.3, 16.6, -1);
+    head.addChild(hair);
+
+    var hair = new Object3D(whiteSphere.vertices, whiteSphere.faces);
+    hair.setLocalScale(1.75, 1.2, 1.75);
+    hair.setLocalRotation(0, 0, GEO.rad(30));
+    hair.setLocalTranslation(-2.3, 16.5, 1);
     head.addChild(hair);
 
     tmp = GEO.combineLines(
