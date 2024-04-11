@@ -54,8 +54,10 @@ function main() {
     var floor = createFloor();
 
     // Placing objects
-    bicycle.main.translate(100, 12.6, 0);
+    bicycle.main.translate(0, 12.6, 0);
     bicycle.main.rotate(0, GEO.rad(180), 0);
+    bicycle.frontPivot.rotate(0, GEO.rad(-20), 0);
+    bicycle.body.rotate(GEO.rad(-15), 0, 0);
 
     // Making the animations
     var bicycleLoop = new AnimationList([
@@ -68,11 +70,18 @@ function main() {
         new Animate(bicycle.leftLeg, 1000, 2000, MoveType.Rotate, 0, 0, 50),
         new Animate(bicycle.rightLeg, 0, 1000, MoveType.Rotate, 0, 0, 50),
         new Animate(bicycle.rightLeg, 1000, 2000, MoveType.Rotate, 0, 0, -50),
-        new Animate(bicycle.leftThigh, 0, 1000, MoveType.Rotate, 0, 0, 80),
-        new Animate(bicycle.leftThigh, 1000, 2000, MoveType.Rotate, 0, 0, -80),
+        new Animate(bicycle.leftThigh, 0, 1000, MoveType.Rotate, 0, 0, 85),
+        new Animate(bicycle.leftThigh, 1000, 2000, MoveType.Rotate, 0, 0, -85),
         new Animate(bicycle.rightThigh, 0, 1000, MoveType.Rotate, 0, 0, -85),
         new Animate(bicycle.rightThigh, 1000, 2000, MoveType.Rotate, 0, 0, 85),
-    ], 0, 2000, true);
+        new Animate(bicycle.frontPivot, 0, 1000, MoveType.Rotate, 0, 40, 0),
+        new Animate(bicycle.frontPivot, 1000, 2000, MoveType.Rotate, 0, -40, 0),
+        new Animate(bicycle.body, 0, 1000, MoveType.Rotate, 30, 0, 0),
+        new Animate(bicycle.body, 1000, 2000, MoveType.Rotate, -30, 0, 0),
+    ], true);
+
+    // For controlling speed of animation
+    bicycleLoop.multiplySpeed(0.6);
 
     var animations = [];
     animations.push(bicycleLoop);
@@ -93,13 +102,15 @@ function main() {
         }
 
         VIEWMATRIX = glMatrix.mat4.create();
+
+        // Stationary mode
+        glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -20, -30]);
+
         glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, PHI);
         glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, THETA);
-        
+
         // Follow mode
-        glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [-bicycle.main.TRANSMATRIX[12] + 30, -20, -30]);
-        // Stationary mode
-        // glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -20, -30]);
+        // glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [-bicycle.main.TRANSMATRIX[12] + 30, -20, -30]);
 
         GL.viewport(0, 0, CANVAS.width, CANVAS.height);
         GL.clear(GL.COLOR_BUFFER_BIT | GL.D_BUFFER_BIT);
@@ -114,8 +125,8 @@ function main() {
         floor.setUniform4(PROJMATRIX, VIEWMATRIX);
 
         // Some logic
-        if(bicycle.main.TRANSMATRIX[12] <= -50.0) bicycle.main.translate(100, 0, 0);
-        else bicycle.main.translate(-0.3, 0, 0);
+        if (bicycle.main.TRANSMATRIX[12] <= -50.0) bicycle.main.translate(100, 0, 0);
+        //else bicycle.main.translate(-0.3, 0, 0);
 
         bicycle.main.draw();
         floor.draw();

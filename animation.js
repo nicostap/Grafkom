@@ -45,15 +45,17 @@ class Animate {
 class AnimationList {
     // Parameter
     animations;
-    start;
-    end;
+    start = 99999999999;
+    end = 0;
     isLoop;
 
-    constructor(animations, start, end, isLoop) {
+    constructor(animations, isLoop) {
         this.animations = animations;
-        this.start = start;
-        this.end = end;
         this.isLoop = isLoop;
+        for(let i = 0; i < this.animations.length; i++) {
+            this.start = Math.min(this.start, this.animations[i].start);
+            this.end = Math.max(this.end, this.animations[i].end);
+        }
     }
 
     run(time, dt) {
@@ -71,5 +73,16 @@ class AnimationList {
                 this.animations[i].end += duration;
             }
         }
+    }
+
+    multiplySpeed(x) {
+        this.end = 0;
+        for(let i = 0; i < this.animations.length; i++) {
+            this.animations[i].start *= x;
+            this.animations[i].end *= x;
+            this.end = Math.max(this.end, this.animations[i].end);
+        }
+        console.log(this.start, this.end);
+        console.log(this.animations[6].start, this.animations[6].end);
     }
 }

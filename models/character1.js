@@ -210,84 +210,87 @@ function createCharacter_1() {
     var blackSphere = GEO.createSphere(1.0, 20, [0, 0, 0]);
 
     var body = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
-    body.setLocalScale(3.0, 8.0, 3.0);
+    body.setLocalScale(3.5, 8.0, 3.5);
     body.setLocalRotation(0, 0, GEO.rad(-12));
     body.setLocalTranslation(-5, 8, 0);
-    bicycleBody.addChild(body);
+    bicycleBody.addChild(body, -5, 3.5, 0);
     var butt = new Object3D(whiteSphere.vertices, whiteSphere.faces);
     butt.setLocalScale(4.6, 3.0, 4.6);
     butt.setLocalRotation(0, 0, GEO.rad(-15));
     butt.setLocalTranslation(-6, 4.2, 0);
-    body.addChild(butt);
+    bicycleBody.addChild(butt);
     var shoulder = new Object3D(whiteSphere.vertices, whiteSphere.faces);
-    shoulder.setLocalScale(3.5, 2.0, 3.5);
+    shoulder.setLocalScale(4, 3.5, 4);
     shoulder.setLocalRotation(0, 0, GEO.rad(-15));
     shoulder.setLocalTranslation(-4, 12, 0);
     body.addChild(shoulder);
     var tail = new Object3D(whiteSphere.vertices, whiteSphere.faces);
     tail.setLocalScale(2, 1, 1);
-    tail.setLocalRotation(0, 0, GEO.rad(-30));
-    tail.setLocalTranslation(-10.5, 4, 0);
+    tail.setLocalRotation(0, 0, GEO.rad(-40));
+    tail.setLocalTranslation(-10.5, 5, 0);
     butt.addChild(tail);
 
     var leftFoot = new Object3D(blackParaboloid.vertices, blackParaboloid.faces);
     leftFoot.setLocalScale(1, 0.8, 1);
-    leftFoot.setLocalTranslation(-5.4, -8.2, -2);
+    leftFoot.setLocalTranslation(-5.4, -8.2, -3.5);
     leftPedal.addChild(leftFoot);
     var rightFoot = new Object3D(blackParaboloid.vertices, blackParaboloid.faces);
     rightFoot.setLocalScale(1, 0.8, 1);
-    rightFoot.setLocalTranslation(-5.4, -5.5, 2);
+    rightFoot.setLocalTranslation(-5.4, -5.5, 3.5);
     rightPedal.addChild(rightFoot);
 
     var leftLeg = new Object3D(blackCylinder.vertices, blackCylinder.faces);
     leftLeg.setLocalScale(0.7, 7, 0.7);
-    leftLeg.setLocalTranslation(-5.4, -5.7, -2);
-    leftFoot.addChild(leftLeg, -5.4, -8.8, -2);
+    leftLeg.setLocalRotation(0, 0, 0);
+    leftLeg.setLocalTranslation(-5.4, -5.7, -3.5);
+    leftFoot.addChild(leftLeg, -5.4, -8.8, -3.5);
     var rightLeg = new Object3D(blackCylinder.vertices, blackCylinder.faces);
     rightLeg.setLocalScale(0.7, 7, 0.7);
     rightLeg.setLocalRotation(0, 0, GEO.rad(-50));
-    rightLeg.setLocalTranslation(-3.1, -3.7, 2);
-    rightFoot.addChild(rightLeg, -5.4, -6.1, 2);
+    rightLeg.setLocalTranslation(-3.1, -3.7, 3.5);
+    rightFoot.addChild(rightLeg, -5.4, -6.1, 3.5);
 
     var leftThigh = new Object3D(blackCylinder.vertices, blackCylinder.faces);
     leftThigh.setLocalScale(0.7, 6.7, 0.7);
-    leftThigh.setLocalTranslation(-5.4, 0.5, -2);
+    leftThigh.setLocalRotation(GEO.rad(10), 0, 0);
+    leftThigh.setLocalTranslation(-5.4, 0.5, -3);
     leftLeg.addChild(leftThigh, -5.4, -2.7, -2);
     var rightThigh = new Object3D(blackCylinder.vertices, blackCylinder.faces);
     rightThigh.setLocalScale(0.7, 6.7, 0.7);
-    rightThigh.setLocalRotation(0, 0, GEO.rad(45));
-    rightThigh.setLocalTranslation(-3.1, 0.5, 2);
-    rightLeg.addChild(rightThigh, -0.4, -1.7, 2);
-
-    var leftForeArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    leftForeArm.setLocalScale(0.7, 6, 0.7);
-    leftForeArm.setLocalRotation(GEO.rad(-30), 0, GEO.rad(30));
-    leftForeArm.setLocalTranslation(-2.5, 10.4, 3);
-    body.addChild(leftForeArm);
-    var rightForeArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    rightForeArm.setLocalScale(0.7, 6, 0.7);
-    rightForeArm.setLocalRotation(GEO.rad(30), 0, GEO.rad(30));
-    rightForeArm.setLocalTranslation(-2.5, 10.4, -3);
-    body.addChild(rightForeArm);
-    var leftArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    leftArm.setLocalScale(0.7, 4.8, 0.7);
-    leftArm.setLocalRotation(GEO.rad(30), 0, GEO.rad(40));
-    leftArm.setLocalTranslation(0.5, 6.8, 3.3);
-    leftForeArm.addChild(leftArm);
-    var rightArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    rightArm.setLocalScale(0.7, 5, 0.7);
-    rightArm.setLocalRotation(GEO.rad(-30), 0, GEO.rad(40));
-    rightArm.setLocalTranslation(0.5, 6.8, -3.3);
-    rightForeArm.addChild(rightArm);
+    rightThigh.setLocalRotation(GEO.rad(-10), 0, GEO.rad(45));
+    rightThigh.setLocalTranslation(-3.1, 0.5, 3);
+    rightLeg.addChild(rightThigh, -0.4, -1.7, 3.5);
 
     var leftHand = new Object3D(blackSphere.vertices, blackSphere.faces);
     leftHand.setLocalScale(1.5, 1, 1);
-    leftHand.setLocalTranslation(2.4, 5.5, 2.2);
+    leftHand.setLocalTranslation(2.4, 5.5, -2.2);
     handle.addChild(leftHand);
     var rightHand = new Object3D(blackSphere.vertices, blackSphere.faces);
     rightHand.setLocalScale(1.5, 1, 1);
-    rightHand.setLocalTranslation(2.4, 5.5, -2.2);
+    rightHand.setLocalTranslation(2.4, 5.5, 2.2);
     handle.addChild(rightHand);
+
+    var leftArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
+    leftArm.setLocalScale(0.7, 4.8, 0.7);
+    leftArm.setLocalRotation(GEO.rad(-30), 0, GEO.rad(40));
+    leftArm.setLocalTranslation(0.5, 6.8, -3.3);
+    leftHand.addChild(leftArm);
+    var rightArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
+    rightArm.setLocalScale(0.7, 5, 0.7);
+    rightArm.setLocalRotation(GEO.rad(30), 0, GEO.rad(40));
+    rightArm.setLocalTranslation(0.5, 6.8, 3.3);
+    rightHand.addChild(rightArm);
+
+    var leftForeArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
+    leftForeArm.setLocalScale(0.7, 6.1, 0.7);
+    leftForeArm.setLocalRotation(GEO.rad(30), 0, GEO.rad(30));
+    leftForeArm.setLocalTranslation(-2.5, 10.4, -3);
+    leftArm.addChild(leftForeArm);
+    var rightForeArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
+    rightForeArm.setLocalScale(0.7, 6.1, 0.7);
+    rightForeArm.setLocalRotation(GEO.rad(-30), 0, GEO.rad(30));
+    rightForeArm.setLocalTranslation(-2.5, 10.4, 3);
+    rightArm.addChild(rightForeArm); 
 
     var head = new Object3D(blackParaboloid.vertices, blackParaboloid.faces);
     head.setLocalScale(2.0, -3.0, 2.0);
@@ -349,15 +352,16 @@ function createCharacter_1() {
 
     return {
         main: bicycleBody,
+        frontPivot: frontPivot,
         frontWheel: frontWheel,
         backWheel: backWheel,
         gear: gear,
         leftPedal: leftPedal,
         rightPedal: rightPedal,
-        body: body,
         leftThigh: leftThigh,
         rightThigh: rightThigh,
         leftLeg: leftLeg,
-        rightLeg: rightLeg
+        rightLeg: rightLeg,
+        body: body
     };
 }
