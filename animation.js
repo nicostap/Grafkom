@@ -78,11 +78,12 @@ class AnimationList {
     multiplySpeed(x) {
         this.end = 0;
         for(let i = 0; i < this.animations.length; i++) {
+            let offset = this.start * (1 - x);
             this.animations[i].start *= x;
             this.animations[i].end *= x;
+            this.animations[i].start += offset;
+            this.animations[i].end += offset;
             this.end = Math.max(this.end, this.animations[i].end);
         }
-        console.log(this.start, this.end);
-        console.log(this.animations[6].start, this.animations[6].end);
     }
 }
