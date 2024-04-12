@@ -1,3 +1,31 @@
+// CAMERA MODE
+let mode = Object.freeze({
+    Stationary: 'Stationary',
+    FPS: 'FPS',
+    Follow: 'Follow'
+});
+let cameraX = 0, cameraY = -20, cameraZ = 0;
+let cameraMode = mode.FPS;
+let zoom = -30;
+function modeStationary() {
+    cameraMode = mode.Stationary;
+    THETA = 0;
+    PHI = 0;
+    zoom = -30;
+}
+function modeFPS() {
+    cameraMode = mode.FPS;
+    THETA = 0;
+    PHI = 0;
+    cameraX = 0, cameraY = -20, cameraZ = 0;
+}
+function modeFollowShaun() {
+    cameraMode = mode.Follow;
+    THETA = 0;
+    PHI = 0;
+    zoom = -30;
+}
+
 function main() {
     CANVAS = document.getElementById("your_canvas");
     CANVAS.width = window.innerWidth;
@@ -10,25 +38,19 @@ function main() {
         return false;
     }
 
-    // CAMERA
+    // CAMERA CONTROL
     var AMORTIZATION = 0.95;
     var dX = 0, dY = 0;
     var drag = false;
     var THETA = 0, PHI = 0;
-
     var x_prev, y_prev;
-
     var mouseDown = function (e) {
         drag = true;
         x_prev = e.pageX, y_prev = e.pageY;
         e.preventDefault();
         return false;
     };
-
-    var mouseUp = function (e) {
-        drag = false;
-    };
-
+    var mouseUp = function (e) { drag = false; };
     var mouseMove = function (e) {
         if (!drag) return false;
         dX = (e.pageX - x_prev) * 2 * Math.PI / CANVAS.width,
@@ -38,23 +60,24 @@ function main() {
         x_prev = e.pageX, y_prev = e.pageY;
         e.preventDefault();
     };
-
+    var mouseScroll = function (e) {
+        const delta = Math.sign(e.deltaY);
+        zoom -= 3 * delta;
+        if (zoom <= -100) zoom = -100;
+        if (zoom >= -20) zoom = -20;
+    };
     CANVAS.addEventListener("mousedown", mouseDown, false);
     CANVAS.addEventListener("mouseup", mouseUp, false);
     CANVAS.addEventListener("mouseout", mouseUp, false);
     CANVAS.addEventListener("mousemove", mouseMove, false);
-
-    let zoom = -30;
-    window.addEventListener("wheel", event => {
-        const delta = Math.sign(event.deltaY);
-        zoom -= 3 * delta;
-        if (zoom <= -100) {
-            zoom = -100;
-        }
-        if (zoom >= -20) {
-            zoom = -20;
-        }
-    });
+    CANVAS.addEventListener("wheel", mouseScroll, false);
+    var keyPressed = {};
+    window.onkeydown = function (e) {
+        keyPressed[e.key] = true;
+    };
+    window.onkeyup = function (e) {
+        keyPressed[e.key] = false;
+    };
 
     // MATRIX
     var PROJMATRIX = glMatrix.mat4.create();
@@ -87,7 +110,7 @@ function main() {
         new Animate(bicycle.rightThigh, 1000, 2000, MoveType.Rotate, 0, 0, 85),
     ], true);
     animations.push(bicycleLoop);
-    
+
     let pivotRotation = 30;
     let bodyRotation = 15;
     var bicycleMotion = new AnimationList([
@@ -120,7 +143,13 @@ function main() {
     bicycleMotion.multiplySpeed(0.5);
     animations.push(bicycleMotion);
 
-    for(let i = 0; i < floor.trees.length; i++) {
+    var honking = new AnimationList([
+        new Animate(bicycle.honk, 0, 1000, MoveType.Scale, 0.8, 0.8, 0.8),
+        new Animate(bicycle.honk, 1000, 2000, MoveType.Scale, 1 / 0.8, 1 / 0.8, 1 / 0.8),
+    ], true);
+    animations.push(honking);
+
+    for (let i = 0; i < floor.trees.length; i++) {
         var treeBreathing = new AnimationList([
             new Animate(floor.trees[i], 0, 1000, MoveType.Scale, 1.2, 1.2, 1.2),
             new Animate(floor.trees[i], 1000, 2000, MoveType.Scale, 1 / 1.2, 1 / 1.2, 1 / 1.2),
@@ -149,21 +178,46 @@ function main() {
             THETA += dX, PHI += dY;
         }
 
+        // Camera control
+        if (cameraMode == 'FPS') {
+            if (keyPressed['w'] || keyPressed['W']) {
+                cameraZ += Math.cos(THETA) * 1.0;
+                cameraX += -Math.sin(THETA) * 1.0;
+            }
+            if (keyPressed['a'] || keyPressed['A']) {
+                cameraZ += Math.cos(THETA - Math.PI / 2) * 1.0;
+                cameraX += -Math.sin(THETA - Math.PI / 2) * 1.0;
+            }
+            if (keyPressed['s'] || keyPressed['S']) {
+                cameraZ += -Math.cos(THETA) * 1.0;
+                cameraX += Math.sin(THETA) * 1.0;
+            }
+            if (keyPressed['d'] || keyPressed['D']) {
+                cameraZ += Math.cos(THETA + Math.PI / 2) * 1.0;
+                cameraX += -Math.sin(THETA + Math.PI / 2) * 1.0;
+            }
+            if (keyPressed['e'] || keyPressed['E']) cameraY -= 1.5;
+            if (keyPressed['q'] || keyPressed['Q']) cameraY += 1.5;
+        }
         VIEWMATRIX = glMatrix.mat4.create();
-
-        // Stationary mode
-        glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -20, zoom]);
-
-        glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, PHI);
-        glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, THETA);
-
-        GL.viewport(0, 0, CANVAS.width, CANVAS.height);
-        GL.clear(GL.COLOR_BUFFER_BIT | GL.D_BUFFER_BIT);
+        if (cameraMode == 'Stationary') {
+            glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -20, zoom]);
+            glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, PHI);
+            glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, THETA);
+        } else if (cameraMode == 'FPS') {
+            glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, PHI);
+            glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, THETA);
+            glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [cameraX, cameraY, cameraZ]);
+        } else if (cameraMode == 'Follow') {
+            glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [bicycle.main.TRANSMATRIX[12] + 30, 20, bicycle.main.TRANSMATRIX[12] + 30]);
+            glMatrix.mat4.lookAt(VIEWMATRIX, [VIEWMATRIX[12], VIEWMATRIX[13], VIEWMATRIX[14]], [bicycle.main.TRANSMATRIX[12], bicycle.main.TRANSMATRIX[13], bicycle.main.TRANSMATRIX[14]], [0, 1, 0]);
+        }
 
         // Drawing the objects
+        GL.viewport(0, 0, CANVAS.width, CANVAS.height);
+        GL.clear(GL.COLOR_BUFFER_BIT | GL.D_BUFFER_BIT);
         bicycle.main.setUniform4(PROJMATRIX, VIEWMATRIX);
         floor.main.setUniform4(PROJMATRIX, VIEWMATRIX);;
-
         bicycle.main.draw();
         floor.main.draw();
 
@@ -171,7 +225,7 @@ function main() {
         for (let animation of animations) {
             animation.run(time, dt);
         }
-        
+
         // Logic
         bicycle.main.translate(0.01 * dt * Math.cos(bicycle.main.rotation.y), 0, 0.01 * dt * -Math.sin(bicycle.main.rotation.y));
 
@@ -179,6 +233,6 @@ function main() {
         GL.flush();
         window.requestAnimationFrame(animate);
     };
-    window.addEventListener('load', animate(0));
+    animate(-1);
 }
 window.addEventListener('load', main);

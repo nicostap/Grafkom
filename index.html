@@ -1,17 +1,35 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <script src="https://cdn.jsdelivr.net/npm/gl-matrix@3.4.3/gl-matrix-min.min.js"></script>
-        <script src="object.js"></script>
-        <script src="geometry.js"></script>
-        <script src="animation.js"></script>
-        <script src="models/world.js"></script>
-        <script src="models/character1.js"></script>
-        <script src="main.js"></script>
-    </head>
-    <body style="margin: 0;">
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gl-matrix@3.4.3/gl-matrix-min.min.js"></script>
+    <script src="object.js"></script>
+    <script src="geometry.js"></script>
+    <script src="animation.js"></script>
+    <script src="models/world.js"></script>
+    <script src="models/character1.js"></script>
+    <script src="main.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div>
+        <div class="buttonNavbar">
+            <button class="buttonUI" onclick="modeStationary()">
+                Stationary
+            </button>
+            <button class="buttonUI" onclick="modeFPS()">
+                FPS
+            </button>
+            <button class="buttonUI" onclick="modeFollowShaun()">
+                Follow Shaun
+            </button>
+        </div>
         <canvas id="your_canvas" style="position: relative;background-color: rgb(174, 185, 255);">
         </canvas>
-    </body>
+    </div>
+</body>
+
 </html>

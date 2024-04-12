@@ -108,8 +108,8 @@ function createFloor() {
     leaf.setLocalTranslation(0, 40.0, 0);
     tree.addChild(leaf);
 
-    var trees = randomiser(tree, floor, 0, 140, 400, 150, 7, 3);
-    trees.push(...randomiser(tree, floor, 0, -140, 400, 150, 7, 3));
+    var trees = randomiser(tree, floor, 0, 140, 400, 150, 6, 3);
+    trees.push(...randomiser(tree, floor, 0, -140, 400, 150, 6, 3));
 
     return {main: floor, grass: grass, trees: trees};
 }

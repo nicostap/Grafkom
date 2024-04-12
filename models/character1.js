@@ -14,6 +14,8 @@ function createCharacter_1() {
     var darkGreyCylinder = GEO.createCylinder(1.0, 1.0, 20, [0.3, 0.3, 0.3]);
     var greyCylinder = GEO.createCylinder(1, 1, 20, [0.7, 0.7, 0.7]);
     var greyHyperbola = GEO.createEllipticParaboloid(1.0, 1.0, 20, [0.1, 0.1, 0.1]);
+    var greySphere = GEO.createSphere(1.0, 20, [0.2, 0.2, 0.2]);
+    var yellowHyperboloid = GEO.createHyperboloidOneSheet(1.0, 1.0, 20, [0.5, 0.5, 0]);
 
     var body_part_1 = new Object3D(redBox.vertices, redBox.faces);
     body_part_1.setLocalScale(0.5, 8.0, 1);
@@ -89,6 +91,16 @@ function createCharacter_1() {
     handleBar.setLocalRotation(0, GEO.rad(-60), GEO.rad(90));
     handleBar.setLocalTranslation(2.4, 5.8, -2);
     handle.addChild(handleBar);
+
+    var honk = new Object3D(greySphere.vertices, greySphere.faces);
+    honk.setLocalScale(1.3, 1.3, 1.3);
+    honk.setLocalTranslation(1, 6.2, 0);
+    handle.addChild(honk);
+    var trumpet = new Object3D(yellowHyperboloid.vertices, yellowHyperboloid.faces);
+    trumpet.setLocalScale(0.3, 0.8, 0.3);
+    trumpet.setLocalRotation(0, 0, GEO.rad(90));
+    trumpet.setLocalTranslation(3.2, 6.2, 0);
+    handle.addChild(trumpet);
 
     var frontWheel = new Object3D(darkGreyCylinder.vertices, darkGreyCylinder.faces);
     frontWheel.setLocalScale(5, 0.5, 5);
@@ -374,6 +386,7 @@ function createCharacter_1() {
         rightThigh: rightThigh,
         leftLeg: leftLeg,
         rightLeg: rightLeg,
-        body: body
+        body: body,
+        honk: honk
     };
 }

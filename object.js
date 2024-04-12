@@ -210,11 +210,25 @@ class Object3D {
     }
   }
 
-  scale(kx, ky, kz) {
+  #scaleChildren(kx, ky, kz, x, y, z) {
+    glMatrix.vec3.add(this.origin, this.origin, [x, y, z]);
     glMatrix.vec3.multiply(this.origin, this.origin, [kx, ky, kz]);
+    glMatrix.vec3.add(this.origin, this.origin, [-x, -y, -z]);
+
+    glMatrix.mat4.translate(this.SCALEMATRIX, this.SCALEMATRIX, [x, y, z]);
     glMatrix.mat4.scale(this.SCALEMATRIX, this.SCALEMATRIX, [kx, ky, kz]);
+    glMatrix.mat4.translate(this.SCALEMATRIX, this.SCALEMATRIX, [-x, -y, -z]);
     for (let i = 0; i < this.child.length; i++) {
       this.child[i].scale(kx, ky, kz);
+    }
+  }
+
+  scale(kx, ky, kz) {
+    glMatrix.mat4.translate(this.SCALEMATRIX, this.SCALEMATRIX, this.origin);
+    glMatrix.mat4.scale(this.SCALEMATRIX, this.SCALEMATRIX, [kx, ky, kz]);
+    glMatrix.mat4.translate(this.SCALEMATRIX, this.SCALEMATRIX, [-this.origin[0], -this.origin[1], -this.origin[2]]);
+    for (let i = 0; i < this.child.length; i++) {
+      this.child[i].#scaleChildren(kx, ky, kz, ...this.origin);
     }
   }
 
