@@ -2,49 +2,70 @@ function createFloor() {
     var floorVertices = [];
     var floorFaces = [];
 
-    let normal = [0, 0.5, 0];
-    for (let i = 0; i < 30; i++) {
-        for (let j = 0; j < 30; j++) {
+    let normal = [];
+    let floorColor = [64 / 255, 41 / 255, 5 / 255];
+    let heightDist = [];
+    let floorSide = 500;
+    let partition = 50;
+    let tileSide = floorSide / partition;
+
+    for (let i = 0; i < partition; i++) {
+        heightDist.push([]);
+        for (let j = 0; j < partition; j++) {
+            heightDist[i].push(1.5 * Math.random());
+        }
+    }
+    for (let i = 0; i < partition; i++) {
+        for (let j = 0; j < partition; j++) {
             let currpoint = [
-                (i - 15) * 30,
-                0,
-                (j - 15) * 30,
+                (i - partition / 2) * tileSide,
+                heightDist[i][j],
+                (j - partition / 2) * tileSide,
             ];
             let sidepoint = [
-                (i - 15) * 30,
-                0,
-                (j - 14) * 30,
+                (i - partition / 2) * tileSide,
+                heightDist[i][j + 1],
+                (j - partition / 2 + 1) * tileSide,
             ];
-            if (i != 30) {
+            if (i != partition - 1) {
                 let nextpoint = [
-                    (i - 14) * 30,
-                    0,
-                    (j - 15) * 30,
+                    (i - partition / 2 + 1) * tileSide,
+                    heightDist[i + 1][j],
+                    (j - partition / 2) * tileSide,
                 ];
-                let currIndex = floorVertices.length / 9;
-                floorVertices.push(...currpoint, ...normal, ...[0, 0.2, 0]);
-                floorVertices.push(...sidepoint, ...normal, ...[0, 0.2, 0]);
-                floorVertices.push(...nextpoint, ...normal, ...[0, 0.2, 0]);
+                currIndex = floorVertices.length / 9;
+                glMatrix.vec3.cross(
+                    normal,
+                    [currpoint[0] - nextpoint[0], currpoint[1] - nextpoint[1], currpoint[2] - nextpoint[2]],
+                    [currpoint[0] - sidepoint[0], currpoint[1] - sidepoint[1], currpoint[2] - sidepoint[2]]
+                );
+                glMatrix.vec3.normalize(normal, normal);
+                floorVertices.push(...currpoint, ...normal, ...floorColor);
+                floorVertices.push(...sidepoint, ...normal, ...floorColor);
+                floorVertices.push(...nextpoint, ...normal, ...floorColor);
                 floorFaces.push(currIndex, currIndex + 1, currIndex + 2);
             }
             if (i != 0) {
                 let nextpoint = [
-                    (i - 16) * 30,
-                    0,
-                    (j - 14) * 30,
+                    (i - partition / 2 - 1) * tileSide,
+                    heightDist[i - 1][j + 1],
+                    (j - partition / 2 + 1) * tileSide,
                 ];
-                let currIndex = floorVertices.length / 9;
-                floorVertices.push(...currpoint, ...normal, ...[0, 0.2, 0]);
-                floorVertices.push(...sidepoint, ...normal, ...[0, 0.2, 0]);
-                floorVertices.push(...nextpoint, ...normal, ...[0, 0.2, 0]);
+                currIndex = floorVertices.length / 9;
+                glMatrix.vec3.cross(
+                    normal,
+                    [sidepoint[0] - nextpoint[0], sidepoint[1] - nextpoint[1], sidepoint[2] - nextpoint[2]],
+                    [sidepoint[0] - currpoint[0], sidepoint[1] - currpoint[1], sidepoint[2] - currpoint[2]],
+                );
+                glMatrix.vec3.normalize(normal, normal);
+                floorVertices.push(...currpoint, ...normal, ...floorColor);
+                floorVertices.push(...sidepoint, ...normal, ...floorColor);
+                floorVertices.push(...nextpoint, ...normal, ...floorColor);
                 floorFaces.push(currIndex, currIndex + 1, currIndex + 2);
             }
         }
     }
-
     var floor = new Object3D(floorVertices, floorFaces);
-    floor.setLocalScale(1000.0, 0.1, 1000.0);
-    floor.setLocalTranslation(0, 0, 0);
 
     // Random grass generator
     var grassVertices = [
@@ -88,13 +109,13 @@ function createFloor() {
     grass.scale(1, 3, 1);
     floor.addChild(grass);
 
-    var brownHyperboloid = GEO.createHyperboloidOneSheet(1.0, 3.0, 20, [160 / 255, 82 / 255, 45 / 255]);
-    var greenParaboloid = GEO.createEllipticParaboloid(1.4, 5.0, 30, [0.1, 0.6, 0.1]);
+    var brownHyperboloid = GEO.createHyperboloidOneSheet(1.0, 3.0, 10, [160 / 255, 82 / 255, 45 / 255]);
+    var greenParaboloid = GEO.createEllipticParaboloid(1.0, 1.0, 30, [0.2, 0.7, 0.2]);
     var tree = new Object3D(brownHyperboloid.vertices, brownHyperboloid.faces);
     var leaf = new Object3D(greenParaboloid.vertices, greenParaboloid.faces);
     tree.setLocalTranslation(0, 6.5, 0);
-    leaf.setLocalTranslation(0, 50.0, 0);
-    leaf.setLocalScale(5, 5, 5);
+    leaf.setLocalScale(8, 20, 8);
+    leaf.setLocalTranslation(0, 35.0, 0);
     tree.addChild(leaf);
 
     var treeSide1 = randomiser(tree, floor, 0, 120, 100, 150, 1, 4);
@@ -161,7 +182,7 @@ function randomiser(child, parent, centerX, centerZ, length, width, divisorX, di
     for (let i = 0; i < divisorX; i++) {
         for (let j = 0; j < divisorZ; j++) {
             let offsetX = (i + Math.random()) * length / divisorX - length / 2 + centerX;
-            let scaleY = 0.8 + Math.random();
+            let scaleY = 1.0 + Math.random();
             let offsetZ = (j + Math.random()) * width / divisorZ - width / 2 + centerZ;
 
             let newChild = child.clone();

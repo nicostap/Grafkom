@@ -17,35 +17,35 @@ class Object3D {
     varying vec3 vView;
     
     void main(void) {
-        gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.0);
-        vColor = color;
-
         vNormal = vec3(uNormalMatrix * vec4(normal, 1.0));
 
         // For fog
         v_position = (Vmatrix * Mmatrix * vec4(position, 1.)).xyz;
         vView = vec3(Vmatrix * Mmatrix * vec4(position, 1.));
+
+        gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.0);
+        vColor = color;
     }`;
   static default_shader_fragment_source = `
     precision mediump float;
     varying vec3 vColor;
 
-    vec4 u_fogColor = vec4(5. / 255., 13. / 255., 62. / 255., 1.);
+    vec4 u_fogColor = vec4(174. / 255., 185. / 255., 255. / 255., 1.);
     float u_fogNear = 0.1;
-    float u_fogFar = 240.;
+    float u_fogFar = 300.;
 
     varying vec3 v_position;
     varying vec3 vNormal;
     varying vec3 vView;
 
     // Info sumber cahaya
-    const vec3 source_ambient_color = vec3(0.9,0.9,0.9);
+    const vec3 source_ambient_color = vec3(1.,1.,1.);
     const vec3 source_diffuse_color = vec3(1. ,1., 1.);
     const vec3 source_specular_color = vec3(1.,1.,1.); 
-    const vec3 source_direction = vec3(1.,1.,0.8);
+    const vec3 source_direction = vec3(1.,1.,1.);
 
     // Info objeknya tipe warna pada materialnya seperti apa
-    const vec3 mat_ambient_color = vec3(0.3,0.3,0.3);
+    const vec3 mat_ambient_color = vec3(0.8,0.8,0.8);
     const vec3 mat_diffuse_color = vec3(0.6,0.6,0.6);
     const vec3 mat_specular_color = vec3(0.2,0.2,0.2);
     const float mat_shininess = 0.1;
