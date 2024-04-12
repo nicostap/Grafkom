@@ -32,11 +32,11 @@ class Animate {
     run(time, dt) {
         if(time > this.start && time < this.end) {
             // Count the frames
-            var fc = Math.floor(this.end / dt) - Math.ceil(this.start / dt);
+            var div = dt / (this.end - this.start);
             if(this.type == 'Rotate') {
-                this.object.rotate(this.x / fc, this.y / fc, this.z / fc);
+                this.object.rotate(this.x * div, this.y * div, this.z * div);
             } else if(this.type == 'Translate') {
-                this.object.translate(this.x / fc, this.y / fc, this.z / fc);
+                this.object.translate(this.x * div, this.y * div, this.z * div);
             }
         }
     }

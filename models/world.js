@@ -115,7 +115,7 @@ function createFloor() {
     var leaf = new Object3D(greenParaboloid.vertices, greenParaboloid.faces);
     tree.setLocalTranslation(0, 6.5, 0);
     leaf.setLocalScale(8, 20, 8);
-    leaf.setLocalTranslation(0, 35.0, 0);
+    leaf.setLocalTranslation(0, 40.0, 0);
     tree.addChild(leaf);
 
     var treeSide1 = randomiser(tree, floor, 0, 120, 100, 150, 1, 4);

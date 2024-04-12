@@ -91,6 +91,8 @@ class Object3D {
   ROTATEMATRICES = [glMatrix.mat4.create()];
   TRANSMATRIX = glMatrix.mat4.create();
   origin = [0, 0, 0];
+  
+  rotation = {x: 0, y: 0, z: 0};
 
   // Relationship
   parent = null;
@@ -186,6 +188,9 @@ class Object3D {
     glMatrix.mat4.rotateY(this.ROTATEMATRICES[depth], this.ROTATEMATRICES[depth], ay);
     glMatrix.mat4.rotateZ(this.ROTATEMATRICES[depth], this.ROTATEMATRICES[depth], az);
     glMatrix.mat4.translate(this.ROTATEMATRICES[depth], this.ROTATEMATRICES[depth], [-x, -y, -z]);
+    this.rotation.x += ax;
+    this.rotation.y += ay;
+    this.rotation.z += az;
     for (let i = 0; i < this.child.length; i++) {
       this.child[i].#rotateChildren(ax, ay, az, x, y, z, depth + 1);
     }
@@ -197,6 +202,9 @@ class Object3D {
     glMatrix.mat4.rotateY(this.ROTATEMATRICES[0], this.ROTATEMATRICES[0], ay);
     glMatrix.mat4.rotateZ(this.ROTATEMATRICES[0], this.ROTATEMATRICES[0], az);
     glMatrix.mat4.translate(this.ROTATEMATRICES[0], this.ROTATEMATRICES[0], [-this.origin[0], -this.origin[1], -this.origin[2]]);
+    this.rotation.x += ax;
+    this.rotation.y += ay;
+    this.rotation.z += az;
     for (let i = 0; i < this.child.length; i++) {
       this.child[i].#rotateChildren(ax, ay, az, this.origin[0], this.origin[1], this.origin[2]);
     }
