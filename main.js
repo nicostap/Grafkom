@@ -70,6 +70,7 @@ function main() {
     bicycle.main.rotate(0, GEO.rad(180), 0);
 
     // Making the animations
+    var animations = [];
     var bicycleLoop = new AnimationList([
         new Animate(bicycle.frontWheel, 0, 2000, MoveType.Rotate, 0, 0, -360),
         new Animate(bicycle.backWheel, 0, 2000, MoveType.Rotate, 0, 0, -360),
@@ -85,6 +86,8 @@ function main() {
         new Animate(bicycle.rightThigh, 0, 1000, MoveType.Rotate, 0, 0, -85),
         new Animate(bicycle.rightThigh, 1000, 2000, MoveType.Rotate, 0, 0, 85),
     ], true);
+    animations.push(bicycleLoop);
+    
     let pivotRotation = 30;
     let bodyRotation = 15;
     var bicycleMotion = new AnimationList([
@@ -115,10 +118,21 @@ function main() {
         new Animate(bicycle.main, 40000, 48000, MoveType.Rotate, 0, 0, 0),
     ], true);
     bicycleMotion.multiplySpeed(0.5);
-
-    var animations = [];
-    animations.push(bicycleLoop);
     animations.push(bicycleMotion);
+
+    for(let i = 0; i < floor.trees.length; i++) {
+        var treeBreathing = new AnimationList([
+            new Animate(floor.trees[i], 0, 1000, MoveType.Scale, 1.2, 1.2, 1.2),
+            new Animate(floor.trees[i], 1000, 2000, MoveType.Scale, 1 / 1.2, 1 / 1.2, 1 / 1.2),
+        ], true);
+        animations.push(treeBreathing);
+    }
+
+    var grassBreathing = new AnimationList([
+        new Animate(floor.grass, 0, 1000, MoveType.Translate, 0, 1, 0),
+        new Animate(floor.grass, 1000, 2000, MoveType.Translate, 0, -1, 0),
+    ], true);
+    animations.push(grassBreathing);
 
     // Drawing
     GL.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -146,18 +160,18 @@ function main() {
         GL.viewport(0, 0, CANVAS.width, CANVAS.height);
         GL.clear(GL.COLOR_BUFFER_BIT | GL.D_BUFFER_BIT);
 
+        // Drawing the objects
+        bicycle.main.setUniform4(PROJMATRIX, VIEWMATRIX);
+        floor.main.setUniform4(PROJMATRIX, VIEWMATRIX);;
+
+        bicycle.main.draw();
+        floor.main.draw();
+
         // Running the animations
         for (let animation of animations) {
             animation.run(time, dt);
         }
-
-        // Updating and drawing the objects
-        bicycle.main.setUniform4(PROJMATRIX, VIEWMATRIX);
-        floor.setUniform4(PROJMATRIX, VIEWMATRIX);;
-
-        bicycle.main.draw();
-        floor.draw();
-
+        
         // Logic
         bicycle.main.translate(0.01 * dt * Math.cos(bicycle.main.rotation.y), 0, 0.01 * dt * -Math.sin(bicycle.main.rotation.y));
 
@@ -165,6 +179,6 @@ function main() {
         GL.flush();
         window.requestAnimationFrame(animate);
     };
-    animate(0);
+    window.addEventListener('load', animate(0));
 }
 window.addEventListener('load', main);

@@ -1,6 +1,7 @@
 const MoveType = Object.freeze({
     Rotate: 'Rotate',
     Translate: 'Translate',
+    Scale: 'Scale'
 });
 
 class Animate {
@@ -12,6 +13,9 @@ class Animate {
     x;
     y;
     z;
+    curr_x = 1.0;
+    curr_y = 1.0;
+    curr_z = 1.0;
 
     constructor(object, start, end, type, x, y, z) {
         this.object = object;
@@ -37,6 +41,13 @@ class Animate {
                 this.object.rotate(this.x * div, this.y * div, this.z * div);
             } else if(this.type == 'Translate') {
                 this.object.translate(this.x * div, this.y * div, this.z * div);
+            } else if(this.type == 'Scale') {
+                this.object.scale(1 / this.curr_x, 1 / this.curr_y, 1 / this.curr_z);
+                this.curr_x += (this.x - 1.0) * div;
+                this.curr_y += (this.y - 1.0) * div;
+                this.curr_z += (this.z - 1.0) * div;
+                //console.log(this.curr_x, this.curr_y, this.curr_z);
+                this.object.scale(this.curr_x, this.curr_y, this.curr_z);
             }
         }
     }
@@ -71,6 +82,9 @@ class AnimationList {
             for(let i = 0; i < this.animations.length; i++) {
                 this.animations[i].start += duration;
                 this.animations[i].end += duration;
+                this.animations[i].curr_x = 1.0;
+                this.animations[i].curr_y = 1.0;
+                this.animations[i].curr_z = 1.0;
             }
         }
     }

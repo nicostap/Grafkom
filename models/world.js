@@ -93,19 +93,9 @@ function createFloor() {
     ]
 
     // Object instancing
-    var grassInstance = instanceRandomiser(grassVertices, grassFaces, 0, 0, 100, 300, 10, 10);
+    var grassInstance = instanceRandomiser(grassVertices, grassFaces, 0, 0, 500, 500, 25, 25);
     var grass = new Object3D(grassInstance.vertices, grassInstance.faces);
-    grass.translate(0, 0.2, 0);
-    grass.scale(1, 3, 1);
-    floor.addChild(grass);
-
-    // For repeating grasses
-    var grass = new Object3D(grassInstance.vertices, grassInstance.faces);
-    grass.translate(-100, 0.2, 0);
-    grass.scale(1, 3, 1);
-    floor.addChild(grass);
-    var grass = new Object3D(grassInstance.vertices, grassInstance.faces);
-    grass.translate(100, 0.2, 0);
+    grass.translate(0, 0.45, 0);
     grass.scale(1, 3, 1);
     floor.addChild(grass);
 
@@ -118,27 +108,10 @@ function createFloor() {
     leaf.setLocalTranslation(0, 40.0, 0);
     tree.addChild(leaf);
 
-    var treeSide1 = randomiser(tree, floor, 0, 120, 100, 150, 1, 4);
-    var treeSide2 = randomiser(tree, floor, 0, -120, 100, 150, 1, 4);
+    var trees = randomiser(tree, floor, 0, 140, 400, 150, 7, 3);
+    trees.push(...randomiser(tree, floor, 0, -140, 400, 150, 7, 3));
 
-    for (let i = 0; i < treeSide1.length; i++) {
-        var newTree = treeSide1[i].clone();
-        newTree.translate(100, 0, 0);
-        floor.addChild(newTree);
-        var newTree = treeSide1[i].clone();
-        newTree.translate(-100, 0, 0);
-        floor.addChild(newTree);
-    }
-    for (let i = 0; i < treeSide2.length; i++) {
-        var newTree = treeSide2[i].clone();
-        newTree.translate(100, 0, 0);
-        floor.addChild(newTree);
-        var newTree = treeSide2[i].clone();
-        newTree.translate(-100, 0, 0);
-        floor.addChild(newTree);
-    }
-
-    return floor;
+    return {main: floor, grass: grass, trees: trees};
 }
 
 function instanceRandomiser(vertices, faces, centerX, centerZ, length, width, divisorX, divisorZ) {
