@@ -11,17 +11,23 @@ class Object3D {
     uniform mat4 Mmatrix;
     uniform mat4 uNormalMatrix;
 
+    const vec3 lightWorldPosition = vec3(50., 50., 50.);
+
     varying vec3 vColor;
-    varying vec3 v_position;
+    varying vec3 vPosition;
     varying vec3 vNormal;
-    varying vec3 vView;
+    varying vec3 vSurfaceToLight;
     
     void main(void) {
+        // For normal
         vNormal = vec3(uNormalMatrix * vec4(normal, 1.0));
 
         // For fog
-        v_position = (Vmatrix * Mmatrix * vec4(position, 1.)).xyz;
-        vView = vec3(Vmatrix * Mmatrix * vec4(position, 1.));
+        vPosition = (Vmatrix * Mmatrix * vec4(position, 1.)).xyz;
+
+        // For lighting
+        vec3 surfaceWorldPosition = (Mmatrix * vec4(position, 1.0)).xyz;
+        vSurfaceToLight = lightWorldPosition - surfaceWorldPosition;
 
         gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.0);
         vColor = color;
@@ -34,34 +40,37 @@ class Object3D {
     float u_fogNear = 0.1;
     float u_fogFar = 300.;
 
-    varying vec3 v_position;
+    varying vec3 vPosition;
     varying vec3 vNormal;
-    varying vec3 vView;
+    varying vec3 vSurfaceToLight;
 
-    // Info sumber cahaya
     const vec3 source_ambient_color = vec3(1.,1.,1.);
     const vec3 source_diffuse_color = vec3(1. ,1., 1.);
     const vec3 source_specular_color = vec3(1.,1.,1.); 
-    const vec3 source_direction = vec3(1.,1.,1.);
 
-    // Info objeknya tipe warna pada materialnya seperti apa
     const vec3 mat_ambient_color = vec3(0.8,0.8,0.8);
-    const vec3 mat_diffuse_color = vec3(0.6,0.6,0.6);
-    const vec3 mat_specular_color = vec3(0.2,0.2,0.2);
-    const float mat_shininess = 0.1;
+    const vec3 mat_diffuse_color = vec3(0.8,0.8,0.8);
+    const vec3 mat_specular_color = vec3(0.4,0.4,0.4);
+    const float mat_shininess = 0.2;
 
     void main(void) {
-        vec3 I_ambient = source_ambient_color * mat_ambient_color;
-        vec3 I_diffuse = source_diffuse_color * mat_diffuse_color * max(0., dot(vNormal, source_direction));
-        vec3 V = normalize(vView);
+        vec3 surfaceToLightDirection = normalize(vSurfaceToLight);
         vec3 normal = normalize(vNormal);
-        vec3 R = reflect(source_direction, normal);
+
+        vec3 I_ambient = source_ambient_color * mat_ambient_color;
+        
+        vec3 I_diffuse = source_diffuse_color * mat_diffuse_color * max(0., dot(vNormal, surfaceToLightDirection));
+        
+        vec3 V = normalize(vPosition);
+        vec3 R = reflect(surfaceToLightDirection, normal);
+       
         vec3 I_specular = source_specular_color*mat_specular_color*pow(max(dot(R,V),0.), mat_shininess);
+        
         vec3 I = I_ambient + I_diffuse + I_specular;
 
         vec4 color = vec4(I * vColor, 1.);
 
-        float fogDistance = length(v_position);
+        float fogDistance = length(vPosition);
         float fogAmount = smoothstep(u_fogNear, u_fogFar, fogDistance);
 
         gl_FragColor = mix(color, u_fogColor, fogAmount);
@@ -217,7 +226,7 @@ class Object3D {
     glMatrix.mat4.multiply(NORMALMATRIX, VIEWMATRIX, MOVEMATRIX);
     glMatrix.mat4.invert(NORMALMATRIX, NORMALMATRIX);
     glMatrix.mat4.transpose(NORMALMATRIX, NORMALMATRIX);
-    
+
     GL.useProgram(this.SHADER_PROGRAM);
     GL.uniformMatrix4fv(this._Pmatrix, false, PROJMATRIX);
     GL.uniformMatrix4fv(this._Vmatrix, false, VIEWMATRIX);
