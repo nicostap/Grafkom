@@ -374,6 +374,18 @@ function createCharacter_1() {
     teeth.setLocalTranslation(0.01, 13.2, -1);
     mouth.addChild(teeth);
 
+    var flagpole = new Object3D(greyCylinder.vertices, greyCylinder.faces);
+    flagpole.setLocalScale(0.2, 35.0, 0.2);
+    flagpole.setLocalRotation(GEO.rad(0), GEO.rad(0), GEO.rad(20));
+    flagpole.setLocalTranslation(-17.0, 8, -0.8);
+    bicycleBody.addChild(flagpole);
+
+    var flag = new Object3D(redBox.vertices, redBox.faces);
+    flag.setLocalScale(14.0, 8.0, 0.5);
+    flag.setLocalRotation(0, 0, GEO.rad(20));
+    flag.setLocalTranslation(-28.0, 20, -0.8);
+    bicycleBody.addChild(flag, -25.0, 30.0, -0.8);
+
     return {
         main: bicycleBody,
         frontPivot: frontPivot,
@@ -387,6 +399,7 @@ function createCharacter_1() {
         leftLeg: leftLeg,
         rightLeg: rightLeg,
         body: body,
-        honk: honk
+        honk: honk,
+        flag: flag
     };
 }

@@ -91,8 +91,8 @@ class Object3D {
   ROTATEMATRICES = [glMatrix.mat4.create()];
   TRANSMATRIX = glMatrix.mat4.create();
   origin = [0, 0, 0];
-  
-  rotation = {x: 0, y: 0, z: 0};
+
+  rotation = { x: 0, y: 0, z: 0 };
 
   // Relationship
   parent = null;
@@ -232,6 +232,67 @@ class Object3D {
     }
   }
 
+  #rotateArbitraryAxisChildren(n1, n2, n3, m1, m2, m3, theta, depth = 1) {
+    while (this.ROTATEMATRICES.length <= depth) {
+      this.ROTATEMATRICES.push(glMatrix.mat4.create());
+    }
+    let a = m1;
+    let b = m2;
+    let c = m3;
+    let l = Math.sqrt(a * a + b * b + c * c);
+    let v = Math.sqrt(b * b + c * c);
+    let translate = glMatrix.mat4.fromValues(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, n1, n2, n3, 1);
+    let translateInv = glMatrix.mat4.fromValues(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -n1, -n2, -n3, 1);
+    let rotateX = glMatrix.mat4.fromValues(1, 0, 0, 0, 0, c / v, b / v, 0, 0, -b / v, c / v, 0, 0, 0, 0, 1);
+    let rotateY = glMatrix.mat4.fromValues(v / l, 0, a / l, 0, 0, 1, 0, 0, -a / l, 0, v / l, 0, 0, 0, 0, 1);
+    let rotateZ = glMatrix.mat4.fromValues(Math.cos(theta), -Math.sin(theta), 0, 0, Math.sin(theta), Math.cos(theta), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    let invX = glMatrix.mat4.create();
+    let invY = glMatrix.mat4.create();
+    glMatrix.mat4.invert(invX, rotateX);
+    glMatrix.mat4.invert(invY, rotateY);
+
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[depth], translate, this.ROTATEMATRICES[depth]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[depth], rotateX, this.ROTATEMATRICES[depth]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[depth], rotateY, this.ROTATEMATRICES[depth]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[depth], rotateZ, this.ROTATEMATRICES[depth]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[depth], invY, this.ROTATEMATRICES[depth]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[depth], invX, this.ROTATEMATRICES[depth]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[depth], translateInv, this.ROTATEMATRICES[depth]);
+
+    for (let i = 0; i < this.child.length; i++) {
+      this.child[i].rotateArbritaryAxis(n1, n2, n3, m1, m2, m3, theta, depth + 1);
+    }
+  }
+
+  rotateArbitraryAxis(m1, m2, m3, theta) {
+    let a = m1;
+    let b = m2;
+    let c = m3;
+    let l = Math.sqrt(a * a + b * b + c * c);
+    let v = Math.sqrt(b * b + c * c);
+    let translate = glMatrix.mat4.fromValues(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -this.origin[0], -this.origin[1], -this.origin[2], 1);
+    let translateInv = glMatrix.mat4.fromValues(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ...this.origin, 1);
+    let rotateX = glMatrix.mat4.fromValues(1, 0, 0, 0, 0, c / v, b / v, 0, 0, -b / v, c / v, 0, 0, 0, 0, 1);
+    let rotateY = glMatrix.mat4.fromValues(v / l, 0, a / l, 0, 0, 1, 0, 0, -a / l, 0, v / l, 0, 0, 0, 0, 1);
+    let rotateZ = glMatrix.mat4.fromValues(Math.cos(theta), -Math.sin(theta), 0, 0, Math.sin(theta), Math.cos(theta), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    let invX = glMatrix.mat4.create();
+    let invY = glMatrix.mat4.create();
+    glMatrix.mat4.invert(invX, rotateX);
+    glMatrix.mat4.invert(invY, rotateY);
+
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[0], translate, this.ROTATEMATRICES[0]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[0], rotateX, this.ROTATEMATRICES[0]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[0], rotateY, this.ROTATEMATRICES[0]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[0], rotateZ, this.ROTATEMATRICES[0]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[0], invY, this.ROTATEMATRICES[0]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[0], invX, this.ROTATEMATRICES[0]);
+    glMatrix.mat4.multiply(this.ROTATEMATRICES[0], translateInv, this.ROTATEMATRICES[0]);
+
+    for (let i = 0; i < this.child.length; i++) {
+      this.child[i].#rotateArbitraryAxisChildren(...this.origin, m1, m2, m3, theta);
+    }
+  }
+
   setUniform4(PROJMATRIX, VIEWMATRIX) {
     let MOVEMATRIX = glMatrix.mat4.create();
     glMatrix.mat4.multiply(MOVEMATRIX, this.INIT_SCALEMATRIX, MOVEMATRIX);
@@ -295,8 +356,6 @@ class Object3D {
     this.child.push(object);
   }
 
-  // Warning : Do not use for modelling
-  // Child's local transformation can not be automatically adjusted to parent's future change
   clone() {
     var object = new Object3D(this.object_vertex, this.object_faces, this.shader_vertex_source, this.shader_fragment_source);
     object.INIT_SCALEMATRIX = glMatrix.mat4.clone(this.INIT_SCALEMATRIX);

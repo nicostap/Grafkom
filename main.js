@@ -91,75 +91,82 @@ function main() {
     // Placing objects
     bicycle.main.translate(-30, 14, -30);
     bicycle.main.rotate(0, GEO.rad(180), 0);
+    bicycle.flag.rotateArbitraryAxis(Math.sin(GEO.rad(-20)), Math.cos(GEO.rad(-20)), 0, -45);
 
     // Making the animations
     var animations = [];
     var bicycleLoop = new AnimationList([
-        new Animate(bicycle.frontWheel, 0, 2000, MoveType.Rotate, 0, 0, -360),
-        new Animate(bicycle.backWheel, 0, 2000, MoveType.Rotate, 0, 0, -360),
-        new Animate(bicycle.gear, 0, 2000, MoveType.Rotate, 0, 0, -360),
-        new Animate(bicycle.rightPedal, 0, 2000, MoveType.Rotate, 0, 0, 360),
-        new Animate(bicycle.leftPedal, 0, 2000, MoveType.Rotate, 0, 0, 360),
-        new Animate(bicycle.leftLeg, 0, 1000, MoveType.Rotate, 0, 0, -50),
-        new Animate(bicycle.leftLeg, 1000, 2000, MoveType.Rotate, 0, 0, 50),
-        new Animate(bicycle.rightLeg, 0, 1000, MoveType.Rotate, 0, 0, 50),
-        new Animate(bicycle.rightLeg, 1000, 2000, MoveType.Rotate, 0, 0, -50),
-        new Animate(bicycle.leftThigh, 0, 1000, MoveType.Rotate, 0, 0, 85),
-        new Animate(bicycle.leftThigh, 1000, 2000, MoveType.Rotate, 0, 0, -85),
-        new Animate(bicycle.rightThigh, 0, 1000, MoveType.Rotate, 0, 0, -85),
-        new Animate(bicycle.rightThigh, 1000, 2000, MoveType.Rotate, 0, 0, 85),
+        new RotationAnimation(bicycle.frontWheel, 0, 2000, 0, 0, -360),
+        new RotationAnimation(bicycle.backWheel, 0, 2000, 0, 0, -360),
+        new RotationAnimation(bicycle.gear, 0, 2000, 0, 0, -360),
+        new RotationAnimation(bicycle.rightPedal, 0, 2000, 0, 0, 360),
+        new RotationAnimation(bicycle.leftPedal, 0, 2000, 0, 0, 360),
+        new RotationAnimation(bicycle.leftLeg, 0, 1000, 0, 0, -50),
+        new RotationAnimation(bicycle.leftLeg, 1000, 2000, 0, 0, 50),
+        new RotationAnimation(bicycle.rightLeg, 0, 1000, 0, 0, 50),
+        new RotationAnimation(bicycle.rightLeg, 1000, 2000, 0, 0, -50),
+        new RotationAnimation(bicycle.leftThigh, 0, 1000, 0, 0, 85),
+        new RotationAnimation(bicycle.leftThigh, 1000, 2000, 0, 0, -85),
+        new RotationAnimation(bicycle.rightThigh, 0, 1000, 0, 0, -85),
+        new RotationAnimation(bicycle.rightThigh, 1000, 2000, 0, 0, 85),
     ], true);
     animations.push(bicycleLoop);
 
     let pivotRotation = 30;
     let bodyRotation = 15;
     var bicycleMotion = new AnimationList([
-        new Animate(bicycle.main, 0, 4000, MoveType.Rotate, 0, 90, 0),
-        new Animate(bicycle.frontPivot, 0, 2000, MoveType.Rotate, 0, pivotRotation, 0),
-        new Animate(bicycle.body, 0, 2000, MoveType.Rotate, 15, 0, 0),
-        new Animate(bicycle.frontPivot, 2000, 4000, MoveType.Rotate, 0, -pivotRotation, 0),
-        new Animate(bicycle.body, 2000, 4000, MoveType.Rotate, -bodyRotation, 0, 0),
+        new RotationAnimation(bicycle.main, 0, 4000, 0, 90, 0),
+        new RotationAnimation(bicycle.frontPivot, 0, 2000, 0, pivotRotation, 0),
+        new RotationAnimation(bicycle.body, 0, 2000, 15, 0, 0),
+        new RotationAnimation(bicycle.frontPivot, 2000, 4000, 0, -pivotRotation, 0),
+        new RotationAnimation(bicycle.body, 2000, 4000, -bodyRotation, 0, 0),
 
-        new Animate(bicycle.main, 12000, 16000, MoveType.Rotate, 0, 90, 0),
-        new Animate(bicycle.frontPivot, 12000, 14000, MoveType.Rotate, 0, pivotRotation, 0),
-        new Animate(bicycle.body, 12000, 14000, MoveType.Rotate, bodyRotation, 0, 0),
-        new Animate(bicycle.frontPivot, 14000, 16000, MoveType.Rotate, 0, -pivotRotation, 0),
-        new Animate(bicycle.body, 14000, 16000, MoveType.Rotate, -bodyRotation, 0, 0),
+        new RotationAnimation(bicycle.main, 12000, 16000, 0, 90, 0),
+        new RotationAnimation(bicycle.frontPivot, 12000, 14000, 0, pivotRotation, 0),
+        new RotationAnimation(bicycle.body, 12000, 14000, bodyRotation, 0, 0),
+        new RotationAnimation(bicycle.frontPivot, 14000, 16000, 0, -pivotRotation, 0),
+        new RotationAnimation(bicycle.body, 14000, 16000, -bodyRotation, 0, 0),
 
-        new Animate(bicycle.main, 24000, 28000, MoveType.Rotate, 0, 90, 0),
-        new Animate(bicycle.frontPivot, 24000, 26000, MoveType.Rotate, 0, pivotRotation, 0),
-        new Animate(bicycle.body, 24000, 28000, MoveType.Rotate, bodyRotation, 0, 0),
-        new Animate(bicycle.frontPivot, 26000, 28000, MoveType.Rotate, 0, -pivotRotation, 0),
-        new Animate(bicycle.body, 26000, 28000, MoveType.Rotate, -bodyRotation, 0, 0),
+        new RotationAnimation(bicycle.main, 24000, 28000, 0, 90, 0),
+        new RotationAnimation(bicycle.frontPivot, 24000, 26000, 0, pivotRotation, 0),
+        new RotationAnimation(bicycle.body, 24000, 28000, bodyRotation, 0, 0),
+        new RotationAnimation(bicycle.frontPivot, 26000, 28000, 0, -pivotRotation, 0),
+        new RotationAnimation(bicycle.body, 26000, 28000, -bodyRotation, 0, 0),
 
-        new Animate(bicycle.main, 36000, 40000, MoveType.Rotate, 0, 90, 0),
-        new Animate(bicycle.frontPivot, 36000, 38000, MoveType.Rotate, 0, pivotRotation, 0),
-        new Animate(bicycle.body, 36000, 38000, MoveType.Rotate, bodyRotation, 0, 0),
-        new Animate(bicycle.frontPivot, 38000, 40000, MoveType.Rotate, 0, -pivotRotation, 0),
-        new Animate(bicycle.body, 38000, 40000, MoveType.Rotate, -bodyRotation, 0, 0),
+        new RotationAnimation(bicycle.main, 36000, 40000, 0, 90, 0),
+        new RotationAnimation(bicycle.frontPivot, 36000, 38000, 0, pivotRotation, 0),
+        new RotationAnimation(bicycle.body, 36000, 38000, bodyRotation, 0, 0),
+        new RotationAnimation(bicycle.frontPivot, 38000, 40000, 0, -pivotRotation, 0),
+        new RotationAnimation(bicycle.body, 38000, 40000, -bodyRotation, 0, 0),
 
-        new Animate(bicycle.main, 40000, 48000, MoveType.Rotate, 0, 0, 0),
+        new RotationAnimation(bicycle.main, 40000, 48000, 0, 0, 0),
     ], true);
     bicycleMotion.multiplySpeed(0.5);
     animations.push(bicycleMotion);
 
     var honking = new AnimationList([
-        new Animate(bicycle.honk, 0, 1000, MoveType.Scale, 0.8, 0.8, 0.8),
-        new Animate(bicycle.honk, 1000, 2000, MoveType.Scale, 1 / 0.8, 1 / 0.8, 1 / 0.8),
+        new ScaleAnimation(bicycle.honk, 0, 1000, 0.8, 0.8, 0.8),
+        new ScaleAnimation(bicycle.honk, 1000, 2000, 1 / 0.8, 1 / 0.8, 1 / 0.8),
     ], true);
     animations.push(honking);
 
+    var flagMotion = new AnimationList([
+        new ArbitraryAxisRotationAnimation(bicycle.flag, 0, 1000, Math.sin(GEO.rad(-20)), Math.cos(GEO.rad(-20)), 0, 90),
+        new ArbitraryAxisRotationAnimation(bicycle.flag, 1000, 2000, Math.sin(GEO.rad(-20)), Math.cos(GEO.rad(-20)), 0, -90),
+    ], true);
+    animations.push(flagMotion);
+
     for (let i = 0; i < floor.trees.length; i++) {
         var treeBreathing = new AnimationList([
-            new Animate(floor.trees[i], 0, 1000, MoveType.Scale, 1.2, 1.2, 1.2),
-            new Animate(floor.trees[i], 1000, 2000, MoveType.Scale, 1 / 1.2, 1 / 1.2, 1 / 1.2),
+            new ScaleAnimation(floor.trees[i], 0, 1000, 1.2, 1.2, 1.2),
+            new ScaleAnimation(floor.trees[i], 1000, 2000, 1 / 1.2, 1 / 1.2, 1 / 1.2),
         ], true);
         animations.push(treeBreathing);
     }
 
     var grassBreathing = new AnimationList([
-        new Animate(floor.grass, 0, 1000, MoveType.Translate, 0, 1, 0),
-        new Animate(floor.grass, 1000, 2000, MoveType.Translate, 0, -1, 0),
+        new TranslationAnimation(floor.grass, 0, 1000, 0, 0.5, 0),
+        new TranslationAnimation(floor.grass, 1000, 2000, 0, -0.5, 0),
     ], true);
     animations.push(grassBreathing);
 

@@ -1,54 +1,99 @@
-const MoveType = Object.freeze({
-    Rotate: 'Rotate',
-    Translate: 'Translate',
-    Scale: 'Scale'
-});
+class TranslationAnimation {
+    object;
+    start;
+    end;
+    x; y; z;
+    constructor(object, start, end, x, y, z) {
+        this.object = object;
+        this.start = start;
+        this.end = end;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 
-class Animate {
+    run(time, dt) {
+        if (time > this.start && time < this.end) {
+            var div = dt / (this.end - this.start);
+            this.object.translate(this.x * div, this.y * div, this.z * div);
+        }
+    }
+}
+
+class RotationAnimation {
+    object;
+    start;
+    end;
+    ax; ay; az;
+
+    constructor(object, start, end, ax, ay, az) {
+        this.object = object;
+        this.start = start;
+        this.end = end;
+        this.ax = GEO.rad(ax);
+        this.ay = GEO.rad(ay);
+        this.az = GEO.rad(az);
+    }
+
+    run(time, dt) {
+        if (time > this.start && time < this.end) {
+            var div = dt / (this.end - this.start);
+            this.object.rotate(this.ax * div, this.ay * div, this.az * div);
+        }
+    }
+}
+
+class ScaleAnimation {
+    object;
+    start;
+    end;
+    kx; ky; kz;
+    curr_x = 1.0; curr_y = 1.0; curr_z = 1.0;
+
+    constructor(object, start, end, kx, ky, kz) {
+        this.object = object;
+        this.start = start;
+        this.end = end;
+        this.kx = kx;
+        this.ky = ky;
+        this.kz = kz;
+    }
+
+    run(time, dt) {
+        if (time > this.start && time < this.end) {
+            var div = dt / (this.end - this.start);
+            this.object.scale(1 / this.curr_x, 1 / this.curr_y, 1 / this.curr_z);
+            this.curr_x += (this.kx - 1.0) * div;
+            this.curr_y += (this.ky - 1.0) * div;
+            this.curr_z += (this.kz - 1.0) * div;
+            this.object.scale(this.curr_x, this.curr_y, this.curr_z);
+
+        }
+    }
+}
+
+class ArbitraryAxisRotationAnimation {
     // Parameters
     object;
     start;
     end;
-    type;
-    x;
-    y;
-    z;
-    curr_x = 1.0;
-    curr_y = 1.0;
-    curr_z = 1.0;
+    m1; m2; m3;
+    theta;
 
-    constructor(object, start, end, type, x, y, z) {
+    constructor(object, start, end, m1, m2, m3, theta) {
         this.object = object;
         this.start = start;
         this.end = end;
-        this.type = type;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-
-        if (type == 'Rotate') {
-            this.x *= Math.PI / 180.0;
-            this.y *= Math.PI / 180.0;
-            this.z *= Math.PI / 180.0;
-        }
+        this.m1 = m1;
+        this.m2 = m2;
+        this.m3 = m3;
+        this.theta = GEO.rad(theta);
     }
 
     run(time, dt) {
-        if(time > this.start && time < this.end) {
-            // Count the frames
+        if (time > this.start && time < this.end) {
             var div = dt / (this.end - this.start);
-            if(this.type == 'Rotate') {
-                this.object.rotate(this.x * div, this.y * div, this.z * div);
-            } else if(this.type == 'Translate') {
-                this.object.translate(this.x * div, this.y * div, this.z * div);
-            } else if(this.type == 'Scale') {
-                this.object.scale(1 / this.curr_x, 1 / this.curr_y, 1 / this.curr_z);
-                this.curr_x += (this.x - 1.0) * div;
-                this.curr_y += (this.y - 1.0) * div;
-                this.curr_z += (this.z - 1.0) * div;
-                //console.log(this.curr_x, this.curr_y, this.curr_z);
-                this.object.scale(this.curr_x, this.curr_y, this.curr_z);
-            }
+            this.object.rotateArbitraryAxis(this.m1, this.m2, this.m3, this.theta * div);
         }
     }
 }
@@ -63,23 +108,23 @@ class AnimationList {
     constructor(animations, isLoop) {
         this.animations = animations;
         this.isLoop = isLoop;
-        for(let i = 0; i < this.animations.length; i++) {
+        for (let i = 0; i < this.animations.length; i++) {
             this.start = Math.min(this.start, this.animations[i].start);
             this.end = Math.max(this.end, this.animations[i].end);
         }
     }
 
     run(time, dt) {
-        if(time > this.start && time < this.end) {
-            for(let animation of this.animations) {
+        if (time > this.start && time < this.end) {
+            for (let animation of this.animations) {
                 animation.run(time, dt);
             }
         }
-        if(time > this.end && this.isLoop) {
+        if (time > this.end && this.isLoop) {
             let duration = this.end - this.start + 2 * dt;
             this.start += duration;
             this.end += duration;
-            for(let i = 0; i < this.animations.length; i++) {
+            for (let i = 0; i < this.animations.length; i++) {
                 this.animations[i].start += duration;
                 this.animations[i].end += duration;
                 this.animations[i].curr_x = 1.0;
@@ -91,7 +136,7 @@ class AnimationList {
 
     multiplySpeed(x) {
         this.end = 0;
-        for(let i = 0; i < this.animations.length; i++) {
+        for (let i = 0; i < this.animations.length; i++) {
             let offset = this.start * (1 - x);
             this.animations[i].start *= x;
             this.animations[i].end *= x;
