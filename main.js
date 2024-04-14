@@ -158,11 +158,12 @@ function main() {
     GL.depthFunc(GL.LEQUAL);
     GL.clearDepth(1.0);
 
-    let load_time = 1500;
+    let load_time;
+    let render_loop = 3;
     let loaded = false;
-    var time_prev = -1.0;
+    let time_prev = 0;
     var animate = function (time) {
-        var dt = (time - time_prev);
+        let dt = (time - time_prev);
         time_prev = time;
         if (!drag) {
             dX *= AMORTIZATION, dY *= AMORTIZATION;
@@ -212,9 +213,12 @@ function main() {
         bicycle.main.draw();
         floor.main.draw();
 
-        // Only run transformation after first render finished
-        if (time >= load_time && !loaded) loaded = true;
-        else {
+        // Only run transformation after first three render finished
+        if (render_loop > 0) render_loop--;
+        if (render_loop == 0 && !loaded)  {
+            loaded = true;
+            load_time = time;
+        } else {
             // Running the animations
             time -= load_time;
             for (let animation of animations) {
@@ -228,6 +232,6 @@ function main() {
         GL.flush();
         window.requestAnimationFrame(animate);
     };
-    animate(-1);
+    animate(0);
 }
 window.addEventListener('load', main);
