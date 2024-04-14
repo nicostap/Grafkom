@@ -91,7 +91,7 @@ function main() {
     // Placing objects
     bicycle.main.translate(-30, 14, -30);
     bicycle.main.rotate(0, GEO.rad(180), 0);
-    bicycle.flag.rotateArbitraryAxis(Math.sin(GEO.rad(-20)), Math.cos(GEO.rad(-20)), 0, -45);
+    bicycle.flag.rotateArbitraryAxis(Math.cos(GEO.rad(90 + 20)), Math.sin(GEO.rad(90 + 20)), 0, -45);
 
     // Making the animations
     var animations = [];
@@ -112,47 +112,28 @@ function main() {
     ], true);
     animations.push(bicycleLoop);
 
-    let pivotRotation = 30;
-    let bodyRotation = 15;
+    let pivotRotation = 35;
+    let bodyRotation = 20;
     var bicycleMotion = new AnimationList([
         new RotationAnimation(bicycle.main, 0, 4000, 0, 90, 0),
         new RotationAnimation(bicycle.frontPivot, 0, 2000, 0, pivotRotation, 0),
-        new RotationAnimation(bicycle.body, 0, 2000, 15, 0, 0),
+        new RotationAnimation(bicycle.body, 0, 2000, bodyRotation, 0, 0),
         new RotationAnimation(bicycle.frontPivot, 2000, 4000, 0, -pivotRotation, 0),
         new RotationAnimation(bicycle.body, 2000, 4000, -bodyRotation, 0, 0),
-
-        new RotationAnimation(bicycle.main, 12000, 16000, 0, 90, 0),
-        new RotationAnimation(bicycle.frontPivot, 12000, 14000, 0, pivotRotation, 0),
-        new RotationAnimation(bicycle.body, 12000, 14000, bodyRotation, 0, 0),
-        new RotationAnimation(bicycle.frontPivot, 14000, 16000, 0, -pivotRotation, 0),
-        new RotationAnimation(bicycle.body, 14000, 16000, -bodyRotation, 0, 0),
-
-        new RotationAnimation(bicycle.main, 24000, 28000, 0, 90, 0),
-        new RotationAnimation(bicycle.frontPivot, 24000, 26000, 0, pivotRotation, 0),
-        new RotationAnimation(bicycle.body, 24000, 28000, bodyRotation, 0, 0),
-        new RotationAnimation(bicycle.frontPivot, 26000, 28000, 0, -pivotRotation, 0),
-        new RotationAnimation(bicycle.body, 26000, 28000, -bodyRotation, 0, 0),
-
-        new RotationAnimation(bicycle.main, 36000, 40000, 0, 90, 0),
-        new RotationAnimation(bicycle.frontPivot, 36000, 38000, 0, pivotRotation, 0),
-        new RotationAnimation(bicycle.body, 36000, 38000, bodyRotation, 0, 0),
-        new RotationAnimation(bicycle.frontPivot, 38000, 40000, 0, -pivotRotation, 0),
-        new RotationAnimation(bicycle.body, 38000, 40000, -bodyRotation, 0, 0),
-
-        new RotationAnimation(bicycle.main, 40000, 48000, 0, 0, 0),
+        new RotationAnimation(bicycle.main, 4000, 12000, 0, 0, 0),
     ], true);
     bicycleMotion.multiplySpeed(0.5);
     animations.push(bicycleMotion);
 
     var honking = new AnimationList([
-        new ScaleAnimation(bicycle.honk, 0, 1000, 0.8, 0.8, 0.8),
-        new ScaleAnimation(bicycle.honk, 1000, 2000, 1 / 0.8, 1 / 0.8, 1 / 0.8),
+        new ScaleAnimation(bicycle.honk, 0, 1000, 0.6, 0.6, 0.6),
+        new ScaleAnimation(bicycle.honk, 1000, 2000, 1 / 0.6, 1 / 0.6, 1 / 0.6),
     ], true);
     animations.push(honking);
 
     var flagMotion = new AnimationList([
-        new ArbitraryAxisRotationAnimation(bicycle.flag, 0, 1000, Math.sin(GEO.rad(-20)), Math.cos(GEO.rad(-20)), 0, 90),
-        new ArbitraryAxisRotationAnimation(bicycle.flag, 1000, 2000, Math.sin(GEO.rad(-20)), Math.cos(GEO.rad(-20)), 0, -90),
+        new ArbitraryAxisRotationAnimation(bicycle.flag, 0, 1000, Math.cos(GEO.rad(90 + 20)), Math.sin(GEO.rad(90 + 20)), 0, 90),
+        new ArbitraryAxisRotationAnimation(bicycle.flag, 1000, 2000, Math.cos(GEO.rad(90 + 20)), Math.sin(GEO.rad(90 + 20)), 0, -90),
     ], true);
     animations.push(flagMotion);
 
@@ -165,18 +146,21 @@ function main() {
     }
 
     var grassBreathing = new AnimationList([
-        new TranslationAnimation(floor.grass, 0, 1000, 0, 0.5, 0),
-        new TranslationAnimation(floor.grass, 1000, 2000, 0, -0.5, 0),
+        new TranslationAnimation(floor.grass, 0, 1000, 0, 0.75, 0),
+        new TranslationAnimation(floor.grass, 1000, 2000, 0, -0.75, 0),
     ], true);
     animations.push(grassBreathing);
 
     // Drawing
+    GL.enable(GL.CULL_FACE);
     GL.clearColor(0.0, 0.0, 0.0, 0.0);
     GL.enable(GL.DEPTH_TEST);
     GL.depthFunc(GL.LEQUAL);
     GL.clearDepth(1.0);
 
-    var time_prev = 0.0;
+    let load_time = 1500;
+    let loaded = false;
+    var time_prev = -1.0;
     var animate = function (time) {
         var dt = (time - time_prev);
         time_prev = time;
@@ -228,13 +212,17 @@ function main() {
         bicycle.main.draw();
         floor.main.draw();
 
-        // Running the animations
-        for (let animation of animations) {
-            animation.run(time, dt);
+        // Only run transformation after first render finished
+        if (time >= load_time && !loaded) loaded = true;
+        else {
+            // Running the animations
+            time -= load_time;
+            for (let animation of animations) {
+                animation.run(time, dt);
+            }
+            // Logic
+            bicycle.main.translate(0.01 * dt * Math.cos(bicycle.main.rotation.y), 0, 0.01 * dt * -Math.sin(bicycle.main.rotation.y));
         }
-
-        // Logic
-        bicycle.main.translate(0.01 * dt * Math.cos(bicycle.main.rotation.y), 0, 0.01 * dt * -Math.sin(bicycle.main.rotation.y));
 
         // Flush
         GL.flush();

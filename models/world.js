@@ -5,8 +5,8 @@ function createFloor() {
     let normal = [];
     let floorColor = [64 / 255, 41 / 255, 5 / 255];
     let heightDist = [];
-    let floorSide = 500;
-    let partition = 50;
+    let floorSide = 600;
+    let partition = 60;
     let tileSide = floorSide / partition;
 
     for (let i = 0; i < partition; i++) {
@@ -36,13 +36,13 @@ function createFloor() {
                 currIndex = floorVertices.length / 9;
                 glMatrix.vec3.cross(
                     normal,
-                    [currpoint[0] - nextpoint[0], currpoint[1] - nextpoint[1], currpoint[2] - nextpoint[2]],
-                    [currpoint[0] - sidepoint[0], currpoint[1] - sidepoint[1], currpoint[2] - sidepoint[2]]
+                    [nextpoint[0] - currpoint[0], nextpoint[1] - currpoint[1], nextpoint[2] - currpoint[2]],
+                    [sidepoint[0] - currpoint[0], sidepoint[1] - currpoint[1], sidepoint[2] - currpoint[2]],
                 );
                 glMatrix.vec3.normalize(normal, normal);
+                floorVertices.push(...nextpoint, ...normal, ...floorColor);
                 floorVertices.push(...currpoint, ...normal, ...floorColor);
                 floorVertices.push(...sidepoint, ...normal, ...floorColor);
-                floorVertices.push(...nextpoint, ...normal, ...floorColor);
                 floorFaces.push(currIndex, currIndex + 1, currIndex + 2);
             }
             if (i != 0) {
@@ -54,13 +54,13 @@ function createFloor() {
                 currIndex = floorVertices.length / 9;
                 glMatrix.vec3.cross(
                     normal,
-                    [sidepoint[0] - nextpoint[0], sidepoint[1] - nextpoint[1], sidepoint[2] - nextpoint[2]],
-                    [sidepoint[0] - currpoint[0], sidepoint[1] - currpoint[1], sidepoint[2] - currpoint[2]],
+                    [nextpoint[0] - sidepoint[0], nextpoint[1] - sidepoint[1], nextpoint[2] - sidepoint[2]],
+                    [currpoint[0] - sidepoint[0], currpoint[1] - sidepoint[1], currpoint[2] - sidepoint[2]],
                 );
                 glMatrix.vec3.normalize(normal, normal);
-                floorVertices.push(...currpoint, ...normal, ...floorColor);
-                floorVertices.push(...sidepoint, ...normal, ...floorColor);
                 floorVertices.push(...nextpoint, ...normal, ...floorColor);
+                floorVertices.push(...sidepoint, ...normal, ...floorColor);
+                floorVertices.push(...currpoint, ...normal, ...floorColor);
                 floorFaces.push(currIndex, currIndex + 1, currIndex + 2);
             }
         }
@@ -86,16 +86,16 @@ function createFloor() {
         0, 1, 0, 0, 0, -1, 0, 0.5, 0,
     ];
     var grassFaces = [
-        0, 1, 2,
+        2, 1, 0,
         3, 4, 5,
         6, 7, 8,
-        9, 10, 11
+        11, 10, 9
     ]
 
     // Object instancing
     var grassInstance = instanceRandomiser(grassVertices, grassFaces, 0, 0, 500, 500, 25, 25);
     var grass = new Object3D(grassInstance.vertices, grassInstance.faces);
-    grass.translate(0, 0.45, 0);
+    grass.translate(0, 0.75, 0);
     grass.scale(1, 3, 1);
     floor.addChild(grass);
 

@@ -305,8 +305,8 @@ function createCharacter_1() {
     rightArm.addChild(rightForeArm); 
 
     var head = new Object3D(blackParaboloid.vertices, blackParaboloid.faces);
-    head.setLocalScale(2.0, -3.0, 2.0);
-    head.setLocalRotation(0, 0, GEO.rad(40));
+    head.setLocalScale(2.0, 3.0, 2.0);
+    head.setLocalRotation(GEO.rad(180), 0, GEO.rad(-40));
     head.setLocalTranslation(1, 12, 0);
     body.addChild(head);
 
