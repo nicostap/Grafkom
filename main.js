@@ -87,11 +87,13 @@ function main() {
     // Making the objects
     var bicycle = createCharacter_1();
     var floor = createFloor();
+    var farmer = createCharacter_3();
 
     // Placing objects
     bicycle.main.translate(-30, 14, -30);
     bicycle.main.rotate(0, GEO.rad(180), 0);
     bicycle.flag.rotateArbitraryAxis(Math.cos(GEO.rad(90 + 20)), Math.sin(GEO.rad(90 + 20)), 0, -45);
+    farmer.main.translate(0, 20, -50)
 
     // Making the animations
     var animations = [];
@@ -209,9 +211,11 @@ function main() {
         GL.viewport(0, 0, CANVAS.width, CANVAS.height);
         GL.clear(GL.COLOR_BUFFER_BIT | GL.D_BUFFER_BIT);
         bicycle.main.setUniform4(PROJMATRIX, VIEWMATRIX);
-        floor.main.setUniform4(PROJMATRIX, VIEWMATRIX);;
+        floor.main.setUniform4(PROJMATRIX, VIEWMATRIX);
+        farmer.main.setUniform4(PROJMATRIX, VIEWMATRIX);
         bicycle.main.draw();
         floor.main.draw();
+        farmer.main.draw();
 
         // Only run transformation after first three render finished
         if (render_loop > 0) render_loop--;
