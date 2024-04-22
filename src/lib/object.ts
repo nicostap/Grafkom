@@ -1,85 +1,18 @@
-var GL;
+import * as glMatrix from "gl-matrix";
+import defaultVertexShader from "./shaders/default.vert?raw";
+import defaultFragmentShader from "./shaders/default.frag?raw";
 
-class Object3D {
+export class Object3D {
+  static GL: WebGLRenderingContext;
+
   // Default Shader
-  static default_shader_vertex_source = `
-    attribute vec3 position;
-    attribute vec3 normal;
-    attribute vec3 color;
-    uniform mat4 Pmatrix;
-    uniform mat4 Vmatrix;
-    uniform mat4 Mmatrix;
-    uniform mat4 uNormalMatrix;
-
-    const vec3 lightWorldPosition = vec3(50., 50., 50.);
-
-    varying vec3 vColor;
-    varying vec3 vPosition;
-    varying vec3 vNormal;
-    varying vec3 vSurfaceToLight;
-    
-    void main(void) {
-        // For normal
-        vNormal = vec3(uNormalMatrix * vec4(normal, 1.0));
-
-        // For fog
-        vPosition = (Vmatrix * Mmatrix * vec4(position, 1.)).xyz;
-
-        // For lighting
-        vec3 surfaceWorldPosition = (Mmatrix * vec4(position, 1.0)).xyz;
-        vSurfaceToLight = lightWorldPosition - surfaceWorldPosition;
-
-        gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.0);
-        vColor = color;
-    }`;
-  static default_shader_fragment_source = `
-    precision mediump float;
-    varying vec3 vColor;
-
-    vec4 u_fogColor = vec4(174. / 255., 185. / 255., 255. / 255., 1.);
-    float u_fogNear = 0.1;
-    float u_fogFar = 300.;
-
-    varying vec3 vPosition;
-    varying vec3 vNormal;
-    varying vec3 vSurfaceToLight;
-
-    const vec3 source_ambient_color = vec3(1.,1.,1.);
-    const vec3 source_diffuse_color = vec3(1. ,1., 1.);
-    const vec3 source_specular_color = vec3(1.,1.,1.); 
-
-    const vec3 mat_ambient_color = vec3(0.8,0.8,0.8);
-    const vec3 mat_diffuse_color = vec3(0.8,0.8,0.8);
-    const vec3 mat_specular_color = vec3(0.4,0.4,0.4);
-    const float mat_shininess = 0.2;
-
-    void main(void) {
-        vec3 surfaceToLightDirection = normalize(vSurfaceToLight);
-        vec3 normal = normalize(vNormal);
-
-        vec3 I_ambient = source_ambient_color * mat_ambient_color;
-        
-        vec3 I_diffuse = source_diffuse_color * mat_diffuse_color * max(0., dot(vNormal, surfaceToLightDirection));
-        
-        vec3 V = normalize(vPosition);
-        vec3 R = reflect(surfaceToLightDirection, normal);
-       
-        vec3 I_specular = source_specular_color*mat_specular_color*pow(max(dot(R,V),0.), mat_shininess);
-        
-        vec3 I = I_ambient + I_diffuse + I_specular;
-
-        vec4 color = vec4(I * vColor, 1.);
-
-        float fogDistance = length(vPosition);
-        float fogAmount = smoothstep(u_fogNear, u_fogFar, fogDistance);
-
-        gl_FragColor = mix(color, u_fogColor, fogAmount);
-    }`;
+  static default_shader_vertex_source = defaultVertexShader;
+  static default_shader_fragment_source = defaultFragmentShader;
 
   object_vertex;
-  OBJECT_VERTEX;
+  OBJECT_VERTEX: WebGLBuffer | null = null;
   object_faces;
-  OBJECT_FACES;
+  OBJECT_FACES: WebGLBuffer | null = null;
 
   // Local transformation
   INIT_SCALEMATRIX = glMatrix.mat4.create();
@@ -90,24 +23,29 @@ class Object3D {
   SCALEMATRIX = glMatrix.mat4.create();
   ROTATEMATRICES = [glMatrix.mat4.create()];
   TRANSMATRIX = glMatrix.mat4.create();
-  origin = [0, 0, 0];
+  origin: [number, number, number] = [0, 0, 0];
 
   rotation = { x: 0, y: 0, z: 0 };
 
   // Relationship
-  parent = null;
-  child = [];
+  parent: Object3D | null = null;
+  child: Object3D[] = [];
 
   // Shaders
   shader_vertex_source;
   shader_fragment_source;
 
-  compile_shader = function (source, type, typeString) {
-    var shader = GL.createShader(type);
-    GL.shaderSource(shader, source);
-    GL.compileShader(shader);
-    if (!GL.getShaderParameter(shader, GL.COMPILE_STATUS)) {
-      alert("ERROR IN " + typeString + " SHADER: " + GL.getShaderInfoLog(shader));
+  compile_shader = function (source: string, type: number, typeString: string) {
+    const shader = Object3D.GL.createShader(type);
+    if (!shader) {
+      alert('Unable to create shader');
+      return null;
+    }
+
+    Object3D.GL.shaderSource(shader, source);
+    Object3D.GL.compileShader(shader);
+    if (!Object3D.GL.getShaderParameter(shader, Object3D.GL.COMPILE_STATUS)) {
+      alert("ERROR IN " + typeString + " SHADER: " + Object3D.GL.getShaderInfoLog(shader));
       return false;
     }
     return shader;
@@ -116,15 +54,15 @@ class Object3D {
   shader_vertex;
   shader_fragment;
   SHADER_PROGRAM;
-  _Pmatrix;
-  _Vmatrix;
-  _Mmatrix;
-  _Nmatrix;
-  _color;
-  _position;
-  _normal;
+  _Pmatrix: WebGLUniformLocation;
+  _Vmatrix: WebGLUniformLocation;
+  _Mmatrix: WebGLUniformLocation;
+  _Nmatrix: WebGLUniformLocation;
+  _color: number = -1;
+  _position: number = -1;
+  _normal: number = -1;
 
-  constructor(object_vertex, object_faces, shader_vertex_source = null, shader_fragment_source = null) {
+  constructor(object_vertex: number[], object_faces: number[], shader_vertex_source: string | null = null, shader_fragment_source: string | null = null) {
     this.object_vertex = object_vertex;
     this.object_faces = object_faces;
 
@@ -133,53 +71,55 @@ class Object3D {
     if (shader_fragment_source == null) this.shader_fragment_source = Object3D.default_shader_fragment_source;
     else this.shader_fragment_source = shader_fragment_source;
 
-    this.initialize();
-  }
+    this.OBJECT_VERTEX = Object3D.GL.createBuffer();
+    this.OBJECT_FACES = Object3D.GL.createBuffer();
+    this.shader_vertex = this.compile_shader(this.shader_vertex_source, Object3D.GL.VERTEX_SHADER, "VERTEX") as WebGLShader;
+    this.shader_fragment = this.compile_shader(this.shader_fragment_source, Object3D.GL.FRAGMENT_SHADER, "FRAGMENT") as WebGLShader;
+    this.SHADER_PROGRAM = Object3D.GL.createProgram() as WebGLProgram;
 
-  initialize() {
-    this.OBJECT_VERTEX = GL.createBuffer();
-    this.OBJECT_FACES = GL.createBuffer();
-    this.shader_vertex = this.compile_shader(this.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-    this.shader_fragment = this.compile_shader(this.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
-    this.SHADER_PROGRAM = GL.createProgram();
+    if (!this.shader_vertex || !this.shader_fragment || !this.SHADER_PROGRAM) {
+      alert('Unable to create shaders');
+      throw new Error("Unable to create shaders");
+    }
 
-    GL.attachShader(this.SHADER_PROGRAM, this.shader_vertex);
-    GL.attachShader(this.SHADER_PROGRAM, this.shader_fragment);
-    GL.linkProgram(this.SHADER_PROGRAM);
+    Object3D.GL.attachShader(this.SHADER_PROGRAM, this.shader_vertex);
+    Object3D.GL.attachShader(this.SHADER_PROGRAM, this.shader_fragment);
+    Object3D.GL.linkProgram(this.SHADER_PROGRAM);
 
-    this._Pmatrix = GL.getUniformLocation(this.SHADER_PROGRAM, "Pmatrix");
-    this._Vmatrix = GL.getUniformLocation(this.SHADER_PROGRAM, "Vmatrix");
-    this._Mmatrix = GL.getUniformLocation(this.SHADER_PROGRAM, "Mmatrix");
-    this._Nmatrix = GL.getUniformLocation(this.SHADER_PROGRAM, "uNormalMatrix");
+    this._Pmatrix = Object3D.GL.getUniformLocation(this.SHADER_PROGRAM, "Pmatrix") as WebGLUniformLocation;
+    this._Vmatrix = Object3D.GL.getUniformLocation(this.SHADER_PROGRAM, "Vmatrix") as WebGLUniformLocation;
+    this._Mmatrix = Object3D.GL.getUniformLocation(this.SHADER_PROGRAM, "Mmatrix") as WebGLUniformLocation;
+    this._Nmatrix = Object3D.GL.getUniformLocation(this.SHADER_PROGRAM, "uNormalMatrix") as WebGLUniformLocation;
 
-    this._color = GL.getAttribLocation(this.SHADER_PROGRAM, "color");
-    this._position = GL.getAttribLocation(this.SHADER_PROGRAM, "position");
-    this._normal = GL.getAttribLocation(this.SHADER_PROGRAM, "normal");
+    this._color = Object3D.GL.getAttribLocation(this.SHADER_PROGRAM, "color") ?? -1;;
+    this._position = Object3D.GL.getAttribLocation(this.SHADER_PROGRAM, "position") ?? -1;;
+    this._normal = Object3D.GL.getAttribLocation(this.SHADER_PROGRAM, "normal") ?? -1;;
 
-    GL.enableVertexAttribArray(this._color);
-    GL.enableVertexAttribArray(this._position);
-    GL.enableVertexAttribArray(this._normal);
+    Object3D.GL.enableVertexAttribArray(this._color);
+    Object3D.GL.enableVertexAttribArray(this._position);
+    Object3D.GL.enableVertexAttribArray(this._normal);
 
-    GL.useProgram(this.SHADER_PROGRAM);
+    Object3D.GL.useProgram(this.SHADER_PROGRAM);
 
-    GL.bindBuffer(GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
-    GL.bufferData(GL.ARRAY_BUFFER,
+    Object3D.GL.bindBuffer(Object3D.GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
+    Object3D.GL.bufferData(Object3D.GL.ARRAY_BUFFER,
       new Float32Array(this.object_vertex),
-      GL.STATIC_DRAW);
-    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.OBJECT_FACES);
-    GL.bufferData(GL.ELEMENT_ARRAY_BUFFER,
+      Object3D.GL.STATIC_DRAW);
+    Object3D.GL.bindBuffer(Object3D.GL.ELEMENT_ARRAY_BUFFER, this.OBJECT_FACES);
+    Object3D.GL.bufferData(Object3D.GL.ELEMENT_ARRAY_BUFFER,
       new Uint16Array(this.object_faces),
-      GL.STATIC_DRAW);
+      Object3D.GL.STATIC_DRAW);
   }
 
-  translate(tx, ty, tz) {
+
+  translate(tx: number, ty: number, tz: number) {
     glMatrix.mat4.translate(this.TRANSMATRIX, this.TRANSMATRIX, [tx, ty, tz]);
     for (let i = 0; i < this.child.length; i++) {
       this.child[i].translate(tx, ty, tz);
     }
   }
 
-  #rotateChildren(ax, ay, az, x, y, z, depth = 1) {
+  #rotateChildren(ax: number, ay: number, az: number, x: number, y: number, z: number, depth = 1) {
     while (this.ROTATEMATRICES.length <= depth) {
       this.ROTATEMATRICES.push(glMatrix.mat4.create());
     }
@@ -196,7 +136,7 @@ class Object3D {
     }
   }
 
-  rotate(ax, ay, az) {
+  rotate(ax: number, ay: number, az: number) {
     glMatrix.mat4.translate(this.ROTATEMATRICES[0], this.ROTATEMATRICES[0], this.origin);
     glMatrix.mat4.rotateX(this.ROTATEMATRICES[0], this.ROTATEMATRICES[0], ax);
     glMatrix.mat4.rotateY(this.ROTATEMATRICES[0], this.ROTATEMATRICES[0], ay);
@@ -210,7 +150,7 @@ class Object3D {
     }
   }
 
-  #scaleChildren(kx, ky, kz, x, y, z) {
+  #scaleChildren(kx: number, ky: number, kz: number, x: number, y: number, z: number) {
     glMatrix.vec3.add(this.origin, this.origin, [x, y, z]);
     glMatrix.vec3.multiply(this.origin, this.origin, [kx, ky, kz]);
     glMatrix.vec3.add(this.origin, this.origin, [-x, -y, -z]);
@@ -223,7 +163,7 @@ class Object3D {
     }
   }
 
-  scale(kx, ky, kz) {
+  scale(kx: number, ky: number, kz: number) {
     glMatrix.mat4.translate(this.SCALEMATRIX, this.SCALEMATRIX, this.origin);
     glMatrix.mat4.scale(this.SCALEMATRIX, this.SCALEMATRIX, [kx, ky, kz]);
     glMatrix.mat4.translate(this.SCALEMATRIX, this.SCALEMATRIX, [-this.origin[0], -this.origin[1], -this.origin[2]]);
@@ -232,7 +172,7 @@ class Object3D {
     }
   }
 
-  #rotateArbitraryAxisChildren(n1, n2, n3, m1, m2, m3, theta, depth = 1) {
+  #rotateArbitraryAxisChildren(n1: number, n2: number, n3: number, m1: number, m2: number, m3: number, theta: number, depth = 1) {
     while (this.ROTATEMATRICES.length <= depth) {
       this.ROTATEMATRICES.push(glMatrix.mat4.create());
     }
@@ -260,11 +200,11 @@ class Object3D {
     glMatrix.mat4.multiply(this.ROTATEMATRICES[depth], translateInv, this.ROTATEMATRICES[depth]);
 
     for (let i = 0; i < this.child.length; i++) {
-      this.child[i].rotateArbritaryAxis(n1, n2, n3, m1, m2, m3, theta, depth + 1);
+      // this.child[i].rotateArbitraryAxis(n1, n2, n3, m1, m2, m3, theta, depth + 1);
     }
   }
 
-  rotateArbitraryAxis(m1, m2, m3, theta) {
+  rotateArbitraryAxis(m1: number, m2: number, m3: number, theta: number) {
     let a = m1;
     let b = m2;
     let c = m3;
@@ -293,7 +233,7 @@ class Object3D {
     }
   }
 
-  setUniform4(PROJMATRIX, VIEWMATRIX) {
+  setUniform4(PROJMATRIX: glMatrix.mat4, VIEWMATRIX: glMatrix.mat4) {
     let MOVEMATRIX = glMatrix.mat4.create();
     glMatrix.mat4.multiply(MOVEMATRIX, this.INIT_SCALEMATRIX, MOVEMATRIX);
     glMatrix.mat4.multiply(MOVEMATRIX, this.INIT_ROTATEMATRIX, MOVEMATRIX);
@@ -310,47 +250,47 @@ class Object3D {
     glMatrix.mat4.invert(NORMALMATRIX, NORMALMATRIX);
     glMatrix.mat4.transpose(NORMALMATRIX, NORMALMATRIX);
 
-    GL.useProgram(this.SHADER_PROGRAM);
-    GL.uniformMatrix4fv(this._Pmatrix, false, PROJMATRIX);
-    GL.uniformMatrix4fv(this._Vmatrix, false, VIEWMATRIX);
-    GL.uniformMatrix4fv(this._Mmatrix, false, MOVEMATRIX);
-    GL.uniformMatrix4fv(this._Nmatrix, false, NORMALMATRIX);
+    Object3D.GL.useProgram(this.SHADER_PROGRAM);
+    Object3D.GL.uniformMatrix4fv(this._Pmatrix, false, PROJMATRIX);
+    Object3D.GL.uniformMatrix4fv(this._Vmatrix, false, VIEWMATRIX);
+    Object3D.GL.uniformMatrix4fv(this._Mmatrix, false, MOVEMATRIX);
+    Object3D.GL.uniformMatrix4fv(this._Nmatrix, false, NORMALMATRIX);
 
     for (let i = 0; i < this.child.length; i++) {
       this.child[i].setUniform4(PROJMATRIX, VIEWMATRIX);
     }
   }
 
-  setLocalTranslation(x, y, z) {
+  setLocalTranslation(x: number, y: number, z: number) {
     glMatrix.mat4.fromTranslation(this.INIT_TRANSMATRIX, [x, y, z]);
   }
 
-  setLocalRotation(ax, ay, az) {
+  setLocalRotation(ax: number, ay: number, az: number) {
     glMatrix.mat4.identity(this.INIT_ROTATEMATRIX);
     glMatrix.mat4.rotateX(this.INIT_ROTATEMATRIX, this.INIT_ROTATEMATRIX, ax);
     glMatrix.mat4.rotateY(this.INIT_ROTATEMATRIX, this.INIT_ROTATEMATRIX, ay);
     glMatrix.mat4.rotateZ(this.INIT_ROTATEMATRIX, this.INIT_ROTATEMATRIX, az);
   }
 
-  setLocalScale(kx, ky, kz) {
+  setLocalScale(kx: number, ky: number, kz: number) {
     glMatrix.mat4.fromScaling(this.INIT_SCALEMATRIX, [kx, ky, kz]);
   }
 
   draw() {
-    GL.useProgram(this.SHADER_PROGRAM);
-    GL.bindBuffer(GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
-    GL.vertexAttribPointer(this._position, 3, GL.FLOAT, false, (3 + 3 + 3) * 4, 0);
-    GL.vertexAttribPointer(this._normal, 3, GL.FLOAT, false, (3 + 3 + 3) * 4, 3 * 4);
-    GL.vertexAttribPointer(this._color, 3, GL.FLOAT, false, (3 + 3 + 3) * 4, (3 + 3) * 4);
-    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.OBJECT_FACES);
-    GL.drawElements(GL.TRIANGLES, this.object_faces.length, GL.UNSIGNED_SHORT, 0);
+    Object3D.GL.useProgram(this.SHADER_PROGRAM);
+    Object3D.GL.bindBuffer(Object3D.GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
+    Object3D.GL.vertexAttribPointer(this._position, 3, Object3D.GL.FLOAT, false, (3 + 3 + 3) * 4, 0);
+    Object3D.GL.vertexAttribPointer(this._normal, 3, Object3D.GL.FLOAT, false, (3 + 3 + 3) * 4, 3 * 4);
+    Object3D.GL.vertexAttribPointer(this._color, 3, Object3D.GL.FLOAT, false, (3 + 3 + 3) * 4, (3 + 3) * 4);
+    Object3D.GL.bindBuffer(Object3D.GL.ELEMENT_ARRAY_BUFFER, this.OBJECT_FACES);
+    Object3D.GL.drawElements(Object3D.GL.TRIANGLES, this.object_faces.length, Object3D.GL.UNSIGNED_SHORT, 0);
 
     for (let i = 0; i < this.child.length; i++) {
       this.child[i].draw();
     }
   }
 
-  addChild(object, ox = object.INIT_TRANSMATRIX[12], oy = object.INIT_TRANSMATRIX[13], oz = object.INIT_TRANSMATRIX[14]) {
+  addChild(object: Object3D, ox = object.INIT_TRANSMATRIX[12], oy = object.INIT_TRANSMATRIX[13], oz = object.INIT_TRANSMATRIX[14]) {
     object.parent = this;
     object.origin = [ox, oy, oz];
     this.child.push(object);
@@ -380,85 +320,85 @@ class Object3D {
   }
 }
 
-class Object3DTexture extends Object3D {
-  static default_shader_vertex_source = `
-      attribute vec3 position;
-      uniform mat4 Pmatrix, Vmatrix, Mmatrix;
-      attribute vec2 uv;
-      varying vec2 vUV;
+// class Object3DTexture extends Object3D {
+//   static default_shader_vertex_source = `
+//       attribute vec3 position;
+//       uniform mat4 Pmatrix, Vmatrix, Mmatrix;
+//       attribute vec2 uv;
+//       varying vec2 vUV;
       
-      void main(void) {
-          gl_Position = Pmatrix * Vmatrix * Mmatrix * vec4(position, 1.);
-          vUV=uv;
-      }`;
-  static default_shader_fragment_source = `
-      precision mediump float;
-      uniform sampler2D sampler;
-      varying vec2 vUV;
+//       void main(void) {
+//           gl_Position = Pmatrix * Vmatrix * Mmatrix * vec4(position, 1.);
+//           vUV=uv;
+//       }`;
+//   static default_shader_fragment_source = `
+//       precision mediump float;
+//       uniform sampler2D sampler;
+//       varying vec2 vUV;
       
-      void main(void) {
-          gl_FragColor = texture2D(sampler, vUV);
-          //gl_FragColor = vec4(1.,1.,1.,1.);
-      }`;
+//       void main(void) {
+//           gl_FragColor = texture2D(sampler, vUV);
+//           //gl_FragColor = vec4(1.,1.,1.,1.);
+//       }`;
 
-  _sampler;
-  texture;
-  textureURL;
+//   _sampler;
+//   texture;
+//   textureURL;
 
-  constructor(object_vertex, object_faces, textureURL) {
-    super(object_vertex, object_faces, Object3DTexture.default_shader_vertex_source, Object3DTexture.default_shader_fragment_source);
-    this.texture = GEO.loadTexture(textureURL);
-  }
+//   constructor(object_vertex, object_faces, textureURL) {
+//     super(object_vertex, object_faces, Object3DTexture.default_shader_vertex_source, Object3DTexture.default_shader_fragment_source);
+//     this.texture = GEO.loadTexture(textureURL);
+//   }
 
-  initialize() {
-    this.shader_vertex = this.compile_shader(this.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-    this.shader_fragment = this.compile_shader(this.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+//   initialize() {
+//     this.shader_vertex = this.compile_shader(this.shader_vertex_source, Object3D.GL.VERTEX_SHADER, "VERTEX");
+//     this.shader_fragment = this.compile_shader(this.shader_fragment_source, Object3D.GL.FRAGMENT_SHADER, "FRAGMENT");
 
-    this.SHADER_PROGRAM = GL.createProgram();
+//     this.SHADER_PROGRAM = Object3D.GL.createProgram();
 
-    GL.attachShader(this.SHADER_PROGRAM, this.shader_vertex);
-    GL.attachShader(this.SHADER_PROGRAM, this.shader_fragment);
+//     Object3D.GL.attachShader(this.SHADER_PROGRAM, this.shader_vertex);
+//     Object3D.GL.attachShader(this.SHADER_PROGRAM, this.shader_fragment);
 
-    GL.linkProgram(this.SHADER_PROGRAM);
+//     Object3D.GL.linkProgram(this.SHADER_PROGRAM);
 
-    this._Pmatrix = GL.getUniformLocation(this.SHADER_PROGRAM, "Pmatrix");
-    this._Vmatrix = GL.getUniformLocation(this.SHADER_PROGRAM, "Vmatrix");
-    this._Mmatrix = GL.getUniformLocation(this.SHADER_PROGRAM, "Mmatrix");
+//     this._Pmatrix = Object3D.GL.getUniformLocation(this.SHADER_PROGRAM, "Pmatrix");
+//     this._Vmatrix = Object3D.GL.getUniformLocation(this.SHADER_PROGRAM, "Vmatrix");
+//     this._Mmatrix = Object3D.GL.getUniformLocation(this.SHADER_PROGRAM, "Mmatrix");
 
-    this._sampler = GL.getUniformLocation(this.SHADER_PROGRAM, "sampler");
+//     this._sampler = Object3D.GL.getUniformLocation(this.SHADER_PROGRAM, "sampler");
 
-    this._color = GL.getAttribLocation(this.SHADER_PROGRAM, "uv");
-    this._position = GL.getAttribLocation(this.SHADER_PROGRAM, "position");
+//     this._color = Object3D.GL.getAttribLocation(this.SHADER_PROGRAM, "uv");
+//     this._position = Object3D.GL.getAttribLocation(this.SHADER_PROGRAM, "position");
 
-    GL.enableVertexAttribArray(this._color);
-    GL.enableVertexAttribArray(this._position);
+//     Object3D.GL.enableVertexAttribArray(this._color);
+//     Object3D.GL.enableVertexAttribArray(this._position);
 
-    GL.useProgram(this.SHADER_PROGRAM);
-    GL.uniform1i(this._sampler, 0);
+//     Object3D.GL.useProgram(this.SHADER_PROGRAM);
+//     Object3D.GL.uniform1i(this._sampler, 0);
 
-    this.OBJECT_VERTEX = GL.createBuffer();
-    this.OBJECT_FACES = GL.createBuffer();
+//     this.OBJECT_VERTEX = Object3D.GL.createBuffer();
+//     this.OBJECT_FACES = Object3D.GL.createBuffer();
 
-    GL.bindBuffer(GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
-    GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(this.object_vertex), GL.STATIC_DRAW);
+//     Object3D.GL.bindBuffer(Object3D.GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
+//     Object3D.GL.bufferData(Object3D.GL.ARRAY_BUFFER, new Float32Array(this.object_vertex), Object3D.GL.STATIC_DRAW);
 
-    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.OBJECT_FACES);
-    GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.object_faces), GL.STATIC_DRAW);
-  }
+//     Object3D.GL.bindBuffer(Object3D.GL.ELEMENT_ARRAY_BUFFER, this.OBJECT_FACES);
+//     Object3D.GL.bufferData(Object3D.GL.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.object_faces), Object3D.GL.STATIC_DRAW);
+//   }
 
-  draw() {
-    GL.useProgram(this.SHADER_PROGRAM);
-    GL.activeTexture(GL.TEXTURE0);
-    GL.bindTexture(GL.TEXTURE_2D, this.texture);
+//   draw() {
+//     Object3D.GL.useProgram(this.SHADER_PROGRAM);
+//     Object3D.GL.activeTexture(Object3D.GL.TEXTURE0);
+//     Object3D.GL.bindTexture(Object3D.GL.TEXTURE_2D, this.texture);
 
-    GL.bindBuffer(GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
-    GL.vertexAttribPointer(this._position, 3, GL.FLOAT, false, 4 * (3 + 2), 0);
-    GL.vertexAttribPointer(this._color, 2, GL.FLOAT, false, 4 * (3 + 2), 3 * 4);
+//     Object3D.GL.bindBuffer(Object3D.GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
+//     Object3D.GL.vertexAttribPointer(this._position, 3, Object3D.GL.FLOAT, false, 4 * (3 + 2), 0);
+//     Object3D.GL.vertexAttribPointer(this._color, 2, Object3D.GL.FLOAT, false, 4 * (3 + 2), 3 * 4);
 
-    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.OBJECT_FACES);
-    GL.drawElements(GL.TRIANGLE_STRIP, this.object_faces.length, GL.UNSIGNED_SHORT, 0);
-    for (let i = 0; i < this.child.length; i++) {
-      this.child[i].draw();
-    }
-  }
-}
+//     Object3D.GL.bindBuffer(Object3D.GL.ELEMENT_ARRAY_BUFFER, this.OBJECT_FACES);
+//     Object3D.GL.drawElements(Object3D.GL.TRIANGLE_STRIP, this.object_faces.length, Object3D.GL.UNSIGNED_SHORT, 0);
+//     for (let i = 0; i < this.child.length; i++) {
+//       this.child[i].draw();
+//     }
+//   }
+// }

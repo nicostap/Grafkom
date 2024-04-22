@@ -1,10 +1,14 @@
-function createFloor() {
+import * as glMatrix from 'gl-matrix';
+import { Object3D } from '../object';
+import { GEO } from '../geometry';
+
+export function createFloor() {
     var floorVertices = [];
     var floorFaces = [];
 
-    let normal = [];
+    let normal: glMatrix.vec3 = [0,0,0];
     let floorColor = [64 / 255, 41 / 255, 5 / 255];
-    let heightDist = [];
+    let heightDist: number[][] = [];
     let floorSide = 600;
     let partition = 60;
     let tileSide = floorSide / partition;
@@ -33,7 +37,7 @@ function createFloor() {
                     heightDist[i + 1][j],
                     (j - partition / 2) * tileSide,
                 ];
-                currIndex = floorVertices.length / 9;
+                const currIndex = floorVertices.length / 9;
                 glMatrix.vec3.cross(
                     normal,
                     [nextpoint[0] - currpoint[0], nextpoint[1] - currpoint[1], nextpoint[2] - currpoint[2]],
@@ -51,7 +55,8 @@ function createFloor() {
                     heightDist[i - 1][j + 1],
                     (j - partition / 2 + 1) * tileSide,
                 ];
-                currIndex = floorVertices.length / 9;
+                const currIndex = floorVertices.length / 9;
+                
                 glMatrix.vec3.cross(
                     normal,
                     [nextpoint[0] - sidepoint[0], nextpoint[1] - sidepoint[1], nextpoint[2] - sidepoint[2]],
@@ -114,7 +119,7 @@ function createFloor() {
     return {main: floor, grass: grass, trees: trees};
 }
 
-function instanceRandomiser(vertices, faces, centerX, centerZ, length, width, divisorX, divisorZ) {
+export function instanceRandomiser(vertices: number[], faces: number[], centerX: number, centerZ: number, length: number, width: number, divisorX: number, divisorZ: number) {
     let vertexCount = vertices.length / 9;
     let faceCount = faces.length / 3;
     for (let i = 0; i < divisorX; i++) {
@@ -150,7 +155,7 @@ function instanceRandomiser(vertices, faces, centerX, centerZ, length, width, di
     return { vertices: vertices, faces: faces };
 }
 
-function randomiser(child, parent, centerX, centerZ, length, width, divisorX, divisorZ) {
+export function randomiser(child: Object3D, parent: Object3D, centerX: number, centerZ: number, length: number, width: number, divisorX: number, divisorZ: number) {
     let objects = [];
     for (let i = 0; i < divisorX; i++) {
         for (let j = 0; j < divisorZ; j++) {

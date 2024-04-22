@@ -1,4 +1,7 @@
-function createCharacter_3() {
+import { GEO } from "../geometry";
+import { Object3D } from "../object";
+
+export function createCharacter_3() {
 
     //shapes and color
     var beigeCylinder = GEO.createCylinder(1.0, 2.0, 20, [228/255, 179/255, 121/255]);

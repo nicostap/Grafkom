@@ -1,57 +1,86 @@
+import * as glMatrix from "gl-matrix";
+import { GEO } from "./geometry";
+import { AnimationList, ArbitraryAxisRotationAnimation, RotationAnimation, ScaleAnimation, TranslationAnimation, type AbstractAnimation } from "./animation";
+import { createCharacter_1 } from "./models/character1";
+import { createCharacter_3 } from "./models/character3";
+import { createFloor } from "./models/world";
+import { Object3D } from "./object";
+
 // CAMERA MODE
-let mode = Object.freeze({
-    Stationary: 'Stationary',
-    FPS: 'FPS',
-    Follow: 'Follow'
-});
+enum mode {
+    Stationary = 'Stationary',
+    FPS = 'FPS',
+    Follow = 'Follow'
+}
+
 let cameraX = 0, cameraY = -20, cameraZ = 0;
-let cameraMode = mode.FPS;
+let cameraMode: mode = mode.FPS;
 let zoom = -30;
-function modeStationary() {
+
+let THETA = 0;
+let PHI = 0;
+
+export function modeStationary() {
     cameraMode = mode.Stationary;
     THETA = 0;
     PHI = 0;
     zoom = -30;
 }
-function modeFPS() {
+export function modeFPS() {
     cameraMode = mode.FPS;
     THETA = 0;
     PHI = 0;
     cameraX = 0, cameraY = -20, cameraZ = 0;
 }
-function modeFollowShaun() {
+export function modeFollowShaun() {
     cameraMode = mode.Follow;
     THETA = 0;
     PHI = 0;
     zoom = -30;
 }
 
-function main() {
-    CANVAS = document.getElementById("your_canvas");
+export function renderMain() {
+    const CANVAS = document.getElementById("your_canvas");
+    if (!(CANVAS instanceof HTMLCanvasElement)) {
+        alert("Canvas not found");
+        return false;
+    }
+
     CANVAS.width = window.innerWidth;
     CANVAS.height = window.innerHeight;
 
+    let GL: WebGLRenderingContext;
+
     try {
-        GL = CANVAS.getContext("webgl", { antialias: true });
+        const glCtx = CANVAS.getContext("webgl", { antialias: true });
+
+        if (!glCtx) {
+            alert("WebGL context cannot be initialized");
+            return false;
+        }
+
+        GL = glCtx;
     } catch (e) {
         alert("WebGL context cannot be initialized");
         return false;
     }
+
+    Object3D.GL = GL;
 
     // CAMERA CONTROL
     var AMORTIZATION = 0.95;
     var dX = 0, dY = 0;
     var drag = false;
     var THETA = 0, PHI = 0;
-    var x_prev, y_prev;
-    var mouseDown = function (e) {
+    var x_prev: number, y_prev: number;
+    var mouseDown = function (e: MouseEvent) {
         drag = true;
         x_prev = e.pageX, y_prev = e.pageY;
         e.preventDefault();
         return false;
     };
-    var mouseUp = function (e) { drag = false; };
-    var mouseMove = function (e) {
+    var mouseUp = function () { drag = false; };
+    var mouseMove = function (e: MouseEvent) {
         if (!drag) return false;
         dX = (e.pageX - x_prev) * 2 * Math.PI / CANVAS.width,
             dY = (e.pageY - y_prev) * 2 * Math.PI / CANVAS.height;
@@ -60,7 +89,7 @@ function main() {
         x_prev = e.pageX, y_prev = e.pageY;
         e.preventDefault();
     };
-    var mouseScroll = function (e) {
+    var mouseScroll = function (e: WheelEvent) {
         const delta = Math.sign(e.deltaY);
         zoom -= 3 * delta;
         if (zoom <= -100) zoom = -100;
@@ -71,7 +100,8 @@ function main() {
     CANVAS.addEventListener("mouseout", mouseUp, false);
     CANVAS.addEventListener("mousemove", mouseMove, false);
     CANVAS.addEventListener("wheel", mouseScroll, false);
-    var keyPressed = {};
+
+    var keyPressed: Record<string, boolean> = {};
     window.onkeydown = function (e) {
         keyPressed[e.key] = true;
     };
@@ -96,7 +126,7 @@ function main() {
     farmer.main.translate(0, 20, -50)
 
     // Making the animations
-    var animations = [];
+    var animations: AbstractAnimation[] = [];
     var bicycleLoop = new AnimationList([
         new RotationAnimation(bicycle.frontWheel, 0, 2000, 0, 0, -360),
         new RotationAnimation(bicycle.backWheel, 0, 2000, 0, 0, -360),
@@ -160,11 +190,11 @@ function main() {
     GL.depthFunc(GL.LEQUAL);
     GL.clearDepth(1.0);
 
-    let load_time;
+    let load_time: number;
     let render_loop = 3;
     let loaded = false;
     let time_prev = 0;
-    var animate = function (time) {
+    var animate = function (time: number) {
         let dt = (time - time_prev);
         time_prev = time;
         if (!drag) {
@@ -209,7 +239,7 @@ function main() {
 
         // Drawing the objects
         GL.viewport(0, 0, CANVAS.width, CANVAS.height);
-        GL.clear(GL.COLOR_BUFFER_BIT | GL.D_BUFFER_BIT);
+        GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
         bicycle.main.setUniform4(PROJMATRIX, VIEWMATRIX);
         floor.main.setUniform4(PROJMATRIX, VIEWMATRIX);
         farmer.main.setUniform4(PROJMATRIX, VIEWMATRIX);
@@ -238,4 +268,3 @@ function main() {
     };
     animate(0);
 }
-window.addEventListener('load', main);

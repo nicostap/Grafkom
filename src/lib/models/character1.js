@@ -1,4 +1,7 @@
-function createCharacter_1() {
+import { GEO } from "../geometry";
+import { Object3D } from "../object";
+
+export function createCharacter_1() {
     var tmp = GEO.combineLines(
         [1, 0, 0],
         GEO.createCurve([3, 3.5, 0.5, -1.5, -3.5, 0.5, -6, -4.5, 0.5], 30, 2),
