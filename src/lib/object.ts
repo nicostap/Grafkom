@@ -201,6 +201,7 @@ export class Object3D {
 
     for (let i = 0; i < this.child.length; i++) {
       // this.child[i].rotateArbitraryAxis(n1, n2, n3, m1, m2, m3, theta, depth + 1);
+      this.child[i].#rotateArbitraryAxisChildren(n1, n2, n3, m1, m2, m3, theta, depth + 1);
     }
   }
 
