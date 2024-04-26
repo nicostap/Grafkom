@@ -62,9 +62,9 @@ enum mode {
 
 let cameraX = 0,
   cameraY = -20,
-  cameraZ = -100;
+  cameraZ = -200;
 let cameraMode: mode = mode.FPS;
-let zoom = -100;
+let zoom = -200;
 
 let THETA = 0;
 let PHI = 0;
@@ -73,19 +73,19 @@ export function modeStationary() {
   cameraMode = mode.Stationary;
   THETA = 0;
   PHI = 0;
-  zoom = -100;
+  zoom = -200;
 }
 export function modeFPS() {
   cameraMode = mode.FPS;
   THETA = 0;
   PHI = 0;
-  (cameraX = 0), (cameraY = -20), (cameraZ = -100);
+  (cameraX = 0), (cameraY = -20), (cameraZ = -200);
 }
 export function modeFollowShaun() {
   cameraMode = mode.Follow;
   THETA = 0;
   PHI = 0;
-  zoom = -100;
+  zoom = -200;
 }
 
 export function renderMain() {
@@ -146,7 +146,7 @@ export function renderMain() {
   var mouseScroll = function (e: WheelEvent) {
     const delta = Math.sign(e.deltaY);
     zoom -= 3 * delta;
-    if (zoom <= -150) zoom = -150;
+    if (zoom <= -200) zoom = -200;
     if (zoom >= -100) zoom = -100;
   };
   CANVAS.addEventListener("mousedown", mouseDown, false);
@@ -230,8 +230,8 @@ export function renderMain() {
 
   var honking = new AnimationList(
     [
-      new ScaleAnimation(bicycle.honk, 0, 1000, 0.6, 0.6, 0.6),
-      new ScaleAnimation(bicycle.honk, 1000, 2000, 1 / 0.6, 1 / 0.6, 1 / 0.6),
+      new ScaleAnimation(bicycle.honk, 0, 1000, 0.7, 0.7, 0.7),
+      new ScaleAnimation(bicycle.honk, 1000, 2000, 1 / 0.7, 1 / 0.7, 1 / 0.7),
     ],
     true
   );
@@ -239,41 +239,34 @@ export function renderMain() {
 
   var flagMotion = new AnimationList(
     [
-      new ArbitraryAxisRotationAnimation(
-        bicycle.flag,
-        0,
-        1000,
-        Math.cos(GEO.rad(90 + 20)),
-        Math.sin(GEO.rad(90 + 20)),
-        0,
-        90
-      ),
-      new ArbitraryAxisRotationAnimation(
-        bicycle.flag,
-        1000,
-        2000,
-        Math.cos(GEO.rad(90 + 20)),
-        Math.sin(GEO.rad(90 + 20)),
-        0,
-        -90
-      ),
+      new ArbitraryAxisRotationAnimation(bicycle.flag, 0, 1000, Math.cos(GEO.rad(90 + 20)), Math.sin(GEO.rad(90 + 20)), 0, 90),
+      new ArbitraryAxisRotationAnimation(bicycle.flag, 1000, 2000, Math.cos(GEO.rad(90 + 20)), Math.sin(GEO.rad(90 + 20)), 0, -90),
     ],
     true
   );
   animations.push(flagMotion);
 
+  for(let i = 0; i < floor.smokes.length; i++) {
+    var smokeMotion = new AnimationList(
+      [
+        new TranslationAnimation(floor.smokes[i], 0, 3000, 0, 30, 0),
+        new ScaleAnimation(floor.smokes[i], 0, 3000, 4, 4, 4),
+      ],
+      true,
+      i * 1000,
+      () => {
+        floor.smokes[i].translate(0, -30, 0);
+        floor.smokes[i].scale(0.25, 0.25, 0.25);
+      }
+    );
+    animations.push(smokeMotion);
+  }
+
   for (let i = 0; i < floor.trees.length; i++) {
     var treeBreathing = new AnimationList(
       [
         new ScaleAnimation(floor.trees[i], 0, 1000, 1.2, 1.2, 1.2),
-        new ScaleAnimation(
-          floor.trees[i],
-          1000,
-          2000,
-          1 / 1.2,
-          1 / 1.2,
-          1 / 1.2
-        ),
+        new ScaleAnimation(floor.trees[i], 1000, 2000, 1 / 1.2, 1 / 1.2, 1 / 1.2),
       ],
       true
     );
