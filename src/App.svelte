@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { renderMain } from "./lib/main";
+  import { fpsStore, tickStore } from "./lib/utils/StatCounter";
   import {
-    renderMain,
     modeStationary,
     modeFPS,
     modeFollowShaun,
-  } from "./lib/main";
-  import { fpsStore, tickStore } from "./lib/utils/StatCounter";
+  } from "./lib/utils/CameraController";
 
   onMount(() => {
     const renderTerminate = renderMain();

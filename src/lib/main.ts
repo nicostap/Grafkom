@@ -16,25 +16,7 @@ import { writable } from "svelte/store";
 import { DefaultShader } from "./shaders/default.shader";
 import { calculateFPS, calculateTick } from "./utils/StatCounter";
 import { AppState, mode } from "./utils/State";
-
-export function modeStationary() {
-  AppState.cameraMode = mode.Stationary;
-  AppState.THETA = 0;
-  AppState.PHI = 0;
-  AppState.zoom = -200;
-}
-export function modeFPS() {
-  AppState.cameraMode = mode.FPS;
-  AppState.THETA = 0;
-  AppState.PHI = 0;
-  (AppState.cameraX = 0), (AppState.cameraY = -20), (AppState.cameraZ = -200);
-}
-export function modeFollowShaun() {
-  AppState.cameraMode = mode.Follow;
-  AppState.THETA = 0;
-  AppState.PHI = 0;
-  AppState.zoom = -200;
-}
+import { CameraController } from "./utils/CameraController";
 
 export function renderMain() {
   const CANVAS = document.getElementById("your_canvas");
@@ -50,66 +32,17 @@ export function renderMain() {
 
   try {
     const glCtx = CANVAS.getContext("webgl", { antialias: true });
-
-    if (!glCtx) {
-      alert("WebGL context cannot be initialized");
-      return false;
-    }
-
+    if (!glCtx) throw new Error("WebGL context cannot be initialized");
     GL = glCtx;
   } catch (e) {
     alert("WebGL context cannot be initialized");
     return false;
   }
 
+  const cameraController = new CameraController(CANVAS, AppState);
+
   Object3D.GL = GL;
   Object3D.defaultShader = new DefaultShader(GL);
-
-  // CAMERA CONTROL
-  var AMORTIZATION = 0.95;
-  var dX = 0,
-    dY = 0;
-  var drag = false;
-  //var THETA = 0,
-  //  PHI = 0;
-  var x_prev: number, y_prev: number;
-  var mouseDown = function (e: MouseEvent) {
-    drag = true;
-    (x_prev = e.pageX), (y_prev = e.pageY);
-    e.preventDefault();
-    return false;
-  };
-  var mouseUp = function () {
-    drag = false;
-  };
-  var mouseMove = function (e: MouseEvent) {
-    if (!drag) return false;
-    (dX = ((e.pageX - x_prev) * 2 * Math.PI) / CANVAS.width),
-      (dY = ((e.pageY - y_prev) * 2 * Math.PI) / CANVAS.height);
-    AppState.THETA += dX;
-    AppState.PHI += dY;
-    (x_prev = e.pageX), (y_prev = e.pageY);
-    e.preventDefault();
-  };
-  var mouseScroll = function (e: WheelEvent) {
-    const delta = Math.sign(e.deltaY);
-    AppState.zoom -= 3 * delta;
-    if (AppState.zoom <= -200) AppState.zoom = -200;
-    if (AppState.zoom >= -100) AppState.zoom = -100;
-  };
-  CANVAS.addEventListener("mousedown", mouseDown, false);
-  CANVAS.addEventListener("mouseup", mouseUp, false);
-  CANVAS.addEventListener("mouseout", mouseUp, false);
-  CANVAS.addEventListener("mousemove", mouseMove, false);
-  CANVAS.addEventListener("wheel", mouseScroll, false);
-
-  var keyPressed: Record<string, boolean> = {};
-  window.onkeydown = function (e) {
-    keyPressed[e.key] = true;
-  };
-  window.onkeyup = function (e) {
-    keyPressed[e.key] = false;
-  };
 
   // MATRIX
   var PROJMATRIX = glMatrix.mat4.create();
@@ -272,32 +205,8 @@ export function renderMain() {
     let dt = time - time_prev;
     calculateFPS(dt);
     time_prev = time;
-    if (!drag) {
-      (dX *= AMORTIZATION), (dY *= AMORTIZATION);
-      (AppState.THETA += dX), (AppState.PHI += dY);
-    }
+    cameraController.tick();
 
-    // Camera control
-    if (AppState.cameraMode == "FPS") {
-      if (keyPressed["w"] || keyPressed["W"]) {
-        AppState.cameraZ += Math.cos(AppState.THETA) * 1.0;
-        AppState.cameraX += -Math.sin(AppState.THETA) * 1.0;
-      }
-      if (keyPressed["a"] || keyPressed["A"]) {
-        AppState.cameraZ += Math.cos(AppState.THETA - Math.PI / 2) * 1.0;
-        AppState.cameraX += -Math.sin(AppState.THETA - Math.PI / 2) * 1.0;
-      }
-      if (keyPressed["s"] || keyPressed["S"]) {
-        AppState.cameraZ += -Math.cos(AppState.THETA) * 1.0;
-        AppState.cameraX += Math.sin(AppState.THETA) * 1.0;
-      }
-      if (keyPressed["d"] || keyPressed["D"]) {
-        AppState.cameraZ += Math.cos(AppState.THETA + Math.PI / 2) * 1.0;
-        AppState.cameraX += -Math.sin(AppState.THETA + Math.PI / 2) * 1.0;
-      }
-      if (keyPressed["e"] || keyPressed["E"]) AppState.cameraY -= 1.5;
-      if (keyPressed["q"] || keyPressed["Q"]) AppState.cameraY += 1.5;
-    }
     VIEWMATRIX = glMatrix.mat4.create();
     if (AppState.cameraMode == "Stationary") {
       glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -20, AppState.zoom]);
@@ -376,5 +285,6 @@ export function renderMain() {
 
   return () => {
     isTerminated = true;
+    cameraController.unhookEvents();
   };
 }
