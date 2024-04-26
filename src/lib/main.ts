@@ -13,6 +13,7 @@ import { createCharacter_3 } from "./models/character3";
 import { createFloor } from "./models/world";
 import { Object3D } from "./object";
 import { writable } from "svelte/store";
+import { DefaultShader } from "./shaders/default.shader";
 
 export const fpsStore = writable(0);
 export const tickStore = writable(0);
@@ -114,6 +115,7 @@ export function renderMain() {
   }
 
   Object3D.GL = GL;
+  Object3D.defaultShader = new DefaultShader(GL);
 
   // CAMERA CONTROL
   var AMORTIZATION = 0.95;
@@ -373,11 +375,19 @@ export function renderMain() {
     GL.viewport(0, 0, CANVAS.width, CANVAS.height);
     GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
     bicycle.main.setUniform4(PROJMATRIX, VIEWMATRIX);
+    // bicycle.main.draw();
     floor.main.setUniform4(PROJMATRIX, VIEWMATRIX);
+    // floor.main.draw();
     farmer.main.setUniform4(PROJMATRIX, VIEWMATRIX);
-    bicycle.main.draw();
-    floor.main.draw();
-    farmer.main.draw();
+    // farmer.main.draw();
+
+    // Manual batch drawing
+    Object3D.defaultShader.use();
+    [bicycle.main, floor.main, farmer.main]
+      .flatMap((o) => o.queueBatch())
+      .forEach((o) => {
+        o.drawBatch();
+      });
 
     // Only run transformation after first three render finished
     if (render_loop > 0) render_loop--;
