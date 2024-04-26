@@ -287,14 +287,14 @@ export function renderMain() {
     animations.push(treeBreathing);
   }
 
-  var grassBreathing = new AnimationList(
-    [
-      new TranslationAnimation(floor.grass, 0, 1000, 0, 0.75, 0),
-      new TranslationAnimation(floor.grass, 1000, 2000, 0, -0.75, 0),
-    ],
-    true
-  );
-  animations.push(grassBreathing);
+  // var grassBreathing = new AnimationList(
+  //   [
+  //     new TranslationAnimation(floor.grass, 0, 1000, 0, 0.75, 0),
+  //     new TranslationAnimation(floor.grass, 1000, 2000, 0, -0.75, 0),
+  //   ],
+  //   true
+  // );
+  // animations.push(grassBreathing);
 
   // Drawing
   GL.enable(GL.CULL_FACE);
@@ -394,7 +394,7 @@ export function renderMain() {
     if (render_loop == 0 && !loaded) {
       loaded = true;
       load_time = time;
-    } else {
+    } else if(loaded) {
       // Running the animations
       time -= load_time;
       for (let animation of animations) {
