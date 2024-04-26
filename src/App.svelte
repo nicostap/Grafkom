@@ -5,6 +5,8 @@
     modeStationary,
     modeFPS,
     modeFollowShaun,
+    fpsStore,
+    tickStore,
   } from "./lib/main";
 
   onMount(() => {
@@ -17,6 +19,14 @@
     <button class="buttonUI" on:click={modeStationary}> Stationary </button>
     <button class="buttonUI" on:click={modeFPS}> FPS </button>
     <button class="buttonUI" on:click={modeFollowShaun}> Follow Shaun </button>
+  </div>
+  <div class="info">
+    <span style="width: 5em;">
+      FPS: <span>{$fpsStore.toFixed(1)}</span>
+    </span>
+    <span style="width: 8em;">
+      CPU Tick: <span>{$tickStore.toFixed(2)}ms</span>
+    </span>
   </div>
   <canvas
     id="your_canvas"
@@ -37,7 +47,6 @@
     margin: 10px;
     border: none;
     padding: 15px 30px;
-    font-family: "Roboto", sans-serif;
     font-weight: 500;
     font-size: 16px;
     color: #fff;
@@ -65,5 +74,21 @@
   .buttonUI:hover::before {
     width: 0;
     height: 0;
+  }
+
+  .info {
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    right: 0;
+    color: white;
+    padding: 1em;
+    display: flex;
+    gap: 1em;
+  }
+
+  .info > span {
+    display: flex;
+    justify-content: space-between;
   }
 </style>

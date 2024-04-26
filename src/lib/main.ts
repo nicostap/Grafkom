@@ -12,6 +12,45 @@ import { createCharacter_1 } from "./models/character1";
 import { createCharacter_3 } from "./models/character3";
 import { createFloor } from "./models/world";
 import { Object3D } from "./object";
+import { writable } from "svelte/store";
+
+export const fpsStore = writable(0);
+export const tickStore = writable(0);
+
+const fpsBuffer: number[] = [];
+const fpsBufferSamples = 60;
+
+const tickBuffer: number[] = [];
+const tickBufferSamples = 60;
+
+function calculateTick(tickStart: number) {
+  const tickEnd = performance.now();
+  const tick = tickEnd - tickStart;
+
+  tickBuffer.push(tick);
+  if (tickBuffer.length > tickBufferSamples) {
+    tickBuffer.shift();
+  }
+
+  const sum = tickBuffer.reduce((a, b) => a + b, 0);
+  const avg = sum / tickBuffer.length;
+
+  tickStore.set(avg);
+}
+
+function calculateFPS(dt: number) {
+  const fps = 1000 / dt;
+
+  fpsBuffer.push(fps);
+  if (fpsBuffer.length > fpsBufferSamples) {
+    fpsBuffer.shift();
+  }
+
+  const sum = fpsBuffer.reduce((a, b) => a + b, 0);
+  const avg = sum / fpsBuffer.length;
+
+  fpsStore.set(avg);
+}
 
 // CAMERA MODE
 enum mode {
@@ -266,8 +305,12 @@ export function renderMain() {
   let render_loop = 3;
   let loaded = false;
   let time_prev = 0;
-  var animate = function (time: number) {
+
+  const animate = function (time: number) {
+    const startTick = performance.now();
+
     let dt = time - time_prev;
+    calculateFPS(dt);
     time_prev = time;
     if (!drag) {
       (dX *= AMORTIZATION), (dY *= AMORTIZATION);
@@ -358,6 +401,8 @@ export function renderMain() {
     // Flush
     GL.flush();
     window.requestAnimationFrame(animate);
+
+    calculateTick(startTick);
   };
   animate(0);
 }
