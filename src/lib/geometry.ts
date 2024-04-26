@@ -546,4 +546,26 @@ export const GEO = {
     };
     return texture;
   },
+  makePipe: function (pathPoints: number[], poly: number, color: number[]) {
+    var path: number[][] = [];
+    for (let i = 0; i < pathPoints.length/3;) {
+      path.push([pathPoints[i], pathPoints[i+1], pathPoints[i+2]]);
+      i+=3;
+    }
+
+    // finding the normal of the next point
+    var projectContour = function (fromIndex: number, toIndex: number) {
+      var dir1: number[], dir2: number[], normal: number[];
+
+      dir1 = [path[toIndex][0]-path[fromIndex][0], path[toIndex][1]-path[fromIndex][1], path[toIndex][2]-path[fromIndex][2]];
+      if(toIndex == path.length-1)
+          dir2 = dir1;
+      else
+          dir2 = [path[toIndex+1][0]-path[toIndex][0], path[toIndex+1][1]-path[toIndex][1], path[toIndex+1][2]-path[toIndex][2]];
+
+      normal = [dir1[0]+dir2[0], dir1[1]+dir2[1], dir1[2]+dir2[2]];
+      // nah habis ini ndatau
+      return fromIndex;
+    };
+  }
 };
