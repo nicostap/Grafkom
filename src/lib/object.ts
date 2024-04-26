@@ -47,9 +47,9 @@ export class Object3D {
     if (!Object3D.GL.getShaderParameter(shader, Object3D.GL.COMPILE_STATUS)) {
       alert(
         "ERROR IN " +
-          typeString +
-          " SHADER: " +
-          Object3D.GL.getShaderInfoLog(shader)
+        typeString +
+        " SHADER: " +
+        Object3D.GL.getShaderInfoLog(shader)
       );
       return false;
     }

@@ -6,7 +6,7 @@ export function createFloor() {
     var floorVertices = [];
     var floorFaces = [];
 
-    let normal: glMatrix.vec3 = [0,0,0];
+    let normal: glMatrix.vec3 = [0, 0, 0];
     let floorColor = [64 / 255, 41 / 255, 5 / 255];
     let heightDist: number[][] = [];
     let floorSide = 600;
@@ -56,7 +56,7 @@ export function createFloor() {
                     (j - partition / 2 + 1) * tileSide,
                 ];
                 const currIndex = floorVertices.length / 9;
-                
+
                 glMatrix.vec3.cross(
                     normal,
                     [nextpoint[0] - sidepoint[0], nextpoint[1] - sidepoint[1], nextpoint[2] - sidepoint[2]],
@@ -73,36 +73,19 @@ export function createFloor() {
     var floor = new Object3D(floorVertices, floorFaces);
 
     // Random grass generator
-    var grassVertices = [
-        -1, 0, 0, 0, -1, 0, 0, 0.3, 0,
-        0, 0, 1, 0, -1, 0, 0, 0.3, 0,
-        1, 0, 0, 0, -1, 0, 0, 0.3, 0,
-
-        -1, 0, 0, -1, 1, 1, 0, 0.3, 0,
-        0, 0, 1, -1, 1, 1, 0, 0.3, 0,
-        0, 1, 0, -1, 1, 1, 0, 0.5, 0,
-
-        0, 0, 1, 1, 1, 1, 0, 0.3, 0,
-        1, 0, 0, 1, 1, 1, 0, 0.3, 0,
-        0, 1, 0, 1, 1, 1, 0, 0.5, 0,
-
-        -1, 0, 0, 0, 0, -1, 0, 0.3, 0,
-        1, 0, 0, 0, 0, -1, 0, 0.3, 0,
-        0, 1, 0, 0, 0, -1, 0, 0.5, 0,
-    ];
-    var grassFaces = [
-        2, 1, 0,
-        3, 4, 5,
-        6, 7, 8,
-        11, 10, 9
-    ]
+    var grassGeometry = GEO.combineLines(
+        [0, 0.5, 0],
+        GEO.createCurve([0.4, 0, 0.4, 0.4, 3, 0.4, 0, 5, -1], 10, 2),
+        GEO.createCurve([-0.4, 0, 0.4, -0.4, 3, 0.4, 0, 5, -1], 10, 2),
+        GEO.createCurve([0, 0, -0.4, 0, 3, -0.4, 0, 5, -1], 10, 2),
+    );
 
     // Object instancing
-    var grassInstance = instanceRandomiser(grassVertices, grassFaces, 0, 0, 500, 500, 25, 25);
-    var grass = new Object3D(grassInstance.vertices, grassInstance.faces);
+    let grassInstance = instanceRandomiser(grassGeometry.vertices, grassGeometry.faces, 0, 0, 100, 100, 10, 10);
+    let grass = new Object3D(grassInstance.vertices, grassInstance.faces);
     grass.translate(0, 0.75, 0);
-    grass.scale(1, 3, 1);
-    floor.addChild(grass);
+    randomiser(grass, floor, 0, 0, 500, 500, 6, 6);
+
 
     var brownHyperboloid = GEO.createHyperboloidOneSheet(1.0, 3.0, 10, [160 / 255, 82 / 255, 45 / 255]);
     var greenParaboloid = GEO.createEllipticParaboloid(1.0, 1.0, 30, [0.2, 0.7, 0.2]);
@@ -116,7 +99,7 @@ export function createFloor() {
     var trees = randomiser(tree, floor, 0, 140, 400, 150, 6, 3);
     trees.push(...randomiser(tree, floor, 0, -140, 400, 150, 6, 3));
 
-    return {main: floor, grass: grass, trees: trees};
+    return { main: floor, trees: trees };
 }
 
 export function instanceRandomiser(vertices: number[], faces: number[], centerX: number, centerZ: number, length: number, width: number, divisorX: number, divisorZ: number) {
@@ -124,15 +107,18 @@ export function instanceRandomiser(vertices: number[], faces: number[], centerX:
     let faceCount = faces.length / 3;
     for (let i = 0; i < divisorX; i++) {
         for (let j = 0; j < divisorZ; j++) {
-            let offsetX = (i + Math.random()) * length / divisorX - length / 2 + centerX;
             let scaleY = 0.5 + Math.random() * 2.0;
+            let rotateY = Math.random() * 360;
+            let offsetX = (i + Math.random()) * length / divisorX - length / 2 + centerX;
             let offsetZ = (j + Math.random()) * width / divisorZ - width / 2 + centerZ;
             for (let k = 0; k < vertexCount; k++) {
                 let vertexIndex = k * 9;
+                let position = glMatrix.vec3.fromValues(vertices[vertexIndex], vertices[vertexIndex + 1], vertices[vertexIndex + 2]);
+                position[1] * scaleY;
+                glMatrix.vec3.rotateY(position, position, [0, 0, 0], GEO.rad(rotateY));
+                glMatrix.vec3.add(position, position, [offsetX, 0, offsetZ]);
                 vertices.push(
-                    vertices[vertexIndex] + offsetX,
-                    vertices[vertexIndex + 1] * scaleY,
-                    vertices[vertexIndex + 2] + offsetZ,
+                    ...position,
                     vertices[vertexIndex + 3],
                     vertices[vertexIndex + 4],
                     vertices[vertexIndex + 5],
@@ -141,7 +127,7 @@ export function instanceRandomiser(vertices: number[], faces: number[], centerX:
                     vertices[vertexIndex + 8]
                 );
             }
-            let offsetIndex = ((i * divisorX) + j + 1) * vertexCount;
+            let offsetIndex = ((i * divisorZ) + j + 1) * vertexCount;
             for (let k = 0; k < faceCount; k++) {
                 let faceIndex = k * 3;
                 faces.push(
@@ -159,13 +145,16 @@ export function randomiser(child: Object3D, parent: Object3D, centerX: number, c
     let objects = [];
     for (let i = 0; i < divisorX; i++) {
         for (let j = 0; j < divisorZ; j++) {
-            let offsetX = (i + Math.random()) * length / divisorX - length / 2 + centerX;
             let scaleY = 1.0 + Math.random();
+            let scaleXZ = 1.0 + Math.random() * 0.2;
+            let rotationY = Math.random() * GEO.rad(360);
+            let offsetX = (i + Math.random()) * length / divisorX - length / 2 + centerX;
             let offsetZ = (j + Math.random()) * width / divisorZ - width / 2 + centerZ;
 
             let newChild = child.clone();
             parent.addChild(newChild);
-            newChild.scale(1, scaleY, 1);
+            newChild.scale(scaleXZ, scaleY, scaleXZ);
+            newChild.rotate(0, rotationY, 0);
             newChild.translate(offsetX, 0, offsetZ);
 
             objects.push(newChild);

@@ -3,7 +3,7 @@ varying vec3 vColor;
 
 vec4 u_fogColor = vec4(174. / 255., 185. / 255., 255. / 255., 1.);
 float u_fogNear = 0.1;
-float u_fogFar = 300.;
+float u_fogFar = 500.;
 
 varying vec3 vPosition;
 varying vec3 vNormal;
