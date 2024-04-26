@@ -9,8 +9,8 @@ export function createFloor() {
     let normal: glMatrix.vec3 = [0, 0, 0];
     let floorColor = [64 / 255, 41 / 255, 5 / 255];
     let heightDist: number[][] = [];
-    let floorSide = 660;
-    let partition = 60;
+    let floorSide = 1200;
+    let partition = 120;
     let tileSide = floorSide / partition;
 
     for (let i = 0; i < partition; i++) {
@@ -100,8 +100,8 @@ export function createFloor() {
 
     var trees = [];//randomiser(tree, floor, 0, 180, 400, 150, 6, 3);
     trees.push(...randomiser(tree, floor, 0, -180, 400, 150, 6, 3));
-    trees.push(...randomiser(tree, floor, 200, 80, 150, 350, 3, 9));
-    trees.push(...randomiser(tree, floor, -200, 80, 150, 350, 3, 9));
+    trees.push(...randomiser(tree, floor, 220, 100, 200, 500, 3, 9));
+    trees.push(...randomiser(tree, floor, -220, 100, 200, 500, 3, 9));
 
     // Rock
     var greySphere = GEO.createSphere(1.0, 10, [0.3, 0.3, 0.3]);
@@ -270,10 +270,24 @@ export function createFloor() {
     chimney.setLocalScale(12, 0.1, 12);
     chimney.setLocalTranslation(-20, 81.5, 0);
     houseMain.addChild(chimney);
+
+    var smokes = [];
     var smoke = new Object3D(greySphere.vertices, greySphere.faces);
     smoke.setLocalScale(4.0, 3.0, 4.0);
     smoke.setLocalTranslation(-20, 78.5, 0);
-    houseMain.addChild(smoke);
+    houseMain.addChild(smoke, -20, 80, 0);
+    smokes.push(smoke);
+    var smoke = new Object3D(greySphere.vertices, greySphere.faces);
+    smoke.setLocalScale(4.0, 3.0, 4.0);
+    smoke.setLocalTranslation(-20, 78.5, 0);
+    houseMain.addChild(smoke, -20, 80, 0);
+    smokes.push(smoke);
+    var smoke = new Object3D(greySphere.vertices, greySphere.faces);
+    smoke.setLocalScale(4.0, 3.0, 4.0);
+    smoke.setLocalTranslation(-20, 78.5, 0);
+    houseMain.addChild(smoke, -20, 80, 0);
+    smokes.push(smoke);
+
     var terrace = new Object3D(brownBox.vertices, brownBox.faces);
     terrace.setLocalScale(30, 12.0, 4);
     terrace.setLocalTranslation(0, -33, 72);
@@ -399,7 +413,7 @@ export function createFloor() {
     houseMain.translate(0, 30, 0);
     houseMain.scale(0.85, 0.8, 0.8);
 
-    return { main: floor, trees: trees };
+    return { main: floor, trees: trees, smokes: smokes };
 }
 
 export function instanceRandomiser(vertices: number[], faces: number[], centerX: number, centerZ: number, length: number, width: number, divisorX: number, divisorZ: number) {

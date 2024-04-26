@@ -14,79 +14,9 @@ import { createFloor } from "./models/world";
 import { Object3D } from "./object";
 import { writable } from "svelte/store";
 import { DefaultShader } from "./shaders/default.shader";
-
-export const fpsStore = writable(0);
-export const tickStore = writable(0);
-
-const fpsBuffer: number[] = [];
-const fpsBufferSamples = 60;
-
-const tickBuffer: number[] = [];
-const tickBufferSamples = 60;
-
-function calculateTick(tickStart: number) {
-  const tickEnd = performance.now();
-  const tick = tickEnd - tickStart;
-
-  tickBuffer.push(tick);
-  if (tickBuffer.length > tickBufferSamples) {
-    tickBuffer.shift();
-  }
-
-  const sum = tickBuffer.reduce((a, b) => a + b, 0);
-  const avg = sum / tickBuffer.length;
-
-  tickStore.set(avg);
-}
-
-function calculateFPS(dt: number) {
-  const fps = 1000 / dt;
-
-  fpsBuffer.push(fps);
-  if (fpsBuffer.length > fpsBufferSamples) {
-    fpsBuffer.shift();
-  }
-
-  const sum = fpsBuffer.reduce((a, b) => a + b, 0);
-  const avg = sum / fpsBuffer.length;
-
-  fpsStore.set(avg);
-}
-
-// CAMERA MODE
-enum mode {
-  Stationary = "Stationary",
-  FPS = "FPS",
-  Follow = "Follow",
-}
-
-let cameraX = 0,
-  cameraY = -20,
-  cameraZ = -100;
-let cameraMode: mode = mode.FPS;
-let zoom = -100;
-
-let THETA = 0;
-let PHI = 0;
-
-export function modeStationary() {
-  cameraMode = mode.Stationary;
-  THETA = 0;
-  PHI = 0;
-  zoom = -100;
-}
-export function modeFPS() {
-  cameraMode = mode.FPS;
-  THETA = 0;
-  PHI = 0;
-  (cameraX = 0), (cameraY = -20), (cameraZ = -100);
-}
-export function modeFollowShaun() {
-  cameraMode = mode.Follow;
-  THETA = 0;
-  PHI = 0;
-  zoom = -100;
-}
+import { calculateFPS, calculateTick } from "./utils/StatCounter";
+import { AppState, mode } from "./utils/State";
+import { CameraController } from "./utils/CameraController";
 
 export function renderMain() {
   const CANVAS = document.getElementById("your_canvas");
@@ -102,66 +32,17 @@ export function renderMain() {
 
   try {
     const glCtx = CANVAS.getContext("webgl", { antialias: true });
-
-    if (!glCtx) {
-      alert("WebGL context cannot be initialized");
-      return false;
-    }
-
+    if (!glCtx) throw new Error("WebGL context cannot be initialized");
     GL = glCtx;
   } catch (e) {
     alert("WebGL context cannot be initialized");
     return false;
   }
 
+  const cameraController = new CameraController(CANVAS, AppState);
+
   Object3D.GL = GL;
   Object3D.defaultShader = new DefaultShader(GL);
-
-  // CAMERA CONTROL
-  var AMORTIZATION = 0.95;
-  var dX = 0,
-    dY = 0;
-  var drag = false;
-  var THETA = 0,
-    PHI = 0;
-  var x_prev: number, y_prev: number;
-  var mouseDown = function (e: MouseEvent) {
-    drag = true;
-    (x_prev = e.pageX), (y_prev = e.pageY);
-    e.preventDefault();
-    return false;
-  };
-  var mouseUp = function () {
-    drag = false;
-  };
-  var mouseMove = function (e: MouseEvent) {
-    if (!drag) return false;
-    (dX = ((e.pageX - x_prev) * 2 * Math.PI) / CANVAS.width),
-      (dY = ((e.pageY - y_prev) * 2 * Math.PI) / CANVAS.height);
-    THETA += dX;
-    PHI += dY;
-    (x_prev = e.pageX), (y_prev = e.pageY);
-    e.preventDefault();
-  };
-  var mouseScroll = function (e: WheelEvent) {
-    const delta = Math.sign(e.deltaY);
-    zoom -= 3 * delta;
-    if (zoom <= -150) zoom = -150;
-    if (zoom >= -100) zoom = -100;
-  };
-  CANVAS.addEventListener("mousedown", mouseDown, false);
-  CANVAS.addEventListener("mouseup", mouseUp, false);
-  CANVAS.addEventListener("mouseout", mouseUp, false);
-  CANVAS.addEventListener("mousemove", mouseMove, false);
-  CANVAS.addEventListener("wheel", mouseScroll, false);
-
-  var keyPressed: Record<string, boolean> = {};
-  window.onkeydown = function (e) {
-    keyPressed[e.key] = true;
-  };
-  window.onkeyup = function (e) {
-    keyPressed[e.key] = false;
-  };
 
   // MATRIX
   var PROJMATRIX = glMatrix.mat4.create();
@@ -219,7 +100,14 @@ export function renderMain() {
       new RotationAnimation(bicycle.main, 0, 4000, 0, 90, 0),
       new RotationAnimation(bicycle.frontPivot, 0, 2000, 0, pivotRotation, 0),
       new RotationAnimation(bicycle.body, 0, 2000, bodyRotation, 0, 0),
-      new RotationAnimation(bicycle.frontPivot, 2000, 4000, 0, -pivotRotation, 0),
+      new RotationAnimation(
+        bicycle.frontPivot,
+        2000,
+        4000,
+        0,
+        -pivotRotation,
+        0
+      ),
       new RotationAnimation(bicycle.body, 2000, 4000, -bodyRotation, 0, 0),
       new RotationAnimation(bicycle.main, 4000, 12000, 0, 0, 0),
     ],
@@ -230,8 +118,8 @@ export function renderMain() {
 
   var honking = new AnimationList(
     [
-      new ScaleAnimation(bicycle.honk, 0, 1000, 0.6, 0.6, 0.6),
-      new ScaleAnimation(bicycle.honk, 1000, 2000, 1 / 0.6, 1 / 0.6, 1 / 0.6),
+      new ScaleAnimation(bicycle.honk, 0, 1000, 0.7, 0.7, 0.7),
+      new ScaleAnimation(bicycle.honk, 1000, 2000, 1 / 0.7, 1 / 0.7, 1 / 0.7),
     ],
     true
   );
@@ -261,6 +149,22 @@ export function renderMain() {
     true
   );
   animations.push(flagMotion);
+
+  for (let i = 0; i < floor.smokes.length; i++) {
+    var smokeMotion = new AnimationList(
+      [
+        new TranslationAnimation(floor.smokes[i], 0, 3000, 0, 30, 0),
+        new ScaleAnimation(floor.smokes[i], 0, 3000, 4, 4, 4),
+      ],
+      true,
+      i * 1000,
+      () => {
+        floor.smokes[i].translate(0, -30, 0);
+        floor.smokes[i].scale(0.25, 0.25, 0.25);
+      }
+    );
+    animations.push(smokeMotion);
+  }
 
   for (let i = 0; i < floor.trees.length; i++) {
     var treeBreathing = new AnimationList(
@@ -292,52 +196,31 @@ export function renderMain() {
   let loaded = false;
   let time_prev = 0;
 
+  let isTerminated = false;
+
   const animate = function (time: number) {
+    if (isTerminated) return;
     const startTick = performance.now();
 
     let dt = time - time_prev;
     calculateFPS(dt);
     time_prev = time;
-    if (!drag) {
-      (dX *= AMORTIZATION), (dY *= AMORTIZATION);
-      (THETA += dX), (PHI += dY);
-    }
+    cameraController.tick();
 
-    // Camera control
-    if (cameraMode == "FPS") {
-      if (keyPressed["w"] || keyPressed["W"]) {
-        cameraZ += Math.cos(THETA) * 1.0;
-        cameraX += -Math.sin(THETA) * 1.0;
-      }
-      if (keyPressed["a"] || keyPressed["A"]) {
-        cameraZ += Math.cos(THETA - Math.PI / 2) * 1.0;
-        cameraX += -Math.sin(THETA - Math.PI / 2) * 1.0;
-      }
-      if (keyPressed["s"] || keyPressed["S"]) {
-        cameraZ += -Math.cos(THETA) * 1.0;
-        cameraX += Math.sin(THETA) * 1.0;
-      }
-      if (keyPressed["d"] || keyPressed["D"]) {
-        cameraZ += Math.cos(THETA + Math.PI / 2) * 1.0;
-        cameraX += -Math.sin(THETA + Math.PI / 2) * 1.0;
-      }
-      if (keyPressed["e"] || keyPressed["E"]) cameraY -= 1.5;
-      if (keyPressed["q"] || keyPressed["Q"]) cameraY += 1.5;
-    }
     VIEWMATRIX = glMatrix.mat4.create();
-    if (cameraMode == "Stationary") {
-      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -20, zoom]);
-      glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, PHI);
-      glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, THETA);
-    } else if (cameraMode == "FPS") {
-      glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, PHI);
-      glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, THETA);
+    if (AppState.cameraMode == "Stationary") {
+      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -20, AppState.zoom]);
+      glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, AppState.PHI);
+      glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, AppState.THETA);
+    } else if (AppState.cameraMode == "FPS") {
+      glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, AppState.PHI);
+      glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, AppState.THETA);
       glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
-        cameraX,
-        cameraY,
-        cameraZ,
+        AppState.cameraX,
+        AppState.cameraY,
+        AppState.cameraZ,
       ]);
-    } else if (cameraMode == "Follow") {
+    } else if (AppState.cameraMode == "Follow") {
       glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
         bicycle.main.TRANSMATRIX[12] + 15,
         25,
@@ -399,4 +282,9 @@ export function renderMain() {
     calculateTick(startTick);
   };
   animate(0);
+
+  return () => {
+    isTerminated = true;
+    cameraController.unhookEvents();
+  };
 }
