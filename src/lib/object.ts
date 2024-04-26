@@ -1,9 +1,12 @@
 import * as glMatrix from "gl-matrix";
 import defaultVertexShader from "./shaders/default.vert?raw";
 import defaultFragmentShader from "./shaders/default.frag?raw";
+import { DefaultShader } from "./shaders/default.shader";
+import type { Shader } from "./utils/Shader";
 
 export class Object3D {
   static GL: WebGLRenderingContext;
+  static defaultShader: Shader;
 
   // Default Shader
   static default_shader_vertex_source = defaultVertexShader;
@@ -25,39 +28,17 @@ export class Object3D {
   TRANSMATRIX = glMatrix.mat4.create();
   origin: [number, number, number] = [0, 0, 0];
 
+  MOVEMATRIX = glMatrix.mat4.create();
+  NORMALMATRIX = glMatrix.mat4.create();
+  PROJMATRIX = glMatrix.mat4.create();
+  VIEWMATRIX = glMatrix.mat4.create();
+
   rotation = { x: 0, y: 0, z: 0 };
 
   // Relationship
   parent: Object3D | null = null;
   child: Object3D[] = [];
 
-  // Shaders
-  shader_vertex_source;
-  shader_fragment_source;
-
-  compile_shader = function (source: string, type: number, typeString: string) {
-    const shader = Object3D.GL.createShader(type);
-    if (!shader) {
-      alert("Unable to create shader");
-      return null;
-    }
-
-    Object3D.GL.shaderSource(shader, source);
-    Object3D.GL.compileShader(shader);
-    if (!Object3D.GL.getShaderParameter(shader, Object3D.GL.COMPILE_STATUS)) {
-      alert(
-        "ERROR IN " +
-        typeString +
-        " SHADER: " +
-        Object3D.GL.getShaderInfoLog(shader)
-      );
-      return false;
-    }
-    return shader;
-  };
-
-  shader_vertex;
-  shader_fragment;
   SHADER_PROGRAM;
   _Pmatrix: WebGLUniformLocation;
   _Vmatrix: WebGLUniformLocation;
@@ -70,71 +51,71 @@ export class Object3D {
   constructor(
     object_vertex: number[],
     object_faces: number[],
-    shader_vertex_source: string | null = null,
-    shader_fragment_source: string | null = null
+    public shader: Shader = Object3D.defaultShader
   ) {
     this.object_vertex = object_vertex;
     this.object_faces = object_faces;
 
-    if (shader_vertex_source == null)
-      this.shader_vertex_source = Object3D.default_shader_vertex_source;
-    else this.shader_vertex_source = shader_vertex_source;
-    if (shader_fragment_source == null)
-      this.shader_fragment_source = Object3D.default_shader_fragment_source;
-    else this.shader_fragment_source = shader_fragment_source;
-
     this.OBJECT_VERTEX = Object3D.GL.createBuffer();
     this.OBJECT_FACES = Object3D.GL.createBuffer();
-    this.shader_vertex = this.compile_shader(
-      this.shader_vertex_source,
-      Object3D.GL.VERTEX_SHADER,
-      "VERTEX"
-    ) as WebGLShader;
-    this.shader_fragment = this.compile_shader(
-      this.shader_fragment_source,
-      Object3D.GL.FRAGMENT_SHADER,
-      "FRAGMENT"
-    ) as WebGLShader;
-    this.SHADER_PROGRAM = Object3D.GL.createProgram() as WebGLProgram;
+    // this.shader_vertex = this.compile_shader(
+    //   this.shader_vertex_source,
+    //   Object3D.GL.VERTEX_SHADER,
+    //   "VERTEX"
+    // ) as WebGLShader;
+    // this.shader_fragment = this.compile_shader(
+    //   this.shader_fragment_source,
+    //   Object3D.GL.FRAGMENT_SHADER,
+    //   "FRAGMENT"
+    // ) as WebGLShader;
+    // this.SHADER_PROGRAM = Object3D.GL.createProgram() as WebGLProgram;
 
-    if (!this.shader_vertex || !this.shader_fragment || !this.SHADER_PROGRAM) {
-      alert("Unable to create shaders");
-      throw new Error("Unable to create shaders");
-    }
+    // if (!this.shader_vertex || !this.shader_fragment || !this.SHADER_PROGRAM) {
+    //   alert("Unable to create shaders");
+    //   throw new Error("Unable to create shaders");
+    // }
 
-    Object3D.GL.attachShader(this.SHADER_PROGRAM, this.shader_vertex);
-    Object3D.GL.attachShader(this.SHADER_PROGRAM, this.shader_fragment);
-    Object3D.GL.linkProgram(this.SHADER_PROGRAM);
+    // Object3D.GL.attachShader(this.SHADER_PROGRAM, this.shader_vertex);
+    // Object3D.GL.attachShader(this.SHADER_PROGRAM, this.shader_fragment);
+    // Object3D.GL.linkProgram(this.SHADER_PROGRAM);
 
-    this._Pmatrix = Object3D.GL.getUniformLocation(
-      this.SHADER_PROGRAM,
-      "Pmatrix"
-    ) as WebGLUniformLocation;
-    this._Vmatrix = Object3D.GL.getUniformLocation(
-      this.SHADER_PROGRAM,
-      "Vmatrix"
-    ) as WebGLUniformLocation;
-    this._Mmatrix = Object3D.GL.getUniformLocation(
-      this.SHADER_PROGRAM,
-      "Mmatrix"
-    ) as WebGLUniformLocation;
-    this._Nmatrix = Object3D.GL.getUniformLocation(
-      this.SHADER_PROGRAM,
-      "uNormalMatrix"
-    ) as WebGLUniformLocation;
+    // this._Pmatrix = Object3D.GL.getUniformLocation(
+    //   this.SHADER_PROGRAM,
+    //   "Pmatrix"
+    // ) as WebGLUniformLocation;
+    // this._Vmatrix = Object3D.GL.getUniformLocation(
+    //   this.SHADER_PROGRAM,
+    //   "Vmatrix"
+    // ) as WebGLUniformLocation;
+    // this._Mmatrix = Object3D.GL.getUniformLocation(
+    //   this.SHADER_PROGRAM,
+    //   "Mmatrix"
+    // ) as WebGLUniformLocation;
+    // this._Nmatrix = Object3D.GL.getUniformLocation(
+    //   this.SHADER_PROGRAM,
+    //   "uNormalMatrix"
+    // ) as WebGLUniformLocation;
 
-    this._color =
-      Object3D.GL.getAttribLocation(this.SHADER_PROGRAM, "color") ?? -1;
-    this._position =
-      Object3D.GL.getAttribLocation(this.SHADER_PROGRAM, "position") ?? -1;
-    this._normal =
-      Object3D.GL.getAttribLocation(this.SHADER_PROGRAM, "normal") ?? -1;
+    // this._color =
+    //   Object3D.GL.getAttribLocation(this.SHADER_PROGRAM, "color") ?? -1;
+    // this._position =
+    //   Object3D.GL.getAttribLocation(this.SHADER_PROGRAM, "position") ?? -1;
+    // this._normal =
+    //   Object3D.GL.getAttribLocation(this.SHADER_PROGRAM, "normal") ?? -1;
 
-    Object3D.GL.enableVertexAttribArray(this._color);
-    Object3D.GL.enableVertexAttribArray(this._position);
-    Object3D.GL.enableVertexAttribArray(this._normal);
+    // Object3D.GL.enableVertexAttribArray(this._color);
+    // Object3D.GL.enableVertexAttribArray(this._position);
+    // Object3D.GL.enableVertexAttribArray(this._normal);
 
-    Object3D.GL.useProgram(this.SHADER_PROGRAM);
+    this.SHADER_PROGRAM = shader.program;
+    this._Mmatrix = shader.uniforms.Mmatrix;
+    this._Pmatrix = shader.uniforms.Pmatrix;
+    this._Vmatrix = shader.uniforms.Vmatrix;
+    this._Nmatrix = shader.uniforms.uNormalMatrix;
+
+    this._color = shader.attributes.color;
+    this._position = shader.attributes.position;
+    this._normal = shader.attributes.normal;
 
     Object3D.GL.bindBuffer(Object3D.GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
     Object3D.GL.bufferData(
@@ -575,6 +556,9 @@ export class Object3D {
   }
 
   setUniform4(PROJMATRIX: glMatrix.mat4, VIEWMATRIX: glMatrix.mat4) {
+    this.PROJMATRIX = PROJMATRIX;
+    this.VIEWMATRIX = VIEWMATRIX;
+
     let MOVEMATRIX = glMatrix.mat4.create();
     glMatrix.mat4.multiply(MOVEMATRIX, this.INIT_SCALEMATRIX, MOVEMATRIX);
     glMatrix.mat4.multiply(MOVEMATRIX, this.INIT_ROTATEMATRIX, MOVEMATRIX);
@@ -586,16 +570,14 @@ export class Object3D {
     }
     glMatrix.mat4.multiply(MOVEMATRIX, this.TRANSMATRIX, MOVEMATRIX);
 
+    this.MOVEMATRIX = MOVEMATRIX;
+
     let NORMALMATRIX = glMatrix.mat4.create();
     glMatrix.mat4.multiply(NORMALMATRIX, VIEWMATRIX, MOVEMATRIX);
     glMatrix.mat4.invert(NORMALMATRIX, NORMALMATRIX);
     glMatrix.mat4.transpose(NORMALMATRIX, NORMALMATRIX);
 
-    Object3D.GL.useProgram(this.SHADER_PROGRAM);
-    Object3D.GL.uniformMatrix4fv(this._Pmatrix, false, PROJMATRIX);
-    Object3D.GL.uniformMatrix4fv(this._Vmatrix, false, VIEWMATRIX);
-    Object3D.GL.uniformMatrix4fv(this._Mmatrix, false, MOVEMATRIX);
-    Object3D.GL.uniformMatrix4fv(this._Nmatrix, false, NORMALMATRIX);
+    this.NORMALMATRIX = NORMALMATRIX;
 
     for (let i = 0; i < this.child.length; i++) {
       this.child[i].setUniform4(PROJMATRIX, VIEWMATRIX);
@@ -617,8 +599,70 @@ export class Object3D {
     glMatrix.mat4.fromScaling(this.INIT_SCALEMATRIX, [kx, ky, kz]);
   }
 
+  queueBatch() {
+    const result: Object3D[] = [];
+    result.push(this);
+    for (let i = 0; i < this.child.length; i++) {
+      result.push(...this.child[i].queueBatch());
+    }
+
+    return result;
+  }
+
+  drawBatch() {
+    // Set uniforms
+    Object3D.GL.uniformMatrix4fv(this._Pmatrix, false, this.PROJMATRIX);
+    Object3D.GL.uniformMatrix4fv(this._Vmatrix, false, this.VIEWMATRIX);
+    Object3D.GL.uniformMatrix4fv(this._Mmatrix, false, this.MOVEMATRIX);
+    Object3D.GL.uniformMatrix4fv(this._Nmatrix, false, this.NORMALMATRIX);
+
+    // Bind data buffers
+    Object3D.GL.bindBuffer(Object3D.GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
+    Object3D.GL.bindBuffer(Object3D.GL.ELEMENT_ARRAY_BUFFER, this.OBJECT_FACES);
+
+    // Set vertex attributes
+    Object3D.GL.vertexAttribPointer(
+      this._position,
+      3,
+      Object3D.GL.FLOAT,
+      false,
+      (3 + 3 + 3) * 4,
+      0
+    );
+    Object3D.GL.vertexAttribPointer(
+      this._normal,
+      3,
+      Object3D.GL.FLOAT,
+      false,
+      (3 + 3 + 3) * 4,
+      3 * 4
+    );
+    Object3D.GL.vertexAttribPointer(
+      this._color,
+      3,
+      Object3D.GL.FLOAT,
+      false,
+      (3 + 3 + 3) * 4,
+      (3 + 3) * 4
+    );
+
+    // Draw the stuff
+    Object3D.GL.drawElements(
+      Object3D.GL.TRIANGLES,
+      this.object_faces.length,
+      Object3D.GL.UNSIGNED_SHORT,
+      0
+    );
+  }
+
   draw() {
-    Object3D.GL.useProgram(this.SHADER_PROGRAM);
+    this.shader.use();
+
+    Object3D.GL.uniformMatrix4fv(this._Pmatrix, false, this.PROJMATRIX);
+    Object3D.GL.uniformMatrix4fv(this._Vmatrix, false, this.VIEWMATRIX);
+    Object3D.GL.uniformMatrix4fv(this._Mmatrix, false, this.MOVEMATRIX);
+    Object3D.GL.uniformMatrix4fv(this._Nmatrix, false, this.NORMALMATRIX);
+
     Object3D.GL.bindBuffer(Object3D.GL.ARRAY_BUFFER, this.OBJECT_VERTEX);
     Object3D.GL.vertexAttribPointer(
       this._position,
@@ -672,8 +716,7 @@ export class Object3D {
     var object = new Object3D(
       this.object_vertex,
       this.object_faces,
-      this.shader_vertex_source,
-      this.shader_fragment_source
+      this.shader
     );
     object.INIT_SCALEMATRIX = glMatrix.mat4.clone(this.INIT_SCALEMATRIX);
     object.INIT_ROTATEMATRIX = glMatrix.mat4.clone(this.INIT_ROTATEMATRIX);

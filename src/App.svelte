@@ -24,7 +24,7 @@
     <span style="width: 5em;">
       FPS: <span>{$fpsStore.toFixed(1)}</span>
     </span>
-    <span style="width: 8em;">
+    <span style="width: 9em;">
       CPU Tick: <span>{$tickStore.toFixed(2)}ms</span>
     </span>
   </div>
