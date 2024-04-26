@@ -4,12 +4,35 @@ import { Object3D } from "../object";
 export function createCharacter_3() {
 
     //shapes and color
-    var beigeCylinder = GEO.createCylinder(1.0, 2.0, 20, [228/255, 179/255, 121/255]);
-    var beigeSphere = GEO.createSphere(1, 20, [228/255, 179/255, 121/255]);
+    var beige = [228/255, 179/255, 121/255];
+    var beigeCylinder = GEO.createCylinder(1.0, 2.0, 40, beige);
+    var beigeSphere = GEO.createSphere(1, 20, beige);
     var darkBeigeEllipticParaboloid = GEO.createEllipticParaboloid(1.0, 2.0, 20, [214/255, 177/255, 91/255]);
     var darkBeigeCylinder = GEO.createCylinder(1.0, 2.0, 20, [214/255, 177/255, 91/255]);
     var darkJeansCylinder = GEO.createCylinder(1.0, 2.0, 20, [56/255, 73/255, 75/255]);
+    var blackMouth = GEO.combineLines(
+        [0, 0, 0],
+        GEO.createCurve([3, 3.5, -0.8, 0, 3, -0.4, -3, 3.5, -0.8], 30, 2),
+        GEO.createCurve([3, 3, -0.8, 0, 2.5, -0.4, -3, 3, -0.8], 30, 2)
+    );
+    var beigeEar = GEO.createCylinder(1, 1, 20, beige);
 
+    // Custom Curve
+    let tmp1 = [-0.35, 0.5, 0.50, -0.65, 0.6, 0.3, -0.6, 0.8, -0.5, 0, 1.1, -0.7, 0.6, 0.8, -0.5, 0.65, 0.6, 0.3, 0.35, 0.5, 0.5];
+    let tmp2 = [-0.35, 0.0, 0.55, -0.65, 0.0, 0.3, -0.6, 0.0, -0.5, 0, 0.0, -0.7, 0.6, 0.0, -0.5, 0.65, 0.0, 0.3, 0.35, 0, 0.55];
+    let tmp3 = [], tmp4 = [];
+    for (let i = 0; i < tmp1.length; i++) {
+        tmp3.push(tmp1[i]*0.9);
+        tmp4.push(tmp2[i]*0.9);
+    }
+    var orangeHair = GEO.combineLines(
+        [182/255, 107/255, 50/255],
+        GEO.createCurve(tmp1, 30, 2),
+        GEO.createCurve(tmp2, 30, 2),
+        GEO.createCurve(tmp3, 30, 2),
+        GEO.createCurve(tmp4, 30, 2)
+    );
+// 0.25, ~, 0.5
     //objects
     var main = new Object3D(beigeCylinder.vertices, beigeCylinder.faces);
     main.setLocalScale(1, 1, 1);
@@ -43,7 +66,7 @@ export function createCharacter_3() {
 
     var nose_2 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
     nose_2.setLocalScale(1, 1, 1);
-    nose_2.setLocalTranslation(0, 18, 3.75);
+    nose_2.setLocalTranslation(0, 18, 4);
     head.addChild(nose_2);
 
     var left_leg = new Object3D(darkJeansCylinder.vertices, darkJeansCylinder.faces);
@@ -55,6 +78,39 @@ export function createCharacter_3() {
     right_leg.setLocalScale(2.6, 7, 2.6);
     right_leg.setLocalTranslation(-4, -14, 0);
     main.addChild(right_leg);
+
+    var mouth = new Object3D(blackMouth.vertices, blackMouth.faces)
+    mouth.setLocalScale(0.5, 0.5, 0.5);
+    mouth.setLocalTranslation(0, 12, 3.3)
+    head.addChild(mouth);
+
+    var cheeks1 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
+    cheeks1.setLocalScale(0.5, 0.5, 0.5);
+    cheeks1.setLocalTranslation(-1.8, 13.9, 2);
+    head.addChild(cheeks1);
+
+    var cheeks2 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
+    cheeks2.setLocalScale(0.5, 0.5, 0.5);
+    cheeks2.setLocalTranslation(1.8, 13.9, 2);
+    head.addChild(cheeks2);
+
+    var ear1 = new Object3D(beigeEar.vertices, beigeEar.faces);
+    ear1.setLocalScale(1.2, 1.4, 1.2);
+    ear1.setLocalTranslation(3, 19, 0);
+    ear1.setLocalRotation(1.5708, 0, 0);
+    head.addChild(ear1);
+
+    var ear2 = new Object3D(beigeEar.vertices, beigeEar.faces);
+    ear2.setLocalScale(1.2, 1.4, 1.2);
+    ear2.setLocalTranslation(-3, 19, 0);
+    ear2.setLocalRotation(1.5708, 0, 0);
+    head.addChild(ear2);
+
+    var hair = new Object3D(orangeHair.vertices, orangeHair.faces);
+    hair.setLocalScale(5, 5, 5)
+    hair.setLocalTranslation(0, 19, 0);
+    hair.setLocalRotation(0, 0, 0);
+    head.addChild(hair);
 
     return {
         main: main,
