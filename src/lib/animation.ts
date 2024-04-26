@@ -116,7 +116,7 @@ export class AnimationList extends AbstractAnimation {
   start = 99999999999;
   end = 0;
 
-  constructor(public animations: AbstractAnimation[], public isLoop: boolean) {
+  constructor(public animations: AbstractAnimation[], public isLoop: boolean, public startDelay = 0, public runAfter = () => {}) {
     super();
     for (let i = 0; i < this.animations.length; i++) {
       this.start = Math.min(this.start, this.animations[i].start);
@@ -125,13 +125,17 @@ export class AnimationList extends AbstractAnimation {
   }
 
   run(time: number, dt: number) {
+    time -= this.startDelay;
     if (time > this.start && time < this.end) {
       for (let animation of this.animations) {
         animation.run(time, dt);
       }
     }
-    if (time > this.end && this.isLoop) {
-      let duration = this.end - this.start + 2 * dt;
+    if (time > this.end) {
+      this.runAfter();
+      if(!this.isLoop) return;
+      let duration = this.startDelay + this.end - this.start + 2 * dt;
+      this.startDelay = 0;
       this.start += duration;
       this.end += duration;
       for (let i = 0; i < this.animations.length; i++) {
