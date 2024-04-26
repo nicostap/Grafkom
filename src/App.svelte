@@ -5,12 +5,16 @@
     modeStationary,
     modeFPS,
     modeFollowShaun,
-    fpsStore,
-    tickStore,
   } from "./lib/main";
+  import { fpsStore, tickStore } from "./lib/utils/StatCounter";
 
   onMount(() => {
-    renderMain();
+    const renderTerminate = renderMain();
+    return () => {
+      if (renderTerminate) {
+        renderTerminate();
+      }
+    };
   });
 </script>
 

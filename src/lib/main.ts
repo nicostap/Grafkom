@@ -14,78 +14,26 @@ import { createFloor } from "./models/world";
 import { Object3D } from "./object";
 import { writable } from "svelte/store";
 import { DefaultShader } from "./shaders/default.shader";
-
-export const fpsStore = writable(0);
-export const tickStore = writable(0);
-
-const fpsBuffer: number[] = [];
-const fpsBufferSamples = 60;
-
-const tickBuffer: number[] = [];
-const tickBufferSamples = 60;
-
-function calculateTick(tickStart: number) {
-  const tickEnd = performance.now();
-  const tick = tickEnd - tickStart;
-
-  tickBuffer.push(tick);
-  if (tickBuffer.length > tickBufferSamples) {
-    tickBuffer.shift();
-  }
-
-  const sum = tickBuffer.reduce((a, b) => a + b, 0);
-  const avg = sum / tickBuffer.length;
-
-  tickStore.set(avg);
-}
-
-function calculateFPS(dt: number) {
-  const fps = 1000 / dt;
-
-  fpsBuffer.push(fps);
-  if (fpsBuffer.length > fpsBufferSamples) {
-    fpsBuffer.shift();
-  }
-
-  const sum = fpsBuffer.reduce((a, b) => a + b, 0);
-  const avg = sum / fpsBuffer.length;
-
-  fpsStore.set(avg);
-}
-
-// CAMERA MODE
-enum mode {
-  Stationary = "Stationary",
-  FPS = "FPS",
-  Follow = "Follow",
-}
-
-let cameraX = 0,
-  cameraY = -20,
-  cameraZ = -100;
-let cameraMode: mode = mode.FPS;
-let zoom = -100;
-
-let THETA = 0;
-let PHI = 0;
+import { calculateFPS, calculateTick } from "./utils/StatCounter";
+import { AppState, mode } from "./utils/State";
 
 export function modeStationary() {
-  cameraMode = mode.Stationary;
-  THETA = 0;
-  PHI = 0;
-  zoom = -100;
+  AppState.cameraMode = mode.Stationary;
+  AppState.THETA = 0;
+  AppState.PHI = 0;
+  AppState.zoom = -100;
 }
 export function modeFPS() {
-  cameraMode = mode.FPS;
-  THETA = 0;
-  PHI = 0;
-  (cameraX = 0), (cameraY = -20), (cameraZ = -100);
+  AppState.cameraMode = mode.FPS;
+  AppState.THETA = 0;
+  AppState.PHI = 0;
+  (AppState.cameraX = 0), (AppState.cameraY = -20), (AppState.cameraZ = -100);
 }
 export function modeFollowShaun() {
-  cameraMode = mode.Follow;
-  THETA = 0;
-  PHI = 0;
-  zoom = -100;
+  AppState.cameraMode = mode.Follow;
+  AppState.THETA = 0;
+  AppState.PHI = 0;
+  AppState.zoom = -100;
 }
 
 export function renderMain() {
@@ -122,8 +70,8 @@ export function renderMain() {
   var dX = 0,
     dY = 0;
   var drag = false;
-  var THETA = 0,
-    PHI = 0;
+  //var THETA = 0,
+  //  PHI = 0;
   var x_prev: number, y_prev: number;
   var mouseDown = function (e: MouseEvent) {
     drag = true;
@@ -138,16 +86,16 @@ export function renderMain() {
     if (!drag) return false;
     (dX = ((e.pageX - x_prev) * 2 * Math.PI) / CANVAS.width),
       (dY = ((e.pageY - y_prev) * 2 * Math.PI) / CANVAS.height);
-    THETA += dX;
-    PHI += dY;
+    AppState.THETA += dX;
+    AppState.PHI += dY;
     (x_prev = e.pageX), (y_prev = e.pageY);
     e.preventDefault();
   };
   var mouseScroll = function (e: WheelEvent) {
     const delta = Math.sign(e.deltaY);
-    zoom -= 3 * delta;
-    if (zoom <= -150) zoom = -150;
-    if (zoom >= -100) zoom = -100;
+    AppState.zoom -= 3 * delta;
+    if (AppState.zoom <= -150) AppState.zoom = -150;
+    if (AppState.zoom >= -100) AppState.zoom = -100;
   };
   CANVAS.addEventListener("mousedown", mouseDown, false);
   CANVAS.addEventListener("mouseup", mouseUp, false);
@@ -219,7 +167,14 @@ export function renderMain() {
       new RotationAnimation(bicycle.main, 0, 4000, 0, 90, 0),
       new RotationAnimation(bicycle.frontPivot, 0, 2000, 0, pivotRotation, 0),
       new RotationAnimation(bicycle.body, 0, 2000, bodyRotation, 0, 0),
-      new RotationAnimation(bicycle.frontPivot, 2000, 4000, 0, -pivotRotation, 0),
+      new RotationAnimation(
+        bicycle.frontPivot,
+        2000,
+        4000,
+        0,
+        -pivotRotation,
+        0
+      ),
       new RotationAnimation(bicycle.body, 2000, 4000, -bodyRotation, 0, 0),
       new RotationAnimation(bicycle.main, 4000, 12000, 0, 0, 0),
     ],
@@ -292,7 +247,10 @@ export function renderMain() {
   let loaded = false;
   let time_prev = 0;
 
+  let isTerminated = false;
+
   const animate = function (time: number) {
+    if (isTerminated) return;
     const startTick = performance.now();
 
     let dt = time - time_prev;
@@ -300,44 +258,44 @@ export function renderMain() {
     time_prev = time;
     if (!drag) {
       (dX *= AMORTIZATION), (dY *= AMORTIZATION);
-      (THETA += dX), (PHI += dY);
+      (AppState.THETA += dX), (AppState.PHI += dY);
     }
 
     // Camera control
-    if (cameraMode == "FPS") {
+    if (AppState.cameraMode == "FPS") {
       if (keyPressed["w"] || keyPressed["W"]) {
-        cameraZ += Math.cos(THETA) * 1.0;
-        cameraX += -Math.sin(THETA) * 1.0;
+        AppState.cameraZ += Math.cos(AppState.THETA) * 1.0;
+        AppState.cameraX += -Math.sin(AppState.THETA) * 1.0;
       }
       if (keyPressed["a"] || keyPressed["A"]) {
-        cameraZ += Math.cos(THETA - Math.PI / 2) * 1.0;
-        cameraX += -Math.sin(THETA - Math.PI / 2) * 1.0;
+        AppState.cameraZ += Math.cos(AppState.THETA - Math.PI / 2) * 1.0;
+        AppState.cameraX += -Math.sin(AppState.THETA - Math.PI / 2) * 1.0;
       }
       if (keyPressed["s"] || keyPressed["S"]) {
-        cameraZ += -Math.cos(THETA) * 1.0;
-        cameraX += Math.sin(THETA) * 1.0;
+        AppState.cameraZ += -Math.cos(AppState.THETA) * 1.0;
+        AppState.cameraX += Math.sin(AppState.THETA) * 1.0;
       }
       if (keyPressed["d"] || keyPressed["D"]) {
-        cameraZ += Math.cos(THETA + Math.PI / 2) * 1.0;
-        cameraX += -Math.sin(THETA + Math.PI / 2) * 1.0;
+        AppState.cameraZ += Math.cos(AppState.THETA + Math.PI / 2) * 1.0;
+        AppState.cameraX += -Math.sin(AppState.THETA + Math.PI / 2) * 1.0;
       }
-      if (keyPressed["e"] || keyPressed["E"]) cameraY -= 1.5;
-      if (keyPressed["q"] || keyPressed["Q"]) cameraY += 1.5;
+      if (keyPressed["e"] || keyPressed["E"]) AppState.cameraY -= 1.5;
+      if (keyPressed["q"] || keyPressed["Q"]) AppState.cameraY += 1.5;
     }
     VIEWMATRIX = glMatrix.mat4.create();
-    if (cameraMode == "Stationary") {
-      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -20, zoom]);
-      glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, PHI);
-      glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, THETA);
-    } else if (cameraMode == "FPS") {
-      glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, PHI);
-      glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, THETA);
+    if (AppState.cameraMode == "Stationary") {
+      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -20, AppState.zoom]);
+      glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, AppState.PHI);
+      glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, AppState.THETA);
+    } else if (AppState.cameraMode == "FPS") {
+      glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, AppState.PHI);
+      glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, AppState.THETA);
       glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
-        cameraX,
-        cameraY,
-        cameraZ,
+        AppState.cameraX,
+        AppState.cameraY,
+        AppState.cameraZ,
       ]);
-    } else if (cameraMode == "Follow") {
+    } else if (AppState.cameraMode == "Follow") {
       glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
         bicycle.main.TRANSMATRIX[12] + 15,
         25,
@@ -399,4 +357,8 @@ export function renderMain() {
     calculateTick(startTick);
   };
   animate(0);
+
+  return () => {
+    isTerminated = true;
+  };
 }
