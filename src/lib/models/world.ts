@@ -9,7 +9,7 @@ export function createFloor() {
     let normal: glMatrix.vec3 = [0, 0, 0];
     let floorColor = [64 / 255, 41 / 255, 5 / 255];
     let heightDist: number[][] = [];
-    let floorSide = 600;
+    let floorSide = 660;
     let partition = 60;
     let tileSide = floorSide / partition;
 
@@ -75,19 +75,21 @@ export function createFloor() {
     // Random grass generator
     var grassGeometry = GEO.combineLines(
         [0, 0.5, 0],
-        GEO.createCurve([0.4, 0, 0.4, 0.4, 3, 0.4, 0, 5, -1], 10, 2),
-        GEO.createCurve([-0.4, 0, 0.4, -0.4, 3, 0.4, 0, 5, -1], 10, 2),
-        GEO.createCurve([0, 0, -0.4, 0, 3, -0.4, 0, 5, -1], 10, 2),
+        GEO.createCurve([0.4, 0, 0.4, 0.4, 3, 0.4, 0, 5, -1], 5, 2),
+        GEO.createCurve([-0.4, 0, 0.4, -0.4, 3, 0.4, 0, 5, -1], 5, 2),
+        GEO.createCurve([0, 0, -0.4, 0, 3, -0.4, 0, 5, -1], 5, 2),
     );
 
     // Object instancing
-    let grassInstance = instanceRandomiser(grassGeometry.vertices, grassGeometry.faces, 0, 0, 100, 100, 10, 10);
+    let grassInstance = instanceRandomiser(grassGeometry.vertices, grassGeometry.faces, 0, 0, 100, 100, 7, 7);
     let grass = new Object3D(grassInstance.vertices, grassInstance.faces);
     grass.translate(0, 0.75, 0);
-    randomiser(grass, floor, 0, 0, 500, 500, 6, 6);
+    randomiser(grass, floor, 0, 180, 400, 150, 4, 4);
+    randomiser(grass, floor, 0, -180, 400, 150, 4, 4);
+    randomiser(grass, floor, 200, 0, 100, 60, 2, 1);
+    randomiser(grass, floor, -200, 0, 100, 60, 2, 1);
 
-
-    var brownHyperboloid = GEO.createHyperboloidOneSheet(1.0, 3.0, 10, [160 / 255, 82 / 255, 45 / 255]);
+    var brownHyperboloid = GEO.createHyperboloidOneSheet(1.0, 3.0, 7, [160 / 255, 82 / 255, 45 / 255]);
     var greenParaboloid = GEO.createEllipticParaboloid(1.0, 1.0, 30, [0.2, 0.7, 0.2]);
     var tree = new Object3D(brownHyperboloid.vertices, brownHyperboloid.faces);
     var leaf = new Object3D(greenParaboloid.vertices, greenParaboloid.faces);
@@ -96,13 +98,313 @@ export function createFloor() {
     leaf.setLocalTranslation(0, 40.0, 0);
     tree.addChild(leaf);
 
-    var trees = randomiser(tree, floor, 0, 140, 400, 150, 6, 3);
-    trees.push(...randomiser(tree, floor, 0, -140, 400, 150, 6, 3));
+    var trees = [];//randomiser(tree, floor, 0, 180, 400, 150, 6, 3);
+    trees.push(...randomiser(tree, floor, 0, -180, 400, 150, 6, 3));
+    trees.push(...randomiser(tree, floor, 200, 80, 150, 350, 3, 9));
+    trees.push(...randomiser(tree, floor, -200, 80, 150, 350, 3, 9));
+
+    // Rock
+    var greySphere = GEO.createSphere(1.0, 10, [0.3, 0.3, 0.3]);
+    var rockInstance = instanceRandomiser(greySphere.vertices, greySphere.faces, 0, 0, 100, 100, 3, 3);
+    var rock = new Object3D(rockInstance.vertices, rockInstance.faces);
+    rock.setLocalTranslation(0, 0.75, 0);
+    randomiser(rock, floor, 0, 180, 400, 150, 4, 4);
+    randomiser(rock, floor, 0, -180, 400, 150, 4, 4);
+    randomiser(rock, floor, 200, 0, 100, 150, 2, 2);
+    randomiser(rock, floor, -200, 0, 100, 150, 2, 2);
+
+    // House
+    var whiteBox = GEO.createBox(1.0, 1.0, 1.0, [0.8, 0.8, 0.8]);
+    var brownBox = GEO.createBox(1.0, 1.0, 1.0, [139 / 265, 105 / 265, 20 / 265]);
+    var whiteCylinder = GEO.createCylinder(1.0, 1.0, 10, [0.8, 0.8, 0.8]);
+    var whitePrism = GEO.createCylinder(1.0, 1.0, 3, [0.8, 0.8, 0.8]);
+    var redBox = GEO.createBox(1.0, 1.0, 1.0, [0.3, 0, 0]);
+    var blackBox = GEO.createBox(1.0, 1.0, 1.0, [0, 0, 0]);
+    var greenCylinder = GEO.createCylinder(1.0, 1.0, 15, [0, 0.2, 0]);
+    var greenSphere = GEO.createSphere(1.0, 15, [0, 0.2, 0]);
+
+    var houseMain = new Object3D(whiteBox.vertices, whiteBox.faces);
+    houseMain.setLocalScale(100, 55, 60);
+    var terrace = new Object3D(brownBox.vertices, brownBox.faces);
+    terrace.setLocalScale(100, 5.0, 40);
+    terrace.setLocalTranslation(0, -25, 50);
+    houseMain.addChild(terrace);
+    var terrace = new Object3D(whiteBox.vertices, whiteBox.faces);
+    terrace.setLocalScale(100, 2.0, 40);
+    terrace.setLocalTranslation(0, 20, 50);
+    houseMain.addChild(terrace);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(2.0, 42.5, 2.0);
+    pillar.setLocalTranslation(-47.5, -2.5, 67.5);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(2.0, 42.5, 2.0);
+    pillar.setLocalTranslation(47.5, -2.5, 67.5);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(2.0, 42.5, 2.0);
+    pillar.setLocalTranslation(17.5, -2.5, 67.5);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(2.0, 42.5, 2.0);
+    pillar.setLocalTranslation(-17.5, -2.5, 67.5);
+    houseMain.addChild(pillar);
+    var rail = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    rail.setLocalScale(1.0, 40, 1.0);
+    rail.setLocalRotation(GEO.rad(90), 0, 0);
+    rail.setLocalTranslation(47.5, -7.5, 47.5);
+    houseMain.addChild(rail);
+    var rail = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    rail.setLocalScale(1.0, 40, 1.0);
+    rail.setLocalRotation(GEO.rad(90), 0, 0);
+    rail.setLocalTranslation(-47.5, -7.5, 47.5);
+    houseMain.addChild(rail);
+    var rail = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    rail.setLocalScale(1.0, 27.5, 1.0);
+    rail.setLocalRotation(0, 0, GEO.rad(90));
+    rail.setLocalTranslation(32.5, -7.5, 67.5);
+    houseMain.addChild(rail);
+    var rail = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    rail.setLocalScale(1.0, 27.5, 1.0);
+    rail.setLocalRotation(0, 0, GEO.rad(90));
+    rail.setLocalTranslation(-32.5, -7.5, 67.5);
+    houseMain.addChild(rail);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(-47.5 + 30 * 0.25, -16.5, 67.5);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(-47.5 + 30 * 0.5, -16.5, 67.5);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(-47.5 + 30 * 0.75, -16.5, 67.5);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(47.5 - 30 * 0.25, -16.5, 67.5);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(47.5 - 30 * 0.5, -16.5, 67.5);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(47.5 - 30 * 0.75, -16.5, 67.5);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(-47.5, -16.5, 67.5 - 37.5 * 0.25);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(-47.5, -16.5, 67.5 - 37.5 * 0.5);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(-47.5, -16.5, 67.5 - 37.5 * 0.75);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(47.5, -16.5, 67.5 - 37.5 * 0.25);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(47.5, -16.5, 67.5 - 37.5 * 0.5);
+    houseMain.addChild(pillar);
+    var pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1.0, 17.5, 1.0);
+    pillar.setLocalTranslation(47.5, -16.5, 67.5 - 37.5 * 0.75);
+    houseMain.addChild(pillar);
+    var roof = new Object3D(whitePrism.vertices, whitePrism.faces);
+    roof.setLocalScale(20, 100, 34.75);
+    roof.setLocalRotation(0, 0, GEO.rad(90));
+    roof.setLocalTranslation(0, 37.5, 0);
+    houseMain.addChild(roof);
+    var roof = new Object3D(redBox.vertices, redBox.faces);
+    roof.setLocalScale(110, 5, 51.5);
+    roof.setLocalRotation(GEO.rad(45), 0, 0);
+    roof.setLocalTranslation(0, 45.5, 16.5);
+    houseMain.addChild(roof);
+    var roof = new Object3D(redBox.vertices, redBox.faces);
+    roof.setLocalScale(110, 5, 51.5);
+    roof.setLocalRotation(GEO.rad(-45), 0, 0);
+    roof.setLocalTranslation(0, 45.5, -16.5);
+    houseMain.addChild(roof);
+    var window = new Object3D(blackBox.vertices, blackBox.faces);
+    window.setLocalScale(15, 30, 0.1);
+    window.setLocalTranslation(-30, -2.5, 30.01);
+    houseMain.addChild(window);
+    var window = new Object3D(blackBox.vertices, blackBox.faces);
+    window.setLocalScale(15, 30, 0.1);
+    window.setLocalTranslation(30, -2.5, 30.01);
+    houseMain.addChild(window);
+    var window = new Object3D(whiteBox.vertices, whiteBox.faces);
+    window.setLocalScale(1.0, 30, 0.1);
+    window.setLocalTranslation(30, -2.5, 30.02);
+    houseMain.addChild(window);
+    var window = new Object3D(whiteBox.vertices, whiteBox.faces);
+    window.setLocalScale(1.0, 30, 0.1);
+    window.setLocalTranslation(-30, -2.5, 30.02);
+    houseMain.addChild(window);
+    var window = new Object3D(whiteBox.vertices, whiteBox.faces);
+    window.setLocalScale(1.0, 15, 0.1);
+    window.setLocalRotation(0, 0, GEO.rad(90));
+    window.setLocalTranslation(-30, 0, 30.02);
+    houseMain.addChild(window);
+    var window = new Object3D(whiteBox.vertices, whiteBox.faces);
+    window.setLocalScale(1.0, 15, 0.1);
+    window.setLocalRotation(0, 0, GEO.rad(90));
+    window.setLocalTranslation(30, 0, 30.02);
+    houseMain.addChild(window);
+    var door = new Object3D(blackBox.vertices, blackBox.faces);
+    door.setLocalScale(15.0, 35, 0.1);
+    door.setLocalTranslation(0, -5, 30.01);
+    houseMain.addChild(door);
+    var chimney = new Object3D(whiteBox.vertices, whiteBox.faces);
+    chimney.setLocalScale(17, 23, 17);
+    chimney.setLocalTranslation(-20, 70, 0);
+    houseMain.addChild(chimney);
+    var chimney = new Object3D(blackBox.vertices, blackBox.faces);
+    chimney.setLocalScale(12, 0.1, 12);
+    chimney.setLocalTranslation(-20, 81.5, 0);
+    houseMain.addChild(chimney);
+    var smoke = new Object3D(greySphere.vertices, greySphere.faces);
+    smoke.setLocalScale(4.0, 3.0, 4.0);
+    smoke.setLocalTranslation(-20, 78.5, 0);
+    houseMain.addChild(smoke);
+    var terrace = new Object3D(brownBox.vertices, brownBox.faces);
+    terrace.setLocalScale(30, 12.0, 4);
+    terrace.setLocalTranslation(0, -33, 72);
+    houseMain.addChild(terrace);
+    var terrace = new Object3D(brownBox.vertices, brownBox.faces);
+    terrace.setLocalScale(30, 6.0, 4);
+    terrace.setLocalTranslation(0, -36, 76);
+    houseMain.addChild(terrace);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-57, -35, 78);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-40, -35, 78);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-23, -35, 78);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(57, -35, 78);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(40, -35, 78);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(23, -35, 78);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(57, -35, 59);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(57, -35, 42);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(57, -35, 25);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(57, -35, 8);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(57, -35, -9);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(57, -35, -26);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(57, -35, -40);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-57, -35, 59);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-57, -35, 42);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-57, -35, 25);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-57, -35, 8);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-57, -35, -9);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-57, -35, -26);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-57, -35, -40);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-57, -35, -40);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-40, -35, -40);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-23, -35, -40);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(57, -35, -40);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(40, -35, -40);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(23, -35, -40);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(6, -35, -40);
+    houseMain.addChild(bush);
+    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
+    bush.setLocalScale(12, 19, 12);
+    bush.setLocalTranslation(-6, -35, -40);
+    houseMain.addChild(bush);
+
+    floor.addChild(houseMain);
+    houseMain.translate(0, 30, 0);
+    houseMain.scale(0.85, 0.8, 0.8);
 
     return { main: floor, trees: trees };
 }
 
 export function instanceRandomiser(vertices: number[], faces: number[], centerX: number, centerZ: number, length: number, width: number, divisorX: number, divisorZ: number) {
+    let verticesOut = [];
+    let facesOut = [];
     let vertexCount = vertices.length / 9;
     let faceCount = faces.length / 3;
     for (let i = 0; i < divisorX; i++) {
@@ -117,7 +419,7 @@ export function instanceRandomiser(vertices: number[], faces: number[], centerX:
                 position[1] * scaleY;
                 glMatrix.vec3.rotateY(position, position, [0, 0, 0], GEO.rad(rotateY));
                 glMatrix.vec3.add(position, position, [offsetX, 0, offsetZ]);
-                vertices.push(
+                verticesOut.push(
                     ...position,
                     vertices[vertexIndex + 3],
                     vertices[vertexIndex + 4],
@@ -130,7 +432,7 @@ export function instanceRandomiser(vertices: number[], faces: number[], centerX:
             let offsetIndex = ((i * divisorZ) + j + 1) * vertexCount;
             for (let k = 0; k < faceCount; k++) {
                 let faceIndex = k * 3;
-                faces.push(
+                facesOut.push(
                     offsetIndex + faces[faceIndex],
                     offsetIndex + faces[faceIndex + 1],
                     offsetIndex + faces[faceIndex + 2]
@@ -138,14 +440,14 @@ export function instanceRandomiser(vertices: number[], faces: number[], centerX:
             }
         }
     }
-    return { vertices: vertices, faces: faces };
+    return { vertices: verticesOut, faces: facesOut };
 }
 
 export function randomiser(child: Object3D, parent: Object3D, centerX: number, centerZ: number, length: number, width: number, divisorX: number, divisorZ: number) {
     let objects = [];
     for (let i = 0; i < divisorX; i++) {
         for (let j = 0; j < divisorZ; j++) {
-            let scaleY = 1.0 + Math.random();
+            let scaleY = 1.2 + Math.random();
             let scaleXZ = 1.0 + Math.random() * 0.2;
             let rotationY = Math.random() * GEO.rad(360);
             let offsetX = (i + Math.random()) * length / divisorX - length / 2 + centerX;

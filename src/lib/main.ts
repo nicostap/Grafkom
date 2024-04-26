@@ -61,9 +61,9 @@ enum mode {
 
 let cameraX = 0,
   cameraY = -20,
-  cameraZ = 0;
+  cameraZ = -100;
 let cameraMode: mode = mode.FPS;
-let zoom = -30;
+let zoom = -100;
 
 let THETA = 0;
 let PHI = 0;
@@ -72,19 +72,19 @@ export function modeStationary() {
   cameraMode = mode.Stationary;
   THETA = 0;
   PHI = 0;
-  zoom = -30;
+  zoom = -100;
 }
 export function modeFPS() {
   cameraMode = mode.FPS;
   THETA = 0;
   PHI = 0;
-  (cameraX = 0), (cameraY = -20), (cameraZ = 0);
+  (cameraX = 0), (cameraY = -20), (cameraZ = -100);
 }
 export function modeFollowShaun() {
   cameraMode = mode.Follow;
   THETA = 0;
   PHI = 0;
-  zoom = -30;
+  zoom = -100;
 }
 
 export function renderMain() {
@@ -144,8 +144,8 @@ export function renderMain() {
   var mouseScroll = function (e: WheelEvent) {
     const delta = Math.sign(e.deltaY);
     zoom -= 3 * delta;
-    if (zoom <= -100) zoom = -100;
-    if (zoom >= -20) zoom = -20;
+    if (zoom <= -150) zoom = -150;
+    if (zoom >= -100) zoom = -100;
   };
   CANVAS.addEventListener("mousedown", mouseDown, false);
   CANVAS.addEventListener("mouseup", mouseUp, false);
@@ -166,10 +166,10 @@ export function renderMain() {
   var VIEWMATRIX = glMatrix.mat4.create();
   glMatrix.mat4.perspective(
     PROJMATRIX,
-    GEO.rad(90),
+    GEO.rad(100),
     CANVAS.width / CANVAS.height,
     1,
-    1000
+    500
   );
 
   // Making the objects
@@ -178,7 +178,7 @@ export function renderMain() {
   var farmer = createCharacter_3();
 
   // Placing objects
-  bicycle.main.translate(-30, 14, -30);
+  bicycle.main.translate(-40, 14, -55);
   bicycle.main.rotate(0, GEO.rad(180), 0);
   bicycle.flag.rotateArbitraryAxis(
     Math.cos(GEO.rad(90 + 20)),
@@ -217,20 +217,13 @@ export function renderMain() {
       new RotationAnimation(bicycle.main, 0, 4000, 0, 90, 0),
       new RotationAnimation(bicycle.frontPivot, 0, 2000, 0, pivotRotation, 0),
       new RotationAnimation(bicycle.body, 0, 2000, bodyRotation, 0, 0),
-      new RotationAnimation(
-        bicycle.frontPivot,
-        2000,
-        4000,
-        0,
-        -pivotRotation,
-        0
-      ),
+      new RotationAnimation(bicycle.frontPivot, 2000, 4000, 0, -pivotRotation, 0),
       new RotationAnimation(bicycle.body, 2000, 4000, -bodyRotation, 0, 0),
       new RotationAnimation(bicycle.main, 4000, 12000, 0, 0, 0),
     ],
     true
   );
-  bicycleMotion.multiplySpeed(0.5);
+  bicycleMotion.multiplySpeed(1.1);
   animations.push(bicycleMotion);
 
   var honking = new AnimationList(
@@ -284,15 +277,6 @@ export function renderMain() {
     );
     animations.push(treeBreathing);
   }
-
-  // var grassBreathing = new AnimationList(
-  //   [
-  //     new TranslationAnimation(floor.grass, 0, 1000, 0, 0.75, 0),
-  //     new TranslationAnimation(floor.grass, 1000, 2000, 0, -0.75, 0),
-  //   ],
-  //   true
-  // );
-  // animations.push(grassBreathing);
 
   // Drawing
   GL.enable(GL.CULL_FACE);
@@ -353,9 +337,9 @@ export function renderMain() {
       ]);
     } else if (cameraMode == "Follow") {
       glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
-        bicycle.main.TRANSMATRIX[12] + 30,
-        20,
-        bicycle.main.TRANSMATRIX[12] + 30,
+        bicycle.main.TRANSMATRIX[12] + 15,
+        25,
+        bicycle.main.TRANSMATRIX[14] + 15,
       ]);
       glMatrix.mat4.lookAt(
         VIEWMATRIX,
@@ -384,7 +368,7 @@ export function renderMain() {
     if (render_loop == 0 && !loaded) {
       loaded = true;
       load_time = time;
-    } else if(loaded) {
+    } else if (loaded) {
       // Running the animations
       time -= load_time;
       for (let animation of animations) {

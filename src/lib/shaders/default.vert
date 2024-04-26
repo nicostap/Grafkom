@@ -6,7 +6,7 @@ uniform mat4 Vmatrix;
 uniform mat4 Mmatrix;
 uniform mat4 uNormalMatrix;
 
-const vec3 lightWorldPosition = vec3(50., 50., 50.);
+const vec3 lightWorldPosition = vec3(100., 500., 100.);
 
 varying vec3 vColor;
 varying vec3 vPosition;

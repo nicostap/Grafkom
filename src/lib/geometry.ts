@@ -113,9 +113,9 @@ export const GEO = {
         radius * Math.cos(rad),
         -hh,
         radius * Math.sin(rad),
-        Math.cos(rad),
         0,
-        Math.sin(rad),
+        -1,
+        0,
         ...color
       );
     }
@@ -125,9 +125,9 @@ export const GEO = {
         radius * Math.cos(rad),
         hh,
         radius * Math.sin(rad),
+        Math.cos(rad),
         0,
-        -1,
-        0,
+        Math.sin(rad),
         ...color
       );
     }
@@ -154,11 +154,7 @@ export const GEO = {
     }
     for (let i = 0; i < poly; i++) {
       faces.push(i + poly, ((i + 1) % poly) + poly, 4 * poly + 1);
-      faces.push(
-        ((i + 1) % poly) + 3 * poly,
-        i + 3 * poly,
-        ((i + 1) % poly) + 2 * poly
-      );
+      faces.push(((i + 1) % poly) + 3 * poly,i + 3 * poly,((i + 1) % poly) + 2 * poly);
     }
     return { vertices: vertices, faces: faces };
   },
