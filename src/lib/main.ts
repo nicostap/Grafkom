@@ -70,6 +70,14 @@ export function renderMain() {
     -45
   );
   farmer.main.translate(0, 25, 70);
+  farmer.body.rotate(-0.8, 0, 0);
+  farmer.body.translate(0, -12, -5);
+  farmer.head.rotate(0.3, 0, 0);
+  farmer.head.translate(0, 1, 1);
+  // farmer.leftShoulder.rotate(0, 0, 0);
+  // farmer.leftElbow.rotate(0, 0, 0);
+  // farmer.rightShoulder.rotate(-0.9, 0, 0);
+  // farmer.rightElbow.rotate(-2, -2.5, -0.6);
 
   // Making the animations
   var animations: AbstractAnimation[] = [];
