@@ -10,7 +10,7 @@ export function createFloor() {
     let floorColor = [64 / 255, 41 / 255, 5 / 255];
     let heightDist: number[][] = [];
     let floorSide = 1200;
-    let partition = 120;
+    let partition = 100;
     let tileSide = floorSide / partition;
 
     for (let i = 0; i < partition; i++) {
@@ -413,7 +413,76 @@ export function createFloor() {
     houseMain.translate(0, 30, 0);
     houseMain.scale(0.85, 0.8, 0.8);
 
-    return { main: floor, trees: trees, smokes: smokes };
+    var whiteSphere = GEO.createSphere(50.0, 15, [1, 1, 1]);
+    var cloudInstance = instanceRandomiser(whiteSphere.vertices, whiteSphere.faces, 0, 0, 1000, 1000, 6, 6);
+    var cloud = new Object3D(cloudInstance.vertices, cloudInstance.faces);
+    cloud.setLocalTranslation(0, 250, 0);
+    cloud.setLocalScale(1.0, 0.6, 0.8);
+    floor.addChild(cloud);
+
+    var clouds = [cloud];
+    let newChild = cloud.clone();
+    newChild.translate(0, 0, 1000);
+    floor.addChild(newChild);
+    clouds.push(newChild);
+    newChild = cloud.clone();
+    newChild.translate(0, 0, -1000);
+    floor.addChild(newChild);
+    clouds.push(newChild);
+
+    var redParaboloid = GEO.createEllipticParaboloid(1.0, 1.0, 30, [1, 0, 0]);
+    var whiteCurve = GEO.combineLines(
+        [0.9, 0.9, 0.9],
+        GEO.createCurve([0.3, 0, 0.3, 1.2, 3, 1.2, 0.3, 5, 0.3], 7, 2),
+        GEO.createCurve([-0.3, 0, 0.3, 0.6, 3, 1.2, -0.3, 5, 0.3], 7, 2),
+        GEO.createCurve([0, 0, -0.3, 0.9, 3, 0.6, 0, 5, -0.3], 7, 2),
+    );
+    var stalk = new Object3D(whiteCurve.vertices, whiteCurve.faces);
+    var cap = new Object3D(redParaboloid.vertices, redParaboloid.faces);
+    cap.setLocalScale(1.5, 0.75, 1.5);
+    cap.setLocalTranslation(0.4, 5, 0);
+    stalk.addChild(cap);
+    var cap = new Object3D(whiteSphere.vertices, whiteSphere.faces);
+    cap.setLocalScale(0.01, 0.01, 0.01);
+    cap.setLocalTranslation(1.2, 4.4, 0);
+    stalk.addChild(cap);
+    var cap = new Object3D(whiteSphere.vertices, whiteSphere.faces);
+    cap.setLocalScale(0.01, 0.01, 0.01);
+    cap.setLocalTranslation(0.3, 4.4, 0.7);
+    stalk.addChild(cap);
+    var cap = new Object3D(whiteSphere.vertices, whiteSphere.faces);
+    cap.setLocalScale(0.01, 0.01, 0.01);
+    cap.setLocalTranslation(-0.3, 4.4, -0.4);
+    stalk.addChild(cap);
+    randomiser(stalk, floor, 0, 0, 500, 500, 7, 7);
+
+    var blackSphere = GEO.createSphere(1.0, 10, [0, 0, 0]);
+    var purpleCylinder = GEO.createSphere(1.0, 10, [0.5, 0, 0.5]);
+    var butterfly = new Object3D(blackSphere.vertices, blackSphere.faces);
+    butterfly.setLocalScale(0.7, 0.3, 0.3);
+    butterfly.setLocalTranslation(0, 20, 0);
+    var head = new Object3D(blackSphere.vertices, blackSphere.faces);
+    head.setLocalScale(0.3, 0.3, 0.3);
+    head.setLocalTranslation(-0.8, 20, 0);
+    butterfly.addChild(head);
+    var leftWing = new Object3D(purpleCylinder.vertices, purpleCylinder.faces);
+    leftWing.setLocalScale(0.8, 0.1, 1.5);
+    leftWing.setLocalRotation(GEO.rad(45), 0, 0);
+    leftWing.setLocalTranslation(0, 21, -1);
+    butterfly.addChild(leftWing,0, 20, 0);
+    var rightWing = new Object3D(purpleCylinder.vertices, purpleCylinder.faces);
+    rightWing.setLocalScale(0.8, 0.1, 1.5);
+    rightWing.setLocalRotation(GEO.rad(-45), 0, 0);
+    rightWing.setLocalTranslation(0, 21, 1);
+    butterfly.addChild(rightWing, 0, 20, 0);
+
+    var butterflies = randomiser(butterfly, floor, 0, 200, 200, 150, 3, 3);
+    for(let i = 0; i < butterflies.length; i++) {
+        butterflies[i].origin = [0, 20, 10];
+    }
+
+
+    return { main: floor, trees: trees, smokes: smokes, clouds: clouds, butterflies: butterflies };
 }
 
 export function instanceRandomiser(vertices: number[], faces: number[], centerX: number, centerZ: number, length: number, width: number, divisorX: number, divisorZ: number) {
@@ -433,11 +502,11 @@ export function instanceRandomiser(vertices: number[], faces: number[], centerX:
                 position[1] * scaleY;
                 glMatrix.vec3.rotateY(position, position, [0, 0, 0], GEO.rad(rotateY));
                 glMatrix.vec3.add(position, position, [offsetX, 0, offsetZ]);
+                let normal = glMatrix.vec3.fromValues(vertices[vertexIndex + 3], vertices[vertexIndex + 4], vertices[vertexIndex + 5]);
+                glMatrix.vec3.rotateY(normal, normal, [0, 0, 0], GEO.rad(rotateY));
                 verticesOut.push(
                     ...position,
-                    vertices[vertexIndex + 3],
-                    vertices[vertexIndex + 4],
-                    vertices[vertexIndex + 5],
+                    ...normal,
                     vertices[vertexIndex + 6],
                     vertices[vertexIndex + 7],
                     vertices[vertexIndex + 8]
