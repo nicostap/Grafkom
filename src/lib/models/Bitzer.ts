@@ -206,6 +206,7 @@ export class Bitzer {
         arm: Object3D;
         elbow: Object3D;
         forearm: Object3D;
+        hand: Object3D;
       }
     > = Object.fromEntries(
       ["left", "right"].map((side) => {
@@ -248,6 +249,12 @@ export class Bitzer {
         forearm.setLocalRotation(0, 0, (sideMult * Math.PI) / 2);
         elbow.addChild(forearm);
 
+        const hand = new Object3D(skinSphere.vertices, skinSphere.faces);
+        hand.setLocalScale(1.25, 1.5, 1.5);
+        hand.setLocalTranslation(sideMult * 17.5, 3.8, 0);
+        hand.setLocalRotation(0, 0, 0);
+        forearm.addChild(hand);
+
         return [
           side,
           {
@@ -266,5 +273,52 @@ export class Bitzer {
 
     arms.left.elbow.rotate(0, (Math.PI * 5) / 6, -Math.PI / 16);
     // arms.right.elbow.rotate(Math.PI / 4, 0, Math.PI / 16);
+
+    const whistle2DCurveArray = [
+      -0.640625, 0.25520833333333337, 0.20833333333333326, 0.25520833333333337,
+      0.3828125, 0.203125, 0.46614583333333326, 0.1015625, 0.4921875,
+      -0.03385416666666674, 0.47135416666666674, -0.1328125,
+      0.39322916666666674, -0.22916666666666674, 0.27864583333333326,
+      -0.29166666666666674, 0.14322916666666674, -0.296875, 0.03645833333333326,
+      -0.23697916666666674, -0.03385416666666663, -0.171875,
+      -0.16145833333333337, -0.01822916666666674, -0.328125,
+      0.07291666666666663, -0.4765625, 0.10677083333333337, -0.640625, 0.125,
+      -0.640625, 0.125, -0.640625, 0.25520833333333337, -0.640625,
+      0.25520833333333337, -0.640625, 0.25520833333333337,
+    ];
+
+    const whistleCurveWith = 0.5;
+    // Turn into 3D
+    const whistle3DCurveArray1: number[] = [];
+    const whistle3DCurveArray2: number[] = [];
+    for (let i = 0; i < whistle2DCurveArray.length; i += 2) {
+      whistle3DCurveArray1.push(
+        whistle2DCurveArray[i],
+        whistle2DCurveArray[i + 1],
+        whistleCurveWith
+      );
+
+      whistle3DCurveArray2.push(
+        whistle2DCurveArray[i],
+        whistle2DCurveArray[i + 1],
+        -whistleCurveWith
+      );
+    }
+
+    const whistleGeometry = GEO.combineLines(
+      this.colors.whistle,
+      GEO.createCurve(whistle3DCurveArray1, 30, 2),
+      GEO.createCurve(whistle3DCurveArray2, 30, 2)
+    );
+
+    const whistle = new Object3D(
+      whistleGeometry.vertices,
+      whistleGeometry.faces
+    );
+
+    whistle.setLocalScale(2, 2, 0.75);
+    whistle.setLocalTranslation(0, 20, 0);
+    whistle.setLocalRotation(0, 0, 0);
+    arms.right.forearm.addChild(whistle);
   }
 }
