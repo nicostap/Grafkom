@@ -220,10 +220,6 @@ export class Object3D {
     y: number,
     z: number
   ) {
-    glMatrix.vec3.add(this.origin, this.origin, [x, y, z]);
-    glMatrix.vec3.multiply(this.origin, this.origin, [kx, ky, kz]);
-    glMatrix.vec3.add(this.origin, this.origin, [-x, -y, -z]);
-
     glMatrix.mat4.translate(this.SCALEMATRIX, this.SCALEMATRIX, [x, y, z]);
     glMatrix.mat4.scale(this.SCALEMATRIX, this.SCALEMATRIX, [kx, ky, kz]);
     glMatrix.mat4.translate(this.SCALEMATRIX, this.SCALEMATRIX, [-x, -y, -z]);
@@ -276,9 +272,9 @@ export class Object3D {
       0,
       1,
       0,
-      n1,
-      n2,
-      n3,
+      -n1,
+      -n2,
+      -n3,
       1
     );
     let translateInv = glMatrix.mat4.fromValues(
@@ -294,9 +290,9 @@ export class Object3D {
       0,
       1,
       0,
-      -n1,
-      -n2,
-      -n3,
+      n1,
+      n2,
+      n3,
       1
     );
     let rotateX = glMatrix.mat4.fromValues(
@@ -395,7 +391,6 @@ export class Object3D {
     );
 
     for (let i = 0; i < this.child.length; i++) {
-      // this.child[i].rotateArbitraryAxis(n1, n2, n3, m1, m2, m3, theta, depth + 1);
       this.child[i].#rotateArbitraryAxisChildren(
         n1,
         n2,

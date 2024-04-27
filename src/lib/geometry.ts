@@ -16,36 +16,36 @@ export const GEO = {
 
     // prettier-ignore
     var vertices = [
-            -hw, -hh, hl, 0, 0, 1, ...color,
-            hw, -hh, hl, 0, 0, 1, ...color,
-            hw, hh, hl, 0, 0, 1, ...color,
-            -hw, hh, hl, 0, 0, 1, ...color,
+      -hw, -hh, hl, 0, 0, 1, ...color,
+      hw, -hh, hl, 0, 0, 1, ...color,
+      hw, hh, hl, 0, 0, 1, ...color,
+      -hw, hh, hl, 0, 0, 1, ...color,
 
-            -hw, -hh, -hl, 0, 0, -1, ...color,
-            -hw, hh, -hl, 0, 0, -1, ...color,
-            hw, hh, -hl, 0, 0, -1, ...color,
-            hw, -hh, -hl, 0, 0, -1, ...color,
+      -hw, -hh, -hl, 0, 0, -1, ...color,
+      -hw, hh, -hl, 0, 0, -1, ...color,
+      hw, hh, -hl, 0, 0, -1, ...color,
+      hw, -hh, -hl, 0, 0, -1, ...color,
 
-            -hw, hh, -hl, 0, 1, 0, ...color,
-            -hw, hh, hl, 0, 1, 0, ...color,
-            hw, hh, hl, 0, 1, 0, ...color,
-            hw, hh, -hl, 0, 1, 0, ...color,
+      -hw, hh, -hl, 0, 1, 0, ...color,
+      -hw, hh, hl, 0, 1, 0, ...color,
+      hw, hh, hl, 0, 1, 0, ...color,
+      hw, hh, -hl, 0, 1, 0, ...color,
 
-            -hw, -hh, -hl, 0, -1, 0, ...color,
-            hw, -hh, -hl, 0, -1, 0, ...color,
-            hw, -hh, hl, 0, -1, 0, ...color,
-            -hw, -hh, hl, 0, -1, 0, ...color,
+      -hw, -hh, -hl, 0, -1, 0, ...color,
+      hw, -hh, -hl, 0, -1, 0, ...color,
+      hw, -hh, hl, 0, -1, 0, ...color,
+      -hw, -hh, hl, 0, -1, 0, ...color,
 
-            hw, -hh, -hl, 1, 0, 0, ...color,
-            hw, hh, -hl, 1, 0, 0, ...color,
-            hw, hh, hl, 1, 0, 0, ...color,
-            hw, -hh, hl, 1, 0, 0, ...color,
+      hw, -hh, -hl, 1, 0, 0, ...color,
+      hw, hh, -hl, 1, 0, 0, ...color,
+      hw, hh, hl, 1, 0, 0, ...color,
+      hw, -hh, hl, 1, 0, 0, ...color,
 
-            -hw, -hh, -hl, -1, 0, 0, ...color,
-            -hw, -hh, hl, -1, 0, 0, ...color,
-            -hw, hh, hl, -1, 0, 0, ...color,
-            -hw, hh, -hl, -1, 0, 0, ...color,
-        ];
+      -hw, -hh, -hl, -1, 0, 0, ...color,
+      -hw, -hh, hl, -1, 0, 0, ...color,
+      -hw, hh, hl, -1, 0, 0, ...color,
+      -hw, hh, -hl, -1, 0, 0, ...color,
+    ];
     var faces = [
       0,
       1,
@@ -154,7 +154,7 @@ export const GEO = {
     }
     for (let i = 0; i < poly; i++) {
       faces.push(i + poly, ((i + 1) % poly) + poly, 4 * poly + 1);
-      faces.push(((i + 1) % poly) + 3 * poly,i + 3 * poly,((i + 1) % poly) + 2 * poly);
+      faces.push(((i + 1) % poly) + 3 * poly, i + 3 * poly, ((i + 1) % poly) + 2 * poly);
     }
     return { vertices: vertices, faces: faces };
   },
@@ -300,10 +300,7 @@ export const GEO = {
     let stackCount = poly;
 
     let x, y, z, xz;
-    let nx,
-      ny,
-      nz,
-      lengthInv = 1.0 / radius;
+    let nx, ny, nz, lengthInv = 1.0 / radius;
     let sectorStep = (2 * Math.PI) / sectorCount;
     let stackStep = Math.PI / stackCount;
     let sectorAngle, stackAngle;
@@ -321,7 +318,7 @@ export const GEO = {
         vertices.push(z);
 
         nx = x * lengthInv;
-        ny = y * lengthInv;
+        ny = 0;
         nz = z * lengthInv;
         vertices.push(nx);
         vertices.push(ny);

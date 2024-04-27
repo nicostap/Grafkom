@@ -156,14 +156,49 @@ export function renderMain() {
         new TranslationAnimation(floor.smokes[i], 0, 3000, 0, 30, 0),
         new ScaleAnimation(floor.smokes[i], 0, 3000, 4, 4, 4),
       ],
-      true,
-      i * 1000,
-      () => {
+      true, i * 1000, () => {
         floor.smokes[i].translate(0, -30, 0);
         floor.smokes[i].scale(0.25, 0.25, 0.25);
       }
     );
     animations.push(smokeMotion);
+  }
+
+  for (let i = 0; i < floor.clouds.length; i++) {
+    var cloudMotion = new AnimationList(
+      [
+        new TranslationAnimation(floor.clouds[i], 0, 20000, 0, 0, -1000),
+      ], true, 0, () => {
+        floor.clouds[i].translate(0, 0, 1000);
+      }
+    );
+    animations.push(cloudMotion);
+  }
+
+  for (let i = 0; i < floor.butterflies.length; i++) {
+    var butterflyMotion = new AnimationList(
+      [
+        new RotationAnimation(floor.butterflies[i].child[1], 0, 500, -90, 0, 0),
+        new RotationAnimation(floor.butterflies[i].child[1], 500, 1000, 90, 0, 0),
+      ],
+      true
+    );
+    animations.push(butterflyMotion);
+    var butterflyMotion = new AnimationList(
+      [
+        new RotationAnimation(floor.butterflies[i].child[2], 0, 500, 90, 0, 0),
+        new RotationAnimation(floor.butterflies[i].child[2], 500, 1000, -90, 0, 0),
+      ],
+      true
+    );
+    animations.push(butterflyMotion);
+    var butterflyMotion = new AnimationList(
+      [
+        new ArbitraryAxisRotationAnimation(floor.butterflies[i], 0, 3000, -1 + 2 * Math.random(), 1, -1 + 2 * Math.random(), 360),
+      ],
+      true
+    );
+    animations.push(butterflyMotion);
   }
 
   for (let i = 0; i < floor.trees.length; i++) {
@@ -222,9 +257,9 @@ export function renderMain() {
       ]);
     } else if (AppState.cameraMode == "Follow") {
       glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
-        bicycle.main.TRANSMATRIX[12] + 15,
+        bicycle.main.TRANSMATRIX[12] - 30 * Math.cos(bicycle.main.rotation.y + GEO.rad(45)),
         25,
-        bicycle.main.TRANSMATRIX[14] + 15,
+        bicycle.main.TRANSMATRIX[14] - 30 * Math.sin(bicycle.main.rotation.y + GEO.rad(45)),
       ]);
       glMatrix.mat4.lookAt(
         VIEWMATRIX,
