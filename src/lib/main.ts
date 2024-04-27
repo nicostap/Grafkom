@@ -69,7 +69,7 @@ export function renderMain() {
     0,
     -45
   );
-  farmer.main.translate(0, 20, 70);
+  farmer.main.translate(0, 25, 70);
 
   // Making the animations
   var animations: AbstractAnimation[] = [];

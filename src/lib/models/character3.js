@@ -5,11 +5,15 @@ export function createCharacter_3() {
 
     //shapes and color
     var beige = [228/255, 179/255, 121/255];
+    var darkBeige = [214/255, 177/255, 91/255];
+    var jeans = [56/255, 73/255, 75/255];
     var beigeCylinder = GEO.createCylinder(1.0, 2.0, 40, beige);
     var beigeSphere = GEO.createSphere(1, 20, beige);
-    var darkBeigeEllipticParaboloid = GEO.createEllipticParaboloid(1.0, 2.0, 20, [214/255, 177/255, 91/255]);
-    var darkBeigeCylinder = GEO.createCylinder(1.0, 2.0, 20, [214/255, 177/255, 91/255]);
-    var darkJeansCylinder = GEO.createCylinder(1.0, 2.0, 20, [56/255, 73/255, 75/255]);
+    var darkBeigeEllipticParaboloid = GEO.createEllipticParaboloid(1.0, 2.0, 20, darkBeige);
+    var darkBeigeCylinder = GEO.createCylinder(1.0, 2.0, 20, darkBeige);
+    var darkBeigeHyperboloid = GEO.createHyperboloidOneSheet(0.5, 5, 20, [darkBeige[0]*0.5, darkBeige[1]*0.5, darkBeige[2]*0.5]);
+    var darkJeansCylinder = GEO.createCylinder(1.0, 2.0, 20, jeans);
+    var darkJeansSphere = GEO.createSphere(1, 20, jeans);
     var blackMouth = GEO.combineLines(
         [0, 0, 0],
         GEO.createCurve([3, 3.5, -0.8, 0, 3, -0.4, -3, 3.5, -0.8], 30, 2),
@@ -32,21 +36,33 @@ export function createCharacter_3() {
         GEO.createCurve(tmp3, 30, 2),
         GEO.createCurve(tmp4, 30, 2)
     );
+    var darkBeigeSphere = GEO.createSphere(1, 20, darkBeige);
 // 0.25, ~, 0.5
     //objects
     var main = new Object3D(beigeCylinder.vertices, beigeCylinder.faces);
     main.setLocalScale(1, 1, 1);
     main.setLocalTranslation(0, 0, 0);
+    main.setLocalRotation(0, 0, 0);
 
     var body = new Object3D(darkBeigeEllipticParaboloid.vertices, darkBeigeEllipticParaboloid.faces);
     body.setLocalScale(7, 7, 7);
     body.setLocalTranslation(0, 14, 0);
     main.addChild(body);
 
+    var stomach = new Object3D(darkBeigeSphere.vertices, darkBeigeSphere.faces);
+    stomach.setLocalScale(8.5, 5, 8.5);
+    stomach.setLocalTranslation(0, -7.5, 0);
+    body.addChild(stomach);
+
     var neck = new Object3D(darkBeigeCylinder.vertices, darkBeigeCylinder.faces);
     neck.setLocalScale(3.5, 1, 3.5);
     neck.setLocalTranslation(0, 11, 0);
     main.addChild(neck);
+    
+    var neck2 = new Object3D(darkBeigeHyperboloid.vertices, darkBeigeHyperboloid.faces);
+    neck2.setLocalScale(3.5, 0.7, 3.5);
+    neck2.setLocalTranslation(0, 5, 0);
+    neck.addChild(neck2);
 
     var head = new Object3D(beigeCylinder.vertices, beigeCylinder.faces);
     head.setLocalScale(3, 4, 3);
@@ -68,16 +84,6 @@ export function createCharacter_3() {
     nose_2.setLocalScale(1, 1, 1);
     nose_2.setLocalTranslation(0, 18, 4);
     head.addChild(nose_2);
-
-    var left_leg = new Object3D(darkJeansCylinder.vertices, darkJeansCylinder.faces);
-    left_leg.setLocalScale(2.6, 7, 2.6);
-    left_leg.setLocalTranslation(4, -14, 0);
-    main.addChild(left_leg);
-
-    var right_leg = new Object3D(darkJeansCylinder.vertices, darkJeansCylinder.faces);
-    right_leg.setLocalScale(2.6, 7, 2.6);
-    right_leg.setLocalTranslation(-4, -14, 0);
-    main.addChild(right_leg);
 
     var mouth = new Object3D(blackMouth.vertices, blackMouth.faces)
     mouth.setLocalScale(0.5, 0.5, 0.5);
@@ -112,7 +118,94 @@ export function createCharacter_3() {
     hair.setLocalRotation(0, 0, 0);
     head.addChild(hair);
 
+    var armLeft = new Object3D(darkBeigeSphere.vertices, darkBeigeSphere.faces);
+    armLeft.setLocalScale(2.8, 2.8, 2.8)
+    armLeft.setLocalTranslation(4, 8, 0);
+    body.addChild(armLeft);
+
+    var armLeftUpper = new Object3D(darkBeigeCylinder.vertices, darkBeigeCylinder.faces);
+    armLeftUpper.setLocalScale(2.5, 4.5, 2.5);
+    armLeftUpper.setLocalTranslation(8, 4, 0);
+    armLeftUpper.setLocalRotation(0, 0, 0.785398);
+    armLeft.addChild(armLeftUpper);
+
+    var armLeft2 = new Object3D(darkBeigeSphere.vertices, darkBeigeSphere.faces);
+    armLeft2.setLocalScale(2.5, 2.5, 2.5)
+    armLeft2.setLocalTranslation(11, 1, 0);
+    armLeft.addChild(armLeft2);
+
+    var armLeftLower = new Object3D(darkBeigeCylinder.vertices, darkBeigeCylinder.faces);
+    armLeftLower.setLocalScale(2.4, 4.5, 2.4)
+    armLeftLower.setLocalTranslation(11, -3, 0);
+    armLeft2.addChild(armLeftLower);
+
+    var handLeft1 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
+    handLeft1.setLocalScale(2.2, 4, 2.2)
+    handLeft1.setLocalTranslation(11.2, -7, 0);
+    handLeft1.setLocalRotation(0, 0, 0.2);
+    armLeft2.addChild(handLeft1);
+
+    var handLeft2 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
+    handLeft2.setLocalScale(1.1, 3, 1.1)
+    handLeft2.setLocalTranslation(10, -7, 0);
+    handLeft2.setLocalRotation(0, 0, -0.5);
+    handLeft1.addChild(handLeft2);
+
+    var armRight = new Object3D(darkBeigeSphere.vertices, darkBeigeSphere.faces);
+    armRight.setLocalScale(2.8, 2.8, 2.8)
+    armRight.setLocalTranslation(-4, 8, 0);
+    body.addChild(armRight);
+
+    var armRightUpper = new Object3D(darkBeigeCylinder.vertices, darkBeigeCylinder.faces);
+    armRightUpper.setLocalScale(2.5, 4.5, 2.5);
+    armRightUpper.setLocalTranslation(-8, 4, 0);
+    armRightUpper.setLocalRotation(0, 0, -0.785398);
+    armRight.addChild(armRightUpper);
+
+    var armRight2 = new Object3D(darkBeigeSphere.vertices, darkBeigeSphere.faces);
+    armRight2.setLocalScale(2.5, 2.5, 2.5)
+    armRight2.setLocalTranslation(-11, 1, 0);
+    armRight.addChild(armRight2);
+
+    var armRightLower = new Object3D(darkBeigeCylinder.vertices, darkBeigeCylinder.faces);
+    armRightLower.setLocalScale(2.4, 4.5, 2.4)
+    armRightLower.setLocalTranslation(-11, -3, 0);
+    armRight2.addChild(armRightLower);
+
+    var handRight1 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
+    handRight1.setLocalScale(2.2, 4, 2.2)
+    handRight1.setLocalTranslation(-11.2, -7, 0);
+    handRight1.setLocalRotation(0, 0, -0.2);
+    armRight2.addChild(handRight1);
+
+    var handRight2 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
+    handRight2.setLocalScale(1.1, 3, 1.1)
+    handRight2.setLocalTranslation(-10, -7, 0);
+    handRight2.setLocalRotation(0, 0, 0.5);
+    handRight1.addChild(handRight2);
+    
+    var left_leg_joint = new Object3D(darkJeansSphere.vertices, darkJeansSphere.faces);
+    left_leg_joint.setLocalScale(1, 1, 1);
+    left_leg_joint.setLocalTranslation(4, -8, 0);
+    main.addChild(left_leg_joint);
+
+    var right_leg_joint = new Object3D(darkJeansSphere.vertices, darkJeansSphere.faces);
+    right_leg_joint.setLocalScale(1, 1, 1);
+    right_leg_joint.setLocalTranslation(-4, -8, 0);
+    main.addChild(right_leg_joint);
+
+    var left_leg = new Object3D(darkJeansCylinder.vertices, darkJeansCylinder.faces);
+    left_leg.setLocalScale(2.6, 6, 2.6);
+    left_leg.setLocalTranslation(4, -14, 0);
+    left_leg_joint.addChild(left_leg);
+
+    var right_leg = new Object3D(darkJeansCylinder.vertices, darkJeansCylinder.faces);
+    right_leg.setLocalScale(2.6, 6, 2.6);
+    right_leg.setLocalTranslation(-4, -14, 0);
+    right_leg_joint.addChild(right_leg);
+
     return {
         main: main,
+        head: head,
     };
 }
