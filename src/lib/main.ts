@@ -71,6 +71,7 @@ export function renderMain() {
     -45
   );
   farmer.main.translate(0, 25, 70);
+  farmer.main.scale(1, 1, 1);
   farmer.body.rotate(-0.8, 0, 0);
   farmer.body.translate(0, -12, -5);
   farmer.head.rotate(0.3, 0, 0);
@@ -262,6 +263,33 @@ export function renderMain() {
     );
     animations.push(treeBreathing);
   }
+  
+  var farmerMotion = new AnimationList(
+    [
+      new RotationAnimation(farmer.rightElbow, 0, 1000, 0, 0, -37),
+      new RotationAnimation(farmer.rightElbow, 1000, 1500, 0, 0, 0),
+      new RotationAnimation(farmer.rightElbow, 1500, 2500, 0, 0, 37),
+      new RotationAnimation(farmer.rightElbow, 2500, 3000, 0, 0, 0),
+    ],
+    true
+  );
+  farmerMotion.multiplySpeed(1);
+  animations.push(farmerMotion);
+
+  var farmerEatMotion = new AnimationList(
+    [
+      new ScaleAnimation(farmer.leftCheek, 0, 500, 2, 2, 2),
+      new ScaleAnimation(farmer.leftCheek, 500, 1000, 1/2, 1/2, 1/2),
+      new ScaleAnimation(farmer.rightCheek, 0, 500, 2, 2, 2),
+      new ScaleAnimation(farmer.rightCheek, 500, 1000, 1/2, 1/2, 1/2),
+      new TranslationAnimation(farmer.mouth, 0, 500, 0, 0.7, -0.3),
+      new TranslationAnimation(farmer.mouth, 500, 1000, 0, -0.7, 0.3),
+    ],
+    true
+  );
+  farmerEatMotion.multiplySpeed(1);
+  animations.push(farmerEatMotion);
+
 
   // Drawing
   GL.enable(GL.CULL_FACE);
