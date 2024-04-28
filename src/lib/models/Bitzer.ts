@@ -2,6 +2,9 @@ import type { AbstractAnimation } from "../animation";
 import { GEO } from "../geometry";
 import { Object3D } from "../object";
 import { Color } from "../utils/Color";
+import { Watch } from "./BitzerComponents/Watch";
+import { Whistle } from "./BitzerComponents/Whistle";
+import { Wristband } from "./BitzerComponents/Wristband";
 
 export class Bitzer {
   public readonly animations: AbstractAnimation[] = [];
@@ -13,7 +16,6 @@ export class Bitzer {
     collar: Color.fromHex("20170d"),
     accent1: Color.fromHex("3394c1"),
     wristband: Color.fromHex("ece2cc"),
-    whistle: Color.fromHex("90897d"),
 
     eyes: Color.fromHex("ffffff"),
     retina: Color.fromHex("000000"),
@@ -158,14 +160,20 @@ export class Bitzer {
     hatBase.setLocalRotation(0, 0, 0);
     head.addChild(hatBase);
 
-    const hatTop = new Object3D(
+    const hatCover = new Object3D(
       accent1EllipticParaboloid.vertices,
       accent1EllipticParaboloid.faces
     );
-    hatTop.setLocalScale(2.225, 1.5, 2.225);
-    hatTop.setLocalTranslation(0, 17.5, 0);
+    hatCover.setLocalScale(2.225, 1.5, 2.225);
+    hatCover.setLocalTranslation(0, 17.5, 0);
+    hatCover.setLocalRotation(0, 0, 0);
+    hatBase.addChild(hatCover);
+
+    const hatTop = new Object3D(accent1Sphere.vertices, accent1Sphere.faces);
+    hatTop.setLocalScale(0.5, 0.25, 0.5);
+    hatTop.setLocalTranslation(0, 17.25, 0);
     hatTop.setLocalRotation(0, 0, 0);
-    hatBase.addChild(hatTop);
+    hatCover.addChild(hatTop);
 
     const eyeSphere = GEO.createSphere(1, 40, this.colors.eyes);
     const retinaSphere = GEO.createSphere(0.3, 40, this.colors.retina);
@@ -268,12 +276,6 @@ export class Bitzer {
       })
     ) as any;
 
-    arms.left.shoulder.rotate(0, Math.PI / 6, Math.PI / 4);
-    arms.right.shoulder.rotate(0, 0, -Math.PI / 4);
-
-    arms.left.elbow.rotate(0, (Math.PI * 5) / 6, -Math.PI / 16);
-    // arms.right.elbow.rotate(Math.PI / 4, 0, Math.PI / 16);
-
     const whistle2DCurveArray = [
       -0.640625, 0.25520833333333337, 0.20833333333333326, 0.25520833333333337,
       0.3828125, 0.203125, 0.46614583333333326, 0.1015625, 0.4921875,
@@ -305,20 +307,25 @@ export class Bitzer {
       );
     }
 
-    const whistleGeometry = GEO.combineLines(
-      this.colors.whistle,
-      GEO.createCurve(whistle3DCurveArray1, 30, 2),
-      GEO.createCurve(whistle3DCurveArray2, 30, 2)
-    );
+    const whistle = new Whistle();
+    arms.left.forearm.addChild(whistle.root);
+    whistle.root.scale(2, 1.5, 1.5);
+    whistle.root.translate(0, 8, 4);
 
-    const whistle = new Object3D(
-      whistleGeometry.vertices,
-      whistleGeometry.faces
-    );
+    const watch = new Watch();
+    watch.root.scale(1, 1, 1);
+    watch.root.translate(15, 3.8, 0);
+    arms.right.forearm.addChild(watch.root);
 
-    whistle.setLocalScale(2, 2, 0.75);
-    whistle.setLocalTranslation(0, 20, 0);
-    whistle.setLocalRotation(0, 0, 0);
-    arms.right.forearm.addChild(whistle);
+    const wristband = new Wristband();
+    wristband.root.scale(1, 1, 1);
+    wristband.root.translate(-15, 3.8, 0);
+    arms.left.forearm.addChild(wristband.root);
+
+    arms.left.shoulder.rotate(0, Math.PI / 4, Math.PI / 4);
+    arms.right.shoulder.rotate(0, 0, -Math.PI / 4);
+
+    arms.left.elbow.rotate(0, (Math.PI * 8) / 10, (-Math.PI * 2) / 16);
+    // arms.right.elbow.rotate(Math.PI / 4, 0, Math.PI / 16);
   }
 }
