@@ -443,14 +443,14 @@ export const GEO = {
           glMatrix.vec3.cross(
             normal,
             [
-              nextpoint[0] - currpoint[0],
-              nextpoint[1] - currpoint[1],
-              nextpoint[2] - currpoint[2],
-            ],
-            [
               sidepoint[0] - currpoint[0],
               sidepoint[1] - currpoint[1],
               sidepoint[2] - currpoint[2],
+            ],
+            [
+              nextpoint[0] - currpoint[0],
+              nextpoint[1] - currpoint[1],
+              nextpoint[2] - currpoint[2],
             ]
           );
           glMatrix.vec3.normalize(normal, normal);
@@ -463,14 +463,14 @@ export const GEO = {
           glMatrix.vec3.cross(
             normal,
             [
-              sidepoint[0] - currpoint[0],
-              sidepoint[1] - currpoint[1],
-              sidepoint[2] - currpoint[2],
-            ],
-            [
               nextpoint[0] - currpoint[0],
               nextpoint[1] - currpoint[1],
               nextpoint[2] - currpoint[2],
+            ],
+            [
+              sidepoint[0] - currpoint[0],
+              sidepoint[1] - currpoint[1],
+              sidepoint[2] - currpoint[2],
             ]
           );
           glMatrix.vec3.normalize(normal, normal);
@@ -490,14 +490,14 @@ export const GEO = {
           glMatrix.vec3.cross(
             normal,
             [
-              nextpoint[0] - sidepoint[0],
-              nextpoint[1] - sidepoint[1],
-              nextpoint[2] - sidepoint[2],
-            ],
-            [
               currpoint[0] - sidepoint[0],
               currpoint[1] - sidepoint[1],
               currpoint[2] - sidepoint[2],
+            ],
+            [
+              nextpoint[0] - sidepoint[0],
+              nextpoint[1] - sidepoint[1],
+              nextpoint[2] - sidepoint[2],
             ]
           );
           glMatrix.vec3.normalize(normal, normal);
@@ -510,14 +510,14 @@ export const GEO = {
           glMatrix.vec3.cross(
             normal,
             [
-              currpoint[0] - sidepoint[0],
-              currpoint[1] - sidepoint[1],
-              currpoint[2] - sidepoint[2],
-            ],
-            [
               nextpoint[0] - sidepoint[0],
               nextpoint[1] - sidepoint[1],
               nextpoint[2] - sidepoint[2],
+            ],
+            [
+              currpoint[0] - sidepoint[0],
+              currpoint[1] - sidepoint[1],
+              currpoint[2] - sidepoint[2],
             ]
           );
           glMatrix.vec3.normalize(normal, normal);
@@ -638,7 +638,6 @@ export const GEO = {
             minShift = shift;
           }
         }
-        console.log(minShift, minLength);
         while(minShift--) {
           let tmp = lines[0][index];
           let tmp1 = lines[0][index + 1];
@@ -652,7 +651,16 @@ export const GEO = {
           lines[poly - 1][index + 1] = tmp1;
           lines[poly - 1][index + 2] = tmp2;
         } 
-      } 
+      }
+      if(i == vertexCount - 1) {
+        for(let t = 0; t < poly; t++) {
+          lines[t].push(
+            lines[t][index] - path[index] + path[nextIndex],
+            lines[t][index + 1] - path[index + 1] + path[nextIndex + 1],
+            lines[t][index + 2] - path[index + 2] + path[nextIndex + 2],
+          );
+        }
+      }
     }
     return GEO.combineLines(color, ...lines);
   },

@@ -481,6 +481,17 @@ export function createFloor() {
         butterflies[i].origin = [0, 20, 10];
     }
 
+    let test = GEO.createPipe(
+        GEO.createCurve([0, 0, 0, 6, 6, 6, 8, 30, 8, 0, 30, 20], 20, 2),
+        3,
+        10,
+        [1, 0, 0]
+    );
+    let pipe = new Object3D(test.vertices, test.faces);
+    floor.addChild(pipe);
+    pipe.translate(0, 20, 270);
+
+
     return { main: floor, trees: trees, smokes: smokes, clouds: clouds, butterflies: butterflies };
 }
 
