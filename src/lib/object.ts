@@ -184,18 +184,20 @@ export class Object3D {
   }
 
   rotate(ax: number, ay: number, az: number) {
+    let scaledOrigin = glMatrix.vec3.create();
+    glMatrix.vec3.transformMat4(scaledOrigin, this.origin, this.SCALEMATRIX);
     glMatrix.mat4.translate(
       this.ROTATEMATRICES[0],
       this.ROTATEMATRICES[0],
-      this.origin
+      scaledOrigin
     );
     glMatrix.mat4.rotateX(this.ROTATEMATRICES[0], this.ROTATEMATRICES[0], ax);
     glMatrix.mat4.rotateY(this.ROTATEMATRICES[0], this.ROTATEMATRICES[0], ay);
     glMatrix.mat4.rotateZ(this.ROTATEMATRICES[0], this.ROTATEMATRICES[0], az);
     glMatrix.mat4.translate(this.ROTATEMATRICES[0], this.ROTATEMATRICES[0], [
-      -this.origin[0],
-      -this.origin[1],
-      -this.origin[2],
+      -scaledOrigin[0],
+      -scaledOrigin[1],
+      -scaledOrigin[2],
     ]);
     this.rotation.x += ax;
     this.rotation.y += ay;
@@ -205,9 +207,9 @@ export class Object3D {
         ax,
         ay,
         az,
-        this.origin[0],
-        this.origin[1],
-        this.origin[2]
+        scaledOrigin[0],
+        scaledOrigin[1],
+        scaledOrigin[2]
       );
     }
   }
@@ -224,7 +226,7 @@ export class Object3D {
     glMatrix.mat4.scale(this.SCALEMATRIX, this.SCALEMATRIX, [kx, ky, kz]);
     glMatrix.mat4.translate(this.SCALEMATRIX, this.SCALEMATRIX, [-x, -y, -z]);
     for (let i = 0; i < this.child.length; i++) {
-      this.child[i].scale(kx, ky, kz);
+      this.child[i].#scaleChildren(kx, ky, kz, x, y, z);
     }
   }
 
