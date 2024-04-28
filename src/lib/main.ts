@@ -354,7 +354,7 @@ export function renderMain() {
   GL.clearDepth(1.0);
 
   let load_time: number;
-  let render_loop = 3;
+  let render_loop = 5;
   let loaded = false;
   let time_prev = 0;
 
@@ -390,13 +390,13 @@ export function renderMain() {
         AppState.cameraY,
         AppState.cameraZ,
       ]);
-    } else if (AppState.cameraMode == "Follow") {
+    } else if (AppState.cameraMode == "Follow Shaun") {
       glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
         bicycle.main.TRANSMATRIX[12] -
-          30 * Math.cos(bicycle.main.rotation.y + GEO.rad(45)),
-        25,
+          40 * Math.cos(bicycle.main.rotation.y + GEO.rad(45)),
+        35,
         bicycle.main.TRANSMATRIX[14] -
-          30 * Math.sin(bicycle.main.rotation.y + GEO.rad(45)),
+          40 * Math.sin(bicycle.main.rotation.y + GEO.rad(45)),
       ]);
       glMatrix.mat4.lookAt(
         VIEWMATRIX,
@@ -405,6 +405,40 @@ export function renderMain() {
           bicycle.main.TRANSMATRIX[12],
           bicycle.main.TRANSMATRIX[13],
           bicycle.main.TRANSMATRIX[14],
+        ],
+        [0, 1, 0]
+      );
+    } else if(AppState.cameraMode == "Follow Farmer") {
+      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
+        0,
+        60,
+        70
+      ]);
+      glMatrix.mat4.lookAt(
+        VIEWMATRIX,
+        [VIEWMATRIX[12], VIEWMATRIX[13], VIEWMATRIX[14]],
+        [
+          farmer.main.TRANSMATRIX[12],
+          farmer.main.TRANSMATRIX[13],
+          farmer.main.TRANSMATRIX[14]
+        ],
+        [0, 1, 0]
+      );
+    } else if(AppState.cameraMode == "Follow Bitzer") {
+      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
+        bitzer.root.TRANSMATRIX[12] -
+          40 * Math.cos(bitzer.root.rotation.y + GEO.rad(45)),
+        35,
+        bitzer.root.TRANSMATRIX[14] -
+          40 * Math.sin(bitzer.root.rotation.y + GEO.rad(45)),
+      ]);
+      glMatrix.mat4.lookAt(
+        VIEWMATRIX,
+        [VIEWMATRIX[12], VIEWMATRIX[13], VIEWMATRIX[14]],
+        [
+          bitzer.root.TRANSMATRIX[12],
+          bitzer.root.TRANSMATRIX[13],
+          bitzer.root.TRANSMATRIX[14],
         ],
         [0, 1, 0]
       );

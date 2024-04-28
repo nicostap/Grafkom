@@ -3,12 +3,14 @@
 export enum mode {
   Stationary = "Stationary",
   FPS = "FPS",
-  Follow = "Follow",
+  FollowShaun = "Follow Shaun",
+  FollowFarmer = "Follow Farmer",
+  FollowBitzer = "Follow Bitzer"
 }
 
 export const AppState = {
   cameraX: 0,
-  cameraY: -20,
+  cameraY: -35,
   cameraZ: -300,
   cameraMode: mode.FPS,
   zoom: -100,
