@@ -331,12 +331,12 @@ export function renderMain() {
 
   for (let i = 0; i < floor.grass.length; i++) {
     for (let j = 0; j < floor.grass[i].length; j++) {
-      let randomNumber = Math.random();
+      let randomNumber = Math.random()-0.2;
       var grassWindyMotion = new AnimationList(
         [
-          new TranslationAnimation(floor.grass[i][j], 0, 1000, 0, 0, -randomNumber),
-          new TranslationAnimation(floor.grass[i][j], 1000, 2000, 0, 0, randomNumber*1.5),
-          new TranslationAnimation(floor.grass[i][j], 2000, 2500, 0, 0, -randomNumber/2),
+          new TranslationAnimation(floor.grass[i][j], 0, 500, 0, 0, -randomNumber),
+          new TranslationAnimation(floor.grass[i][j], 500, 1000, 0, 0, randomNumber*1.5),
+          new TranslationAnimation(floor.grass[i][j], 1000, 1250, 0, 0, -randomNumber/2),
         ], 
         true
       );
