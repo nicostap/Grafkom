@@ -144,6 +144,15 @@ export function renderMain() {
   bicycleMotion.multiplySpeed(0.29);
   animations.push(bicycleMotion);
 
+  var shaunBop = new AnimationList(
+    [
+      new TranslationAnimation(bicycle.body, 0, 1000, 1, 2, 0),
+      new TranslationAnimation(bicycle.body, 1000, 2000, -1, -2, 0),
+    ],
+    true
+  );
+  animations.push(shaunBop);
+
   var honking = new AnimationList(
     [
       new ScaleAnimation(bicycle.honk, 0, 1000, 0.7, 0.7, 0.7),
