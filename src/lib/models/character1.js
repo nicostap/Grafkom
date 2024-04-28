@@ -285,27 +285,19 @@ export function createCharacter_1() {
     rightHand.setLocalTranslation(2.4, 5.5, 2.2);
     handle.addChild(rightHand);
 
-    var leftArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    leftArm.setLocalScale(0.7, 4.8, 0.7);
-    leftArm.setLocalRotation(GEO.rad(-30), 0, GEO.rad(40));
-    leftArm.setLocalTranslation(0.5, 6.8, -3.3);
+    var tmp = GEO.createPipe(
+        GEO.createCurve(
+            [-7, 0, 0, 0, 0, -3, 3, 0, 0], 30, 2
+        ), 0.7, 10, [0, 0, 0]
+    );
+    var leftArm = new Object3D(tmp.vertices, tmp.faces);
+    leftArm.setLocalRotation(0, 0, GEO.rad(-45));
+    leftArm.setLocalTranslation(0.5, 7, -1.5);
     leftHand.addChild(leftArm);
-    var rightArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    rightArm.setLocalScale(0.7, 5, 0.7);
-    rightArm.setLocalRotation(GEO.rad(30), 0, GEO.rad(40));
-    rightArm.setLocalTranslation(0.5, 6.8, 3.3);
+    var rightArm = new Object3D(tmp.vertices, tmp.faces);
+    rightArm.setLocalRotation(GEO.rad(180), 0, GEO.rad(45));
+    rightArm.setLocalTranslation(0.5, 7, 1.5);
     rightHand.addChild(rightArm);
-
-    var leftForeArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    leftForeArm.setLocalScale(0.7, 6.1, 0.7);
-    leftForeArm.setLocalRotation(GEO.rad(30), 0, GEO.rad(30));
-    leftForeArm.setLocalTranslation(-2.5, 10.4, -3);
-    leftArm.addChild(leftForeArm);
-    var rightForeArm = new Object3D(blackCylinder.vertices, blackCylinder.faces);
-    rightForeArm.setLocalScale(0.7, 6.1, 0.7);
-    rightForeArm.setLocalRotation(GEO.rad(-30), 0, GEO.rad(30));
-    rightForeArm.setLocalTranslation(-2.5, 10.4, 3);
-    rightArm.addChild(rightForeArm); 
 
     var head = new Object3D(blackParaboloid.vertices, blackParaboloid.faces);
     head.setLocalScale(2.0, 3.0, 2.0);

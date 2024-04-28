@@ -126,8 +126,8 @@ export function createFloor() {
     var houseMain = new Object3D(whiteBox.vertices, whiteBox.faces);
     houseMain.setLocalScale(100, 55, 60);
     var terrace = new Object3D(brownBox.vertices, brownBox.faces);
-    terrace.setLocalScale(100, 5.0, 40);
-    terrace.setLocalTranslation(0, -25, 50);
+    terrace.setLocalScale(100, 17.5, 40);
+    terrace.setLocalTranslation(0, -32.5, 50);
     houseMain.addChild(terrace);
     var terrace = new Object3D(whiteBox.vertices, whiteBox.faces);
     terrace.setLocalScale(100, 2.0, 40);
@@ -289,12 +289,12 @@ export function createFloor() {
     smokes.push(smoke);
 
     var terrace = new Object3D(brownBox.vertices, brownBox.faces);
-    terrace.setLocalScale(30, 12.0, 4);
-    terrace.setLocalTranslation(0, -33, 72);
+    terrace.setLocalScale(40, 10.0, 8);
+    terrace.setLocalTranslation(0, -34, 74);
     houseMain.addChild(terrace);
     var terrace = new Object3D(brownBox.vertices, brownBox.faces);
-    terrace.setLocalScale(30, 6.0, 4);
-    terrace.setLocalTranslation(0, -36, 76);
+    terrace.setLocalScale(40, 6.0, 8);
+    terrace.setLocalTranslation(0, -36, 81);
     houseMain.addChild(terrace);
     var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
     bush.setLocalScale(12, 19, 12);
@@ -306,19 +306,11 @@ export function createFloor() {
     houseMain.addChild(bush);
     var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
     bush.setLocalScale(12, 19, 12);
-    bush.setLocalTranslation(-23, -35, 78);
-    houseMain.addChild(bush);
-    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
-    bush.setLocalScale(12, 19, 12);
     bush.setLocalTranslation(57, -35, 78);
     houseMain.addChild(bush);
     var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
     bush.setLocalScale(12, 19, 12);
     bush.setLocalTranslation(40, -35, 78);
-    houseMain.addChild(bush);
-    var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
-    bush.setLocalScale(12, 19, 12);
-    bush.setLocalTranslation(23, -35, 78);
     houseMain.addChild(bush);
     var bush = new Object3D(greenSphere.vertices, greenSphere.faces);
     bush.setLocalScale(12, 19, 12);
@@ -481,15 +473,26 @@ export function createFloor() {
         butterflies[i].origin = [0, 20, 10];
     }
 
-    let test = GEO.createPipe(
-        GEO.createCurve([0, 0, 0, 6, 6, 6, 8, 30, 8, 0, 30, 20], 20, 2),
-        3,
+    let whitePipe = GEO.createPipe(
+        GEO.createCurve([0, -3, -1, 0, 15, 0, 0, 19, -5, 0, 27, -15], 20, 2),
+        1,
         10,
-        [1, 0, 0]
+        [0.8, 0.8, 0.8]
     );
-    let pipe = new Object3D(test.vertices, test.faces);
-    floor.addChild(pipe);
-    pipe.translate(0, 20, 270);
+    pillar = new Object3D(whitePipe.vertices, whitePipe.faces);
+    pillar.setLocalTranslation(14.75, 0, 66.5);
+    floor.addChild(pillar);
+    pillar = new Object3D(whitePipe.vertices, whitePipe.faces);
+    pillar.setLocalTranslation(-14.75, 0, 66.5);
+    floor.addChild(pillar);
+    pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1, 15, 1);
+    pillar.setLocalTranslation(-14.75, 13.5, 59.3);
+    floor.addChild(pillar);
+    pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
+    pillar.setLocalScale(1, 15, 1);
+    pillar.setLocalTranslation(14.75, 13.5, 59.3);
+    floor.addChild(pillar);
 
 
     return { main: floor, trees: trees, smokes: smokes, clouds: clouds, butterflies: butterflies };
