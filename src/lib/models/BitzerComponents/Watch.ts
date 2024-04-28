@@ -25,10 +25,8 @@ export class Watch extends ObjectComponent {
     band.setLocalRotation(0, 0, Math.PI / 2);
     this.root = band;
 
-    console.log("band init_transmatrix", band.INIT_TRANSMATRIX);
-
     const clock = new Object3D(clockCyl.vertices, clockCyl.faces);
-    clock.setLocalScale(0.5, 0.1, 0.5);
+    clock.setLocalScale(0.75, 0.1, 0.75);
     clock.setLocalTranslation(0, 1.6, 0);
     band.addChild(clock);
 

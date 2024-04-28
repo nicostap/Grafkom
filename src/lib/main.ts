@@ -17,6 +17,7 @@ import { calculateFPS, calculateTick } from "./utils/StatCounter";
 import { AppState, mode } from "./utils/State";
 import { CameraController } from "./utils/CameraController";
 import { Bitzer } from "./models/Bitzer";
+import { Lawnmower } from "./models/Lawnmower";
 
 export function renderMain() {
   const CANVAS = document.getElementById("your_canvas");
@@ -60,6 +61,7 @@ export function renderMain() {
   var floor = createFloor();
   var farmer = createCharacter_3();
   const bitzer = new Bitzer();
+  const lawnmower = new Lawnmower();
 
   // Placing objects
   bicycle.main.translate(-60, 20, -72);
@@ -91,11 +93,13 @@ export function renderMain() {
   farmer.pizza.translate(-2, -1, 2);
 
   bitzer.root.translate(0, 25, 120);
+  lawnmower.root.translate(0, 15, 120);
 
   // Making the animations
   var animations: AbstractAnimation[] = [];
 
   animations.push(...bitzer.animations);
+  animations.push(...lawnmower.animations);
   var bicycleLoop = new AnimationList(
     [
       new RotationAnimation(bicycle.frontWheel, 0, 2000, 0, 0, -360),
@@ -410,13 +414,19 @@ export function renderMain() {
     GL.viewport(0, 0, CANVAS.width, CANVAS.height);
     GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
-    [bicycle.main, floor.main, farmer.main, bitzer.root].forEach((o) => {
+    [
+      bicycle.main,
+      floor.main,
+      farmer.main,
+      bitzer.root,
+      lawnmower.root,
+    ].forEach((o) => {
       o.setUniform4(PROJMATRIX, VIEWMATRIX);
     });
 
     // Manual batch drawing
     Object3D.defaultShader.use();
-    [bicycle.main, floor.main, farmer.main, bitzer.root]
+    [bicycle.main, floor.main, farmer.main, bitzer.root, lawnmower.root]
       .flatMap((o) => o.queueBatch())
       .forEach((o) => {
         o.drawBatch();
