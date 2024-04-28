@@ -71,21 +71,23 @@ export function renderMain() {
     0,
     -45
   );
-  farmer.main.translate(0, 25, 70);
-  farmer.main.scale(1, 1, 1);
+  farmer.main.translate(30, 38, 50);
+  farmer.main.rotate(0, -0.7, 0);
+  farmer.sofa.scale(0.8, 0.8, 0.8);
+  farmer.body.scale(0.9, 0.9, 0.9);
   farmer.body.rotate(-0.8, 0, 0);
-  farmer.body.translate(0, -12, -5);
+  farmer.body.translate(4, -12, -4);
   farmer.head.rotate(0.3, 0, 0);
-  farmer.head.translate(0, 1, 1);
-  farmer.leftShoulder.rotate(1.5, 0.2, 0.2);
+  farmer.head.translate(0, 1, 0);
+  farmer.leftShoulder.rotate(1.5, -0.2, 0.2);
   farmer.leftElbow.rotate(0, -1, 0);
   farmer.rightShoulder.rotate(0.8, 0.5, 0);
   farmer.rightElbow.rotate(0, 0, -1.0);
-  farmer.leftLeg.rotate(-0.2, 0, 0.2);
+  farmer.leftLeg.rotate(-0.3, 0, 0.2);
   farmer.leftKnee.rotate(0.9, 0, 0);
   farmer.rightLeg.rotate(-0.2, 0, -0.2);
   farmer.rightKnee.rotate(0.9, 0, 0);
-  farmer.pizza.rotate(0, 0, 1.5);
+  farmer.pizza.rotate(-0.2, 0, 1.5);
   farmer.pizza.translate(-2, -1, 2);
 
   bitzer.root.translate(0, 25, 120);
@@ -272,6 +274,19 @@ export function renderMain() {
       new RotationAnimation(farmer.rightElbow, 1000, 1500, 0, 0, 0),
       new RotationAnimation(farmer.rightElbow, 1500, 2500, 0, 0, 37),
       new RotationAnimation(farmer.rightElbow, 2500, 3000, 0, 0, 0),
+      new RotationAnimation(farmer.rightElbow, 3000, 3500, 0, 0, -37),
+      new RotationAnimation(farmer.rightElbow, 3500, 4000, 0, 0, 0),
+      new RotationAnimation(farmer.rightElbow, 4000, 4500, 0, 0, 37),
+      new RotationAnimation(farmer.rightElbow, 4500, 5000, 0, 0, 0),
+      new RotationAnimation(farmer.head, 5000, 5500, 20, 0, 0),
+      new TranslationAnimation(farmer.neck, 5000, 5500, -1.5, 0, 1.5),
+      new TranslationAnimation(farmer.head, 5000, 5500, -1.5, 1.5, 1.5),
+      new RotationAnimation(farmer.head, 5500, 6000, 0, 30, 0),
+      new RotationAnimation(farmer.head, 6000, 6500, 0, -60, 0),
+      new RotationAnimation(farmer.head, 7000, 7500, 0, 30, 0),
+      new TranslationAnimation(farmer.head, 7500, 8000, 1.5, -1.5, -1.5),
+      new TranslationAnimation(farmer.neck, 7500, 8000, 1.5, 0, -1.5),
+      new RotationAnimation(farmer.head, 7500, 8000, -20, 0, 0),
     ],
     true
   );
@@ -280,17 +295,51 @@ export function renderMain() {
 
   var farmerEatMotion = new AnimationList(
     [
-      new ScaleAnimation(farmer.leftCheek, 0, 500, 2, 2, 2),
-      new ScaleAnimation(farmer.leftCheek, 500, 1000, 1/2, 1/2, 1/2),
-      new ScaleAnimation(farmer.rightCheek, 0, 500, 2, 2, 2),
-      new ScaleAnimation(farmer.rightCheek, 500, 1000, 1/2, 1/2, 1/2),
-      new TranslationAnimation(farmer.mouth, 0, 500, 0, 0.7, -0.3),
-      new TranslationAnimation(farmer.mouth, 500, 1000, 0, -0.7, 0.3),
+      new ScaleAnimation(farmer.leftCheek, 0, 500, 2.75, 2.75, 2.75),
+      new ScaleAnimation(farmer.leftCheek, 500, 1000, 1/2.75, 1/2.75, 1/2.75),
+      new ScaleAnimation(farmer.rightCheek, 0, 500, 2.75, 2.75, 2.75),
+      new ScaleAnimation(farmer.rightCheek, 500, 1000, 1/2.75, 1/2.75, 1/2.75),
+      new TranslationAnimation(farmer.mouth, 0, 500, 0, 0.5, -0.3),
+      new TranslationAnimation(farmer.mouth, 500, 1000, 0, -0.5, 0.3),
+      new RotationAnimation(farmer.leftLeg, 0, 250, -15, 0, 0),
+      new RotationAnimation(farmer.rightLeg, 250, 500, -15, 0, 0),
+      new RotationAnimation(farmer.leftLeg, 250, 500, 15, 0, 0),
+      new RotationAnimation(farmer.rightLeg, 500, 750, 15, 0, 0),
     ],
     true
   );
   farmerEatMotion.multiplySpeed(1);
   animations.push(farmerEatMotion);
+
+  for (let i = 0; i < floor.bushes.length; i++) {
+    let randomNumber = Math.random()*15+5;
+    var bushWindyMotion = new AnimationList(
+      [
+        new RotationAnimation(floor.bushes[i], 0, 1000, -randomNumber, 0, 0),
+        new RotationAnimation(floor.bushes[i], 1000, 2000, randomNumber*1.5, 0, 0),
+        new RotationAnimation(floor.bushes[i], 2000, 2500, -randomNumber/2, 0, 0),
+      ], 
+      true
+    );
+    bushWindyMotion.multiplySpeed(1);
+    animations.push(bushWindyMotion);
+  }
+
+  for (let i = 0; i < floor.grass.length; i++) {
+    for (let j = 0; j < floor.grass[i].length; j++) {
+      let randomNumber = Math.random();
+      var grassWindyMotion = new AnimationList(
+        [
+          new TranslationAnimation(floor.grass[i][j], 0, 1000, 0, 0, -randomNumber),
+          new TranslationAnimation(floor.grass[i][j], 1000, 2000, 0, 0, randomNumber*1.5),
+          new TranslationAnimation(floor.grass[i][j], 2000, 2500, 0, 0, -randomNumber/2),
+        ], 
+        true
+      );
+      grassWindyMotion.multiplySpeed(1);
+      animations.push(grassWindyMotion);
+    }
+  }
 
 
   // Drawing

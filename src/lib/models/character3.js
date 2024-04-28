@@ -173,8 +173,8 @@ export function createCharacter_3() {
     );
 // 0.25, ~, 0.5
     //objects
-    var main = new Object3D(beigeCylinder.vertices, beigeCylinder.faces);
-    main.setLocalScale(1, 1, 1);
+    var main = new Object3D(greenBox.vertices, greenBox.faces);
+    main.setLocalScale(0, 0, 0);
     main.setLocalTranslation(0, 0, 0);
     main.setLocalRotation(0, 0, 0);
 
@@ -506,11 +506,12 @@ export function createCharacter_3() {
     pizza.setLocalRotation(0, 0, 0);
     handRight1.addChild(pizza);
 
-    var pizzaEdge = new Object3D(orangeSphere.vertices, orangeSphere.faces);
-    pizzaEdge.setLocalScale(1, 1, 5)
-    pizzaEdge.setLocalTranslation(-21, 15, 0);
-    pizzaEdge.setLocalRotation(0, 0, 0);
-    pizza.addChild(pizzaEdge);
+    // var pizzaEdge = new Object3D(orangeSphere.vertices, orangeSphere.faces);
+    // // pizzaEdge.setLocalScale(1, 1, 5)
+    // pizzaEdge.setLocalScale(0, 0, 0);
+    // pizzaEdge.setLocalTranslation(-21, 15, 0);
+    // pizzaEdge.setLocalRotation(0, 0, 0);
+    // pizza.addChild(pizzaEdge);
 
     var pizzaPepperoni1 = new Object3D(darkRedSphere.vertices, darkRedSphere.faces);
     pizzaPepperoni1.setLocalScale(1.5, 0.2, 1.5)
@@ -530,10 +531,39 @@ export function createCharacter_3() {
     pizzaPepperoni3.setLocalRotation(0, 0, -0.08);
     pizza.addChild(pizzaPepperoni3);
 
+    let orangePipe = GEO.createPipe(
+        GEO.createCurve([
+            -5, 0, 0,
+            0, 0, 1,
+            5, 0, 0
+        ], 20, 2),
+        1,
+        20,
+        orange
+    );
+    var pizzaEdge2 = new Object3D(orangePipe.vertices, orangePipe.faces);
+    pizzaEdge2.setLocalScale(1, 1, 1)
+    pizzaEdge2.setLocalTranslation(-21, 15, 0);
+    pizzaEdge2.setLocalRotation(0, -1.5, 0);
+    pizza.addChild(pizzaEdge2);
+
+    var pizzaEdgeEdge1 = new Object3D(orangeSphere.vertices, orangeSphere.faces);
+    pizzaEdgeEdge1.setLocalScale(1, 1, 1)
+    pizzaEdgeEdge1.setLocalTranslation(-20.9, 15, 4);
+    pizzaEdgeEdge1.setLocalRotation(0, -1.5, 0);
+    pizzaEdge2.addChild(pizzaEdgeEdge1);
+
+    var pizzaEdgeEdge2 = new Object3D(orangeSphere.vertices, orangeSphere.faces);
+    pizzaEdgeEdge2.setLocalScale(1, 1, 1)
+    pizzaEdgeEdge2.setLocalTranslation(-21.4, 15, -4.7);
+    pizzaEdgeEdge2.setLocalRotation(0, -1.5, 0);
+    pizzaEdge2.addChild(pizzaEdgeEdge2);
+
     return {
         main: main,
         body: body,
         head: head,
+        neck: neck2,
         mouth: mouth,
         leftCheek: cheeks1,
         rightCheek: cheeks2,
