@@ -9,6 +9,7 @@ export function createCharacter_3() {
     var jeans = [56/255, 73/255, 75/255];
     var orange = [182/255, 107/255, 50/255];
     var green = [27/255, 140/255, 60/255];
+    var darkRed = [148/255, 18/255, 18/255];
     var beigeCylinder = GEO.createCylinder(1.0, 2.0, 40, beige);
     var beigeSphere = GEO.createSphere(1, 30, beige);
     var beigeEar = GEO.createCylinder(1, 1, 20, beige);
@@ -142,6 +143,34 @@ export function createCharacter_3() {
     var greenBox = GEO.createBox(1, 1, 1, green);
     var greenCylinder = GEO.createCylinder(1, 1, 30, green);
     var greenSphere = GEO.createSphere(1, 30, green);
+    var darkRedSphere = GEO.createSphere(1, 10, darkRed);
+    var darkBeigePizza = GEO.combineLines(
+        darkBeige, 
+        GEO.createCurve([
+            0, 2.0, 1,
+            7, 1.8, 0.4,
+            10, 0.0, 0,
+            10, 0.0, 0
+        ], 20, 2), 
+        GEO.createCurve([
+            0, 3.0, 1,
+            7, 2.6, 0.4,
+            10.5, 0.0, 0,
+            10, 0.0, 0
+        ], 20, 2), 
+        GEO.createCurve([
+            0, 3.0, -1,
+            7, 2.6, -0.4,
+            10.5, 0.0, 0,
+            10, 0.0, 0
+        ], 20, 2), 
+        GEO.createCurve([
+            0, 2.0, -1,
+            7, 1.8, -0.4,
+            10, 0.0, 0,
+            10, 0.0, 0
+        ], 20, 2)
+    );
 // 0.25, ~, 0.5
     //objects
     var main = new Object3D(beigeCylinder.vertices, beigeCylinder.faces);
@@ -277,13 +306,13 @@ export function createCharacter_3() {
     var handLeft1 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
     handLeft1.setLocalScale(2.2, 4, 2.2)
     handLeft1.setLocalTranslation(21, 8, 0);
-    handLeft1.setLocalRotation(0, 0, 0.2+3.14/2);
+    handLeft1.setLocalRotation(0, 0, -0.2-3.14/2);
     armLeft2.addChild(handLeft1);
 
     var handLeft2 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
     handLeft2.setLocalScale(1.1, 3, 1.1)
-    handLeft2.setLocalTranslation(21, 7, 0);
-    handLeft2.setLocalRotation(0, 0, -0.5+3.14/2);
+    handLeft2.setLocalTranslation(20, 9, 0);
+    handLeft2.setLocalRotation(0, 0, 0.5-3.14/2);
     handLeft1.addChild(handLeft2);
 
     var armRight = new Object3D(darkBeigeSphere.vertices, darkBeigeSphere.faces);
@@ -311,13 +340,13 @@ export function createCharacter_3() {
     var handRight1 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
     handRight1.setLocalScale(2.2, 4, 2.2)
     handRight1.setLocalTranslation(-21, 8, 0);
-    handRight1.setLocalRotation(0, 0, -0.2-3.14/2);
+    handRight1.setLocalRotation(0, 0, 0.2+3.14/2);
     armRight2.addChild(handRight1);
 
     var handRight2 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
     handRight2.setLocalScale(1.1, 3, 1.1)
-    handRight2.setLocalTranslation(-21, 7, 0);
-    handRight2.setLocalRotation(0, 0, 0.5-3.14/2);
+    handRight2.setLocalTranslation(-20, 9, 0);
+    handRight2.setLocalRotation(0, 0, -0.5+3.14/2);
     handRight1.addChild(handRight2);
     
     var left_leg = new Object3D(darkJeansSphere.vertices, darkJeansSphere.faces);
@@ -471,6 +500,36 @@ export function createCharacter_3() {
     sofaBackCushion2.setLocalRotation(0, 0, 3.14/2);
     sofa.addChild(sofaBackCushion2);
 
+    var pizza = new Object3D(darkBeigePizza.vertices, darkBeigePizza.faces);
+    pizza.setLocalScale(1, 1, 4.2)
+    pizza.setLocalTranslation(-21, 12.5, 0);
+    pizza.setLocalRotation(0, 0, 0);
+    handRight1.addChild(pizza);
+
+    var pizzaEdge = new Object3D(orangeSphere.vertices, orangeSphere.faces);
+    pizzaEdge.setLocalScale(1, 1, 5)
+    pizzaEdge.setLocalTranslation(-21, 15, 0);
+    pizzaEdge.setLocalRotation(0, 0, 0);
+    pizza.addChild(pizzaEdge);
+
+    var pizzaPepperoni1 = new Object3D(darkRedSphere.vertices, darkRedSphere.faces);
+    pizzaPepperoni1.setLocalScale(1.5, 0.2, 1.5)
+    pizzaPepperoni1.setLocalTranslation(-20, 15.5, -1.5);
+    pizzaPepperoni1.setLocalRotation(0, 0, 0);
+    pizza.addChild(pizzaPepperoni1);
+
+    var pizzaPepperoni2 = new Object3D(darkRedSphere.vertices, darkRedSphere.faces);
+    pizzaPepperoni2.setLocalScale(1.5, 0.2, 1.5)
+    pizzaPepperoni2.setLocalTranslation(-15, 14.8, -0.5);
+    pizzaPepperoni2.setLocalRotation(0, 0, -0.2);
+    pizza.addChild(pizzaPepperoni2);
+
+    var pizzaPepperoni3 = new Object3D(darkRedSphere.vertices, darkRedSphere.faces);
+    pizzaPepperoni3.setLocalScale(1.5, 0.2, 1.5)
+    pizzaPepperoni3.setLocalTranslation(-18, 15.3, 1.5);
+    pizzaPepperoni3.setLocalRotation(0, 0, -0.08);
+    pizza.addChild(pizzaPepperoni3);
+
     return {
         main: main,
         body: body,
@@ -479,9 +538,13 @@ export function createCharacter_3() {
         leftElbow: armLeft2,
         rightShoulder: armRight,
         rightElbow: armRight2,
+        leftHand: handLeft1,
+        rightHand: handRight1,
         leftLeg: left_leg,
         leftKnee: left_leg_joint,
         rightLeg: right_leg,
-        rightKnee: right_leg_joint
+        rightKnee: right_leg_joint,
+        sofa: sofa,
+        pizza: pizza
     };
 }
