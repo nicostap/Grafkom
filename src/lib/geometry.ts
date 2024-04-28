@@ -419,7 +419,6 @@ export const GEO = {
   combineLines: function (color: number[], ...lines: number[][]) {
     let vertices = [];
     let faces = [];
-
     for (let i = 0; i < lines[0].length / 3; i++) {
       for (let j = 0; j < lines.length; j++) {
         let currpoint = [
@@ -562,33 +561,99 @@ export const GEO = {
     };
     return texture;
   },
-  makePipe: function (pathPoints: number[], poly: number, color: number[]) {
-    var path: number[][] = [];
-    for (let i = 0; i < pathPoints.length / 3; ) {
-      path.push([pathPoints[i], pathPoints[i + 1], pathPoints[i + 2]]);
-      i += 3;
+  createPipe: function (path: number[], radius: number, poly: number, color: number[]) {
+    let vertexCount = path.length / 3;
+    const lines: number[][] = [];
+    for (let i = 0; i < poly; i++) lines.push([]);
+    for (let i = 0; i < vertexCount - 1; i++) {
+      let index = i * 3;
+      let prevIndex = (i - 1) * 3;
+      let nextIndex = (i + 1) * 3;
+      let nextNextIndex = (i + 2) * 3;
+      let normal = glMatrix.vec3.create();
+      if (i == vertexCount - 2) {
+        normal = glMatrix.vec3.fromValues(
+          path[nextIndex] - path[index],
+          path[nextIndex + 1] - path[index + 1],
+          path[nextIndex + 2] - path[index + 2],
+        );
+      } else {
+        let v1 = glMatrix.vec3.fromValues(
+          path[nextIndex] - path[index],
+          path[nextIndex + 1] - path[index + 1],
+          path[nextIndex + 2] - path[index + 2],
+        );
+        let v2 = glMatrix.vec3.fromValues(
+          path[nextNextIndex] - path[nextIndex],
+          path[nextNextIndex + 1] - path[nextIndex + 1],
+          path[nextNextIndex + 2] - path[nextIndex + 2],
+        );
+        glMatrix.vec3.add(normal, v1, v2);
+      }
+      glMatrix.vec3.normalize(normal, normal);
+      let minNorm = 0;
+      let midNorm = 0;
+      let maxNorm = 0;
+      for (let j = 1; j < 3; j++) {
+        if (normal[minNorm] > normal[j]) minNorm = j;
+        if (normal[maxNorm] < normal[j]) maxNorm = j;
+      }
+      for (let j = 0; j < 3; j++) if (j != minNorm && j != maxNorm) midNorm = j;
+      let a = glMatrix.vec3.create();
+      a[midNorm] = -normal[maxNorm];
+      a[maxNorm] = normal[midNorm];
+      let b = glMatrix.vec3.create();
+      glMatrix.vec3.cross(b, normal, a);
+      glMatrix.vec3.normalize(a, a);
+      glMatrix.vec3.normalize(b, b);
+      for (let t = 0; t < poly; t++) {
+        lines[t].push(
+          path[index] + radius * a[0] * Math.cos(GEO.rad(t / poly * 360)) + radius * b[0] * Math.sin(GEO.rad(t / poly * 360)),
+          path[index + 1] + radius * a[1] * Math.cos(GEO.rad(t / poly * 360)) + radius * b[1] * Math.sin(GEO.rad(t / poly * 360)),
+          path[index + 2] + radius * a[2] * Math.cos(GEO.rad(t / poly * 360)) + radius * b[2] * Math.sin(GEO.rad(t / poly * 360)),
+        );
+      }
+      // To prevent twisting
+      if (i != 0) {
+        let minLength = 9999999;
+        let minShift = poly;
+        for (let shift = 0; shift < poly; shift++) {
+          let totalLength = 0;
+          for (let t = 0; t < poly; t++) {
+            totalLength += glMatrix.vec3.distance(
+              glMatrix.vec3.fromValues(
+                lines[(t + shift) % poly][index],
+                lines[(t + shift) % poly][index + 1],
+                lines[(t + shift) % poly][index + 2],
+              ),
+              glMatrix.vec3.fromValues(
+                lines[t][prevIndex],
+                lines[t][prevIndex + 1],
+                lines[t][prevIndex + 2],
+              )
+            );
+          }
+          if(minLength > totalLength) {
+            minLength = totalLength;
+            minShift = shift;
+          }
+        }
+        console.log(minShift, minLength);
+        while(minShift--) {
+          let tmp = lines[0][index];
+          let tmp1 = lines[0][index + 1];
+          let tmp2 = lines[0][index + 2];
+          for(let t = 0; t < poly - 1; t++) {
+            lines[t][index] = lines[t + 1][index];
+            lines[t][index + 1] = lines[t + 1][index + 1];
+            lines[t][index + 2] = lines[t + 1][index + 2];
+          }
+          lines[poly - 1][index] = tmp;
+          lines[poly - 1][index + 1] = tmp1;
+          lines[poly - 1][index + 2] = tmp2;
+        } 
+      } 
     }
-
-    // finding the normal of the next point
-    var projectContour = function (fromIndex: number, toIndex: number) {
-      var dir1: number[], dir2: number[], normal: number[];
-
-      dir1 = [
-        path[toIndex][0] - path[fromIndex][0],
-        path[toIndex][1] - path[fromIndex][1],
-        path[toIndex][2] - path[fromIndex][2],
-      ];
-      if (toIndex == path.length - 1) dir2 = dir1;
-      else
-        dir2 = [
-          path[toIndex + 1][0] - path[toIndex][0],
-          path[toIndex + 1][1] - path[toIndex][1],
-          path[toIndex + 1][2] - path[toIndex][2],
-        ];
-
-      normal = [dir1[0] + dir2[0], dir1[1] + dir2[1], dir1[2] + dir2[2]];
-      // nah habis ini ndatau
-      return fromIndex;
-    };
+    return GEO.combineLines(color, ...lines);
   },
 };

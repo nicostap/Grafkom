@@ -84,10 +84,10 @@ export function createFloor() {
     let grassInstance = instanceRandomiser(grassGeometry.vertices, grassGeometry.faces, 0, 0, 100, 100, 7, 7);
     let grass = new Object3D(grassInstance.vertices, grassInstance.faces);
     grass.translate(0, 0.75, 0);
-    randomiser(grass, floor, 0, 180, 400, 150, 4, 4);
-    randomiser(grass, floor, 0, -180, 400, 150, 4, 4);
-    randomiser(grass, floor, 200, 0, 100, 60, 2, 1);
-    randomiser(grass, floor, -200, 0, 100, 60, 2, 1);
+    randomiser(grass, floor, 0, 220, 700, 150, 7, 4);
+    randomiser(grass, floor, 0, -220, 700, 150, 7, 4);
+    randomiser(grass, floor, 250, 0, 200, 60, 4, 1);
+    randomiser(grass, floor, -250, 0, 200, 60, 4, 1);
 
     var brownHyperboloid = GEO.createHyperboloidOneSheet(1.0, 3.0, 7, [160 / 255, 82 / 255, 45 / 255]);
     var greenParaboloid = GEO.createEllipticParaboloid(1.0, 1.0, 30, [0.2, 0.7, 0.2]);
@@ -480,7 +480,6 @@ export function createFloor() {
     for(let i = 0; i < butterflies.length; i++) {
         butterflies[i].origin = [0, 20, 10];
     }
-
 
     return { main: floor, trees: trees, smokes: smokes, clouds: clouds, butterflies: butterflies };
 }
