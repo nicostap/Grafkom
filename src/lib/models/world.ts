@@ -114,6 +114,15 @@ export function createFloor() {
     randomiser(rock, floor, 200, 0, 100, 150, 2, 2);
     randomiser(rock, floor, -200, 0, 100, 150, 2, 2);
 
+    var rockInstance = instanceRandomiser(greySphere.vertices, greySphere.faces, 0, 0, 100, 100, 3, 3);
+    var rock = new Object3D(rockInstance.vertices, rockInstance.faces);
+    rock.setLocalTranslation(0, 0.75, 0);
+    rock.setLocalScale(3, 4, 3.5);
+    randomiser(rock, floor, 0, 180, 1, 150, 2, 2);
+    randomiser(rock, floor, 0, -180, 1, 150, 2, 2);
+    randomiser(rock, floor, 200, 0, 1, 150, 1, 1);
+    randomiser(rock, floor, -200, 0, 1, 150, 1, 1);
+
     // House
     var whiteBox = GEO.createBox(1.0, 1.0, 1.0, [0.8, 0.8, 0.8]);
     var brownBox = GEO.createBox(1.0, 1.0, 1.0, [139 / 265, 105 / 265, 20 / 265]);

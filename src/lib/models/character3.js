@@ -21,8 +21,22 @@ export function createCharacter_3() {
     var darkBeigeSphere = GEO.createSphere(1, 20, darkBeige);
     var blackMouth = GEO.combineLines(
         [0, 0, 0],
-        GEO.createCurve([3, 3.5, -0.8, 0, 3, -0.4, -3, 3.5, -0.8], 30, 2),
-        GEO.createCurve([3, 3, -0.8, 0, 2.5, -0.4, -3, 3, -0.8], 30, 2)
+        GEO.createCurve([
+            3, 3.5, -0.8, 
+            0, 3, 3, 
+            -3, 3.5, -0.8], 30, 2),
+        GEO.createCurve([
+            3, 3.5, 0.8, 
+            0, 3, 4, 
+            -3, 3.5, 0.8], 30, 2),
+        GEO.createCurve([
+            3, 3, 0.8, 
+            0, 2.5, 4, 
+            -3, 3, 0.8], 30, 2),
+        GEO.createCurve([
+            3, 3, -0.8, 
+            0, 2.5, 3, 
+            -3, 3, -0.8], 30, 2),
     );
 
     // Custom Curve
@@ -221,7 +235,7 @@ export function createCharacter_3() {
 
     var mouth = new Object3D(blackMouth.vertices, blackMouth.faces)
     mouth.setLocalScale(0.5, 0.5, 0.5);
-    mouth.setLocalTranslation(0, 13, 3.3)
+    mouth.setLocalTranslation(0, 13, 2.0)
     head.addChild(mouth);
 
     var cheeks1 = new Object3D(beigeSphere.vertices, beigeSphere.faces);
@@ -351,7 +365,7 @@ export function createCharacter_3() {
     
     var left_leg = new Object3D(darkJeansSphere.vertices, darkJeansSphere.faces);
     left_leg.setLocalScale(1, 1, 1);
-    left_leg.setLocalTranslation(4, -4, 0);
+    left_leg.setLocalTranslation(4, 0, 0);
     body.addChild(left_leg);
 
     var left_leg_upper = new Object3D(darkJeansCylinder.vertices, darkJeansCylinder.faces);
@@ -388,7 +402,7 @@ export function createCharacter_3() {
     
     var right_leg = new Object3D(darkJeansSphere.vertices, darkJeansSphere.faces);
     right_leg.setLocalScale(1, 1, 1);
-    right_leg.setLocalTranslation(-4, -4, 0);
+    right_leg.setLocalTranslation(-4, 0, 0);
     body.addChild(right_leg);
 
     var right_leg_upper = new Object3D(darkJeansCylinder.vertices, darkJeansCylinder.faces);
@@ -565,6 +579,7 @@ export function createCharacter_3() {
         head: head,
         neck: neck2,
         mouth: mouth,
+        stomach: stomach,
         leftCheek: cheeks1,
         rightCheek: cheeks2,
         leftShoulder: armLeft,

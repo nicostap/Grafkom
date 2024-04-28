@@ -305,15 +305,25 @@ export function renderMain() {
       new ScaleAnimation(farmer.rightCheek, 500, 1000, 1/2.75, 1/2.75, 1/2.75),
       new TranslationAnimation(farmer.mouth, 0, 500, 0, 0.5, -0.3),
       new TranslationAnimation(farmer.mouth, 500, 1000, 0, -0.5, 0.3),
-      new RotationAnimation(farmer.leftLeg, 0, 250, -15, 0, 0),
-      new RotationAnimation(farmer.rightLeg, 250, 500, -15, 0, 0),
-      new RotationAnimation(farmer.leftLeg, 250, 500, 15, 0, 0),
-      new RotationAnimation(farmer.rightLeg, 500, 750, 15, 0, 0),
+      new RotationAnimation(farmer.leftLeg, 250, 500, -15, 0, 0),
+      new RotationAnimation(farmer.rightLeg, 500, 750, -15, 0, 0),
+      new RotationAnimation(farmer.leftLeg, 500, 750, 15, 0, 0),
+      new RotationAnimation(farmer.rightLeg, 750, 1000, 15, 0, 0),
     ],
     true
   );
   farmerEatMotion.multiplySpeed(1);
   animations.push(farmerEatMotion);
+
+  var farmerBreathingMotion = new AnimationList(
+    [
+      new ScaleAnimation(farmer.stomach, 0, 1500, 1.05, 1.05, 1.05),
+      new ScaleAnimation(farmer.stomach, 1500, 3000, 1/1.05, 1/1.05, 1/1.05),
+    ],
+    true
+  );
+  farmerBreathingMotion.multiplySpeed(1);
+  animations.push(farmerBreathingMotion);
 
   for (let i = 0; i < floor.bushes.length; i++) {
     let randomNumber = Math.random()*15+5;
