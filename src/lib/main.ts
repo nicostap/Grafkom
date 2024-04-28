@@ -17,6 +17,7 @@ import { DefaultShader } from "./shaders/default.shader";
 import { calculateFPS, calculateTick } from "./utils/StatCounter";
 import { AppState, mode } from "./utils/State";
 import { CameraController } from "./utils/CameraController";
+import { Bitzer } from "./models/Bitzer";
 
 export function renderMain() {
   const CANVAS = document.getElementById("your_canvas");
@@ -59,6 +60,7 @@ export function renderMain() {
   var bicycle = createCharacter_1();
   var floor = createFloor();
   var farmer = createCharacter_3();
+  const bitzer = new Bitzer();
 
   // Placing objects
   bicycle.main.translate(-40, 14, -55);
@@ -70,9 +72,12 @@ export function renderMain() {
     -45
   );
   farmer.main.translate(0, 25, 70);
+  bitzer.root.translate(0, 25, 90);
 
   // Making the animations
   var animations: AbstractAnimation[] = [];
+
+  animations.push(...bitzer.animations);
   var bicycleLoop = new AnimationList(
     [
       new RotationAnimation(bicycle.frontWheel, 0, 2000, 0, 0, -360),
@@ -156,7 +161,9 @@ export function renderMain() {
         new TranslationAnimation(floor.smokes[i], 0, 3000, 0, 30, 0),
         new ScaleAnimation(floor.smokes[i], 0, 3000, 4, 4, 4),
       ],
-      true, i * 1000, () => {
+      true,
+      i * 1000,
+      () => {
         floor.smokes[i].translate(0, -30, 0);
         floor.smokes[i].scale(0.25, 0.25, 0.25);
       }
@@ -166,9 +173,10 @@ export function renderMain() {
 
   for (let i = 0; i < floor.clouds.length; i++) {
     var cloudMotion = new AnimationList(
-      [
-        new TranslationAnimation(floor.clouds[i], 0, 20000, 0, 0, -1000),
-      ], true, 0, () => {
+      [new TranslationAnimation(floor.clouds[i], 0, 20000, 0, 0, -1000)],
+      true,
+      0,
+      () => {
         floor.clouds[i].translate(0, 0, 1000);
       }
     );
@@ -179,7 +187,14 @@ export function renderMain() {
     var butterflyMotion = new AnimationList(
       [
         new RotationAnimation(floor.butterflies[i].child[1], 0, 500, -90, 0, 0),
-        new RotationAnimation(floor.butterflies[i].child[1], 500, 1000, 90, 0, 0),
+        new RotationAnimation(
+          floor.butterflies[i].child[1],
+          500,
+          1000,
+          90,
+          0,
+          0
+        ),
       ],
       true
     );
@@ -187,14 +202,29 @@ export function renderMain() {
     var butterflyMotion = new AnimationList(
       [
         new RotationAnimation(floor.butterflies[i].child[2], 0, 500, 90, 0, 0),
-        new RotationAnimation(floor.butterflies[i].child[2], 500, 1000, -90, 0, 0),
+        new RotationAnimation(
+          floor.butterflies[i].child[2],
+          500,
+          1000,
+          -90,
+          0,
+          0
+        ),
       ],
       true
     );
     animations.push(butterflyMotion);
     var butterflyMotion = new AnimationList(
       [
-        new ArbitraryAxisRotationAnimation(floor.butterflies[i], 0, 3000, -1 + 2 * Math.random(), 1, -1 + 2 * Math.random(), 360),
+        new ArbitraryAxisRotationAnimation(
+          floor.butterflies[i],
+          0,
+          3000,
+          -1 + 2 * Math.random(),
+          1,
+          -1 + 2 * Math.random(),
+          360
+        ),
       ],
       true
     );
@@ -240,7 +270,7 @@ export function renderMain() {
     let dt = time - time_prev;
     calculateFPS(dt);
     time_prev = time;
-    cameraController.tick();
+    cameraController.tick(dt);
 
     VIEWMATRIX = glMatrix.mat4.create();
     if (AppState.cameraMode == "Stationary") {
@@ -265,9 +295,11 @@ export function renderMain() {
       ]);
     } else if (AppState.cameraMode == "Follow") {
       glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
-        bicycle.main.TRANSMATRIX[12] - 30 * Math.cos(bicycle.main.rotation.y + GEO.rad(45)),
+        bicycle.main.TRANSMATRIX[12] -
+          30 * Math.cos(bicycle.main.rotation.y + GEO.rad(45)),
         25,
-        bicycle.main.TRANSMATRIX[14] - 30 * Math.sin(bicycle.main.rotation.y + GEO.rad(45)),
+        bicycle.main.TRANSMATRIX[14] -
+          30 * Math.sin(bicycle.main.rotation.y + GEO.rad(45)),
       ]);
       glMatrix.mat4.lookAt(
         VIEWMATRIX,
@@ -284,16 +316,14 @@ export function renderMain() {
     // Drawing the objects
     GL.viewport(0, 0, CANVAS.width, CANVAS.height);
     GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-    bicycle.main.setUniform4(PROJMATRIX, VIEWMATRIX);
-    // bicycle.main.draw();
-    floor.main.setUniform4(PROJMATRIX, VIEWMATRIX);
-    // floor.main.draw();
-    farmer.main.setUniform4(PROJMATRIX, VIEWMATRIX);
-    // farmer.main.draw();
+
+    [bicycle.main, floor.main, farmer.main, bitzer.root].forEach((o) => {
+      o.setUniform4(PROJMATRIX, VIEWMATRIX);
+    });
 
     // Manual batch drawing
     Object3D.defaultShader.use();
-    [bicycle.main, floor.main, farmer.main]
+    [bicycle.main, floor.main, farmer.main, bitzer.root]
       .flatMap((o) => o.queueBatch())
       .forEach((o) => {
         o.drawBatch();

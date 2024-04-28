@@ -154,7 +154,11 @@ export const GEO = {
     }
     for (let i = 0; i < poly; i++) {
       faces.push(i + poly, ((i + 1) % poly) + poly, 4 * poly + 1);
-      faces.push(((i + 1) % poly) + 3 * poly, i + 3 * poly, ((i + 1) % poly) + 2 * poly);
+      faces.push(
+        ((i + 1) % poly) + 3 * poly,
+        i + 3 * poly,
+        ((i + 1) % poly) + 2 * poly
+      );
     }
     return { vertices: vertices, faces: faces };
   },
@@ -218,7 +222,9 @@ export const GEO = {
     radius: number,
     height: number,
     poly: number,
-    color: number[]
+    color: number[],
+    upperCutoff: number = Math.PI / 2,
+    lowerCutoff: number = -Math.PI / 2
   ) {
     let sectorCount = poly;
     let stackCount = poly;
@@ -234,6 +240,10 @@ export const GEO = {
     let vertices = [];
     for (let i = 0; i <= stackCount; ++i) {
       stackAngle = Math.PI / 2 - i * stackStep;
+      // clamp the stack angle
+      if (stackAngle < lowerCutoff) stackAngle = lowerCutoff;
+      if (stackAngle > upperCutoff) stackAngle = upperCutoff;
+
       xz = radius * Math.cosh(stackAngle);
       y = height * Math.sinh(stackAngle);
       for (let j = 0; j <= sectorCount; ++j) {
@@ -294,19 +304,28 @@ export const GEO = {
     radius: number,
     height: number,
     poly: number,
-    color: number[]
+    color: number[],
+    upperCutoff: number = Math.PI / 2,
+    lowerCutoff: number = -Math.PI / 2
   ) {
     let sectorCount = poly;
     let stackCount = poly;
 
     let x, y, z, xz;
-    let nx, ny, nz, lengthInv = 1.0 / radius;
+    let nx,
+      ny,
+      nz,
+      lengthInv = 1.0 / radius;
     let sectorStep = (2 * Math.PI) / sectorCount;
     let stackStep = Math.PI / stackCount;
     let sectorAngle, stackAngle;
     let vertices = [];
     for (let i = 0; i <= stackCount; ++i) {
       stackAngle = Math.PI / 2 - i * stackStep;
+      // clamp the stack angle
+      if (stackAngle < lowerCutoff) stackAngle = lowerCutoff;
+      if (stackAngle > upperCutoff) stackAngle = upperCutoff;
+
       xz = radius * Math.sqrt(stackAngle);
       y = height * -stackAngle;
       for (let j = 0; j <= sectorCount; ++j) {
@@ -545,24 +564,31 @@ export const GEO = {
   },
   makePipe: function (pathPoints: number[], poly: number, color: number[]) {
     var path: number[][] = [];
-    for (let i = 0; i < pathPoints.length/3;) {
-      path.push([pathPoints[i], pathPoints[i+1], pathPoints[i+2]]);
-      i+=3;
+    for (let i = 0; i < pathPoints.length / 3; ) {
+      path.push([pathPoints[i], pathPoints[i + 1], pathPoints[i + 2]]);
+      i += 3;
     }
 
     // finding the normal of the next point
     var projectContour = function (fromIndex: number, toIndex: number) {
       var dir1: number[], dir2: number[], normal: number[];
 
-      dir1 = [path[toIndex][0]-path[fromIndex][0], path[toIndex][1]-path[fromIndex][1], path[toIndex][2]-path[fromIndex][2]];
-      if(toIndex == path.length-1)
-          dir2 = dir1;
+      dir1 = [
+        path[toIndex][0] - path[fromIndex][0],
+        path[toIndex][1] - path[fromIndex][1],
+        path[toIndex][2] - path[fromIndex][2],
+      ];
+      if (toIndex == path.length - 1) dir2 = dir1;
       else
-          dir2 = [path[toIndex+1][0]-path[toIndex][0], path[toIndex+1][1]-path[toIndex][1], path[toIndex+1][2]-path[toIndex][2]];
+        dir2 = [
+          path[toIndex + 1][0] - path[toIndex][0],
+          path[toIndex + 1][1] - path[toIndex][1],
+          path[toIndex + 1][2] - path[toIndex][2],
+        ];
 
-      normal = [dir1[0]+dir2[0], dir1[1]+dir2[1], dir1[2]+dir2[2]];
+      normal = [dir1[0] + dir2[0], dir1[1] + dir2[1], dir1[2] + dir2[2]];
       // nah habis ini ndatau
       return fromIndex;
     };
-  }
+  },
 };
