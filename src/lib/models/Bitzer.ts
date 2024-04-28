@@ -104,7 +104,7 @@ export class Bitzer {
 
     const collar = new Object3D(collarCylinder.vertices, collarCylinder.faces);
     collar.setLocalScale(2.5, 1, 2.5);
-    collar.setLocalTranslation(0, 6.5, 0);
+    collar.setLocalTranslation(0, 6.25, 0);
     collar.setLocalRotation(0, 0, 0);
     stomach.addChild(collar);
 
