@@ -6,6 +6,8 @@
     modeStationary,
     modeFPS,
     modeFollowShaun,
+    modeFollowFarmer,
+    modeFollowBitzer
   } from "./lib/utils/CameraController";
 
   onMount(() => {
@@ -23,6 +25,8 @@
     <button class="buttonUI" on:click={modeStationary}> Stationary </button>
     <button class="buttonUI" on:click={modeFPS}> FPS </button>
     <button class="buttonUI" on:click={modeFollowShaun}> Follow Shaun </button>
+    <button class="buttonUI" on:click={modeFollowFarmer}> Follow Farmer </button>
+    <button class="buttonUI" on:click={modeFollowBitzer}> Follow Bitzer </button>
   </div>
   <div class="info">
     <span style="width: 5em;">
@@ -49,7 +53,7 @@
   }
 
   .buttonUI {
-    margin: 10px;
+    margin: 6px;
     display: inline-block;
     padding: 10px 20px;
     font-size: 1vw;

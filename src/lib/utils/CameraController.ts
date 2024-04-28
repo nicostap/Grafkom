@@ -171,11 +171,18 @@ export function modeFPS() {
   AppState.cameraMode = mode.FPS;
   AppState.THETA = 0;
   AppState.PHI = 0;
-  (AppState.cameraX = 0), (AppState.cameraY = -20), (AppState.cameraZ = -300);
+  (AppState.cameraX = 0), (AppState.cameraY = -35), (AppState.cameraZ = -300);
 }
 export function modeFollowShaun() {
-  AppState.cameraMode = mode.Follow;
+  AppState.cameraMode = mode.FollowShaun;
   AppState.THETA = 0;
   AppState.PHI = 0;
-  AppState.zoom = -200;
+}
+
+export function modeFollowFarmer() {
+  AppState.cameraMode = mode.FollowFarmer;
+}
+
+export function modeFollowBitzer() {
+  AppState.cameraMode = mode.FollowBitzer;
 }
