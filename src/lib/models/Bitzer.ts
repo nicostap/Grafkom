@@ -1,4 +1,9 @@
-import type { AbstractAnimation } from "../animation";
+import {
+  AnimationList,
+  ArbitraryAxisRotationAnimation,
+  RotationAnimation,
+  type AbstractAnimation,
+} from "../animation";
 import { GEO } from "../geometry";
 import { Object3D } from "../object";
 import { Color } from "../utils/Color";
@@ -336,10 +341,10 @@ export class Bitzer extends ObjectComponent {
     wristband.offsetLocalTranslate(-15, 3.8, 0);
     arms.left.forearm.addChild(wristband.root);
 
-    arms.left.shoulder.rotate(0, Math.PI / 4, Math.PI / 4);
-    arms.right.shoulder.rotate(0, -Math.PI / 3, -Math.PI / 4);
+    arms.left.armJoint.rotate(0, Math.PI / 4, -Math.PI / 6);
+    arms.right.armJoint.rotate(0, -Math.PI / 3, -Math.PI / 4);
 
-    arms.left.elbow.rotate(0, (Math.PI * 8) / 10, (-Math.PI * 2) / 16);
+    arms.left.elbow.rotate(0, 0, -Math.PI / 3);
     arms.right.elbow.rotate(0, -Math.PI / 4, Math.PI / 12);
 
     legs.left.femur.rotate(-Math.PI / 2, 0, 0);
@@ -352,6 +357,19 @@ export class Bitzer extends ObjectComponent {
       ...whistle.components,
       ...watch.components,
       ...wristband.components
+    );
+
+    // Animate the left arm to wave
+    this.animations.push(
+      new AnimationList(
+        [
+          new RotationAnimation(arms.left.armJoint, 0, 400, 20, 10, 20),
+          new RotationAnimation(arms.left.armJoint, 400, 1000, -20, -10, -20),
+          new RotationAnimation(arms.left.elbow, 0, 400, 0, 0, -20),
+          new RotationAnimation(arms.left.elbow, 400, 1000, 0, 0, 20),
+        ],
+        true
+      )
     );
   }
 }

@@ -93,7 +93,9 @@ export function renderMain() {
   farmer.pizza.translate(-2, -1, 2);
 
   // bitzer.root.translate(0, 25, 120);
-  lawnmower.root.translate(0, 15, 120);
+  lawnmower.root.translate(40, 15, -72);
+  lawnmower.root.rotate(0, GEO.rad(-90), 0);
+  // lawnmower.smokeRoot.translate(0, 15, 120);
 
   // Making the animations
   var animations: AbstractAnimation[] = [];
@@ -524,13 +526,14 @@ export function renderMain() {
       farmer.main,
       // bitzer.root,
       lawnmower.root,
+      lawnmower.smokeRoot,
     ].forEach((o) => {
       o.setUniform4(PROJMATRIX, VIEWMATRIX);
     });
 
     // Manual batch drawing
     Object3D.defaultShader.use();
-    [bicycle.main, floor.main, farmer.main, lawnmower.root]
+    [bicycle.main, floor.main, farmer.main, lawnmower.root, lawnmower.smokeRoot]
       .flatMap((o) => o.queueBatch())
       .forEach((o) => {
         o.drawBatch();
@@ -553,6 +556,14 @@ export function renderMain() {
         0,
         0.05 * dt * -Math.sin(bicycle.main.rotation.y)
       );
+
+      lawnmower.root.translate(
+        0.05 * dt * Math.sin(lawnmower.root.rotation.y),
+        0,
+        0.05 * dt * Math.cos(lawnmower.root.rotation.y)
+      );
+
+      // lawnmower.root.rotate(0, 0.0001 * dt, 0);
     }
 
     // Flush

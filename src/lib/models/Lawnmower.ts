@@ -1,5 +1,9 @@
 import * as glMatrix from "gl-matrix";
-import type { AbstractAnimation } from "../animation";
+import {
+  AbstractAnimation,
+  AnimationList,
+  RotationAnimation,
+} from "../animation";
 import { GEO } from "../geometry";
 import { Object3D } from "../object";
 import { Color } from "../utils/Color";
@@ -10,6 +14,8 @@ import { Bitzer } from "./Bitzer";
 export class Lawnmower extends ObjectComponent {
   public readonly animations: AbstractAnimation[] = [];
   public readonly root: Object3D;
+  public readonly smokeRoot: Object3D;
+  public readonly spawnerLoop: number;
 
   private colors = {
     case: Color.fromHex("3dac4e"),
@@ -18,6 +24,7 @@ export class Lawnmower extends ObjectComponent {
     wheelCaps: Color.fromHex("ffe24c"),
     chair: Color.fromHex("ffd308"),
     exhaust: Color.fromHex("9fa4a8"),
+    smoke: Color.fromHex("2e3038"),
   } as const;
 
   constructor() {
@@ -83,6 +90,13 @@ export class Lawnmower extends ObjectComponent {
     lawnmowerBase.addChild(lawnmowerUpperEngine);
     this.components.push(lawnmowerUpperEngine);
 
+    const rotationMarkerPrism = GEO.createCylinder(
+      1,
+      1,
+      32,
+      this.colors.exhaust
+    );
+
     ["fr", "fl", "br", "bl"].forEach((pos) => {
       const facingMultiplier = pos === "fr" || pos === "br" ? 1 : -1;
       const xOffset = 7;
@@ -111,6 +125,29 @@ export class Lawnmower extends ObjectComponent {
       wheelCap.setLocalRotation(0, 0, (facingMultiplier * Math.PI) / 2);
       lawnmowerBase.addChild(wheelCap);
       this.components.push(wheelCap);
+
+      const rotationMarker = new Object3D(
+        rotationMarkerPrism.vertices,
+        rotationMarkerPrism.faces
+      );
+
+      rotationMarker.setLocalScale(0.2, 2, 0.2);
+      rotationMarker.setLocalTranslation(
+        facingMultiplier * xOffset + facingMultiplier * 0.1,
+        -11.5,
+        zOffset + 2
+      );
+      rotationMarker.setLocalRotation(0, 0, (facingMultiplier * Math.PI) / 2);
+      tire.addChild(rotationMarker);
+      this.components.push(rotationMarker);
+
+      // create animations
+      this.animations.push(
+        new AnimationList(
+          [new RotationAnimation(tire, 0, 2000, 360, 0, 0)],
+          true
+        )
+      );
     });
 
     const steeringWheel = new SteeringWheel();
@@ -138,5 +175,82 @@ export class Lawnmower extends ObjectComponent {
     // bitzer.offsetLocalTranslate(0, 14, 0);
 
     chairSeatBase.addChild(bitzer.root);
+
+    const smokeSphere = GEO.createSphere(1, 10, this.colors.smoke);
+
+    const smokeRoot = new Object3D([], []);
+    this.smokeRoot = smokeRoot;
+    const activeSmokes: Object3D[] = [];
+
+    // const smokes = Array.from({ length: 1 }, (_, i) => {
+    //   const smoke = new Object3D(smokeSphere.vertices, smokeSphere.faces);
+    //   smoke.setLocalScale(0.5, 0.5, 0.5);
+    //   smoke.setLocalTranslation(5, -7, -6);
+    //   smoke.setLocalRotation(Math.PI / 2, 0, 0);
+    //   this.smokeRoot.addChild(smoke);
+    //   return smoke;
+    // });
+
+    this.spawnerLoop = setInterval(() => {
+      // max 5 smokes
+      if (activeSmokes.length >= 5) {
+        const smoke = activeSmokes.shift();
+        this.smokeRoot.child = this.smokeRoot.child.filter(
+          (child) => child !== smoke
+        );
+      }
+
+      // const x =
+
+      // create new smoke
+      const newSmoke = new Object3D(smokeSphere.vertices, smokeSphere.faces);
+      newSmoke.setLocalScale(0.7, 0.7, 0.7);
+      const x =
+        exhaust.MOVEMATRIX[12] + -Math.sin(lawnmowerBase.rotation.y) * 1;
+      const y = exhaust.MOVEMATRIX[13];
+      const z =
+        exhaust.MOVEMATRIX[14] + -Math.cos(lawnmowerBase.rotation.y) * 1;
+
+      newSmoke.translate(x, y, z);
+      newSmoke.setLocalRotation(Math.PI / 2, 0, 0);
+      this.smokeRoot.addChild(newSmoke);
+      activeSmokes.push(newSmoke);
+    }, 200);
+
+    this.animations.push(
+      new (class extends AbstractAnimation {
+        start: number;
+        end: number;
+        constructor() {
+          super();
+          this.start = 0;
+          this.end = 99999999999;
+        }
+        public run(time: number, dt: number) {
+          activeSmokes.forEach((smoke) => {
+            smoke.translate(0, dt * 0.02, 0);
+            smoke.scale(1.01, 1.01, 1.01);
+          });
+        }
+      })()
+    );
+
+    // Motion
+    let pivotRotation = 35;
+    let bodyRotation = 20;
+    var motions = new AnimationList(
+      [
+        new RotationAnimation(this.root, 0, 4000, 0, 90, 0),
+        new RotationAnimation(this.root, 4000, 12000, 0, 0, 0),
+      ],
+      true,
+      2000
+    );
+    motions.multiplySpeed(0.29);
+    this.animations.push(motions);
+  }
+
+  public destroy() {
+    clearInterval(this.spawnerLoop);
   }
 }
