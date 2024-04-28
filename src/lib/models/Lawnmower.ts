@@ -97,7 +97,7 @@ export class Lawnmower extends ObjectComponent {
       this.colors.exhaust
     );
 
-    ["fr", "fl", "br", "bl"].forEach((pos) => {
+    const wheels = ["fr", "fl", "br", "bl"].map((pos) => {
       const facingMultiplier = pos === "fr" || pos === "br" ? 1 : -1;
       const xOffset = 7;
       const zOffset = pos === "fr" || pos === "fl" ? 25 : 0;
@@ -123,7 +123,7 @@ export class Lawnmower extends ObjectComponent {
         zOffset
       );
       wheelCap.setLocalRotation(0, 0, (facingMultiplier * Math.PI) / 2);
-      lawnmowerBase.addChild(wheelCap);
+      tire.addChild(wheelCap);
       this.components.push(wheelCap);
 
       const rotationMarker = new Object3D(
@@ -144,10 +144,12 @@ export class Lawnmower extends ObjectComponent {
       // create animations
       this.animations.push(
         new AnimationList(
-          [new RotationAnimation(tire, 0, 2000, 360, 0, 0)],
+          [new RotationAnimation(tire, 0, 2000, 360 * 2, 0, 0)],
           true
         )
       );
+
+      return tire;
     });
 
     const steeringWheel = new SteeringWheel();
@@ -236,12 +238,16 @@ export class Lawnmower extends ObjectComponent {
     );
 
     // Motion
-    let pivotRotation = 35;
-    let bodyRotation = 20;
+    let wheelRotation = 90;
     var motions = new AnimationList(
       [
         new RotationAnimation(this.root, 0, 4000, 0, 90, 0),
         new RotationAnimation(this.root, 4000, 12000, 0, 0, 0),
+        // I'm too dumb to fix this.
+        // new RotationAnimation(wheels[0], 0, 2000, 0, 0, -wheelRotation),
+        // new RotationAnimation(wheels[0], 2000, 4000, 0, 0, wheelRotation),
+        // new RotationAnimation(wheels[1], 0, 2000, 0, 0, -wheelRotation),
+        // new RotationAnimation(wheels[1], 2000, 4000, 0, 0, wheelRotation),
       ],
       true,
       2000
