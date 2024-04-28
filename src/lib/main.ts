@@ -62,8 +62,9 @@ export function renderMain() {
   const bitzer = new Bitzer();
 
   // Placing objects
-  bicycle.main.translate(-40, 14, -55);
+  bicycle.main.translate(-60, 20, -72);
   bicycle.main.rotate(0, GEO.rad(180), 0);
+  bicycle.main.scale(1.5, 1.5, 1.5);
   bicycle.flag.rotateArbitraryAxis(
     Math.cos(GEO.rad(90 + 20)),
     Math.sin(GEO.rad(90 + 20)),
@@ -111,6 +112,7 @@ export function renderMain() {
     ],
     true
   );
+  bicycleLoop.multiplySpeed(0.4);
   animations.push(bicycleLoop);
 
   let pivotRotation = 35;
@@ -133,7 +135,7 @@ export function renderMain() {
     ],
     true
   );
-  bicycleMotion.multiplySpeed(1.1);
+  bicycleMotion.multiplySpeed(0.29);
   animations.push(bicycleMotion);
 
   var honking = new AnimationList(
@@ -384,9 +386,9 @@ export function renderMain() {
       }
       // Logic
       bicycle.main.translate(
-        0.01 * dt * Math.cos(bicycle.main.rotation.y),
+        0.05 * dt * Math.cos(bicycle.main.rotation.y),
         0,
-        0.01 * dt * -Math.sin(bicycle.main.rotation.y)
+        0.05 * dt * -Math.sin(bicycle.main.rotation.y)
       );
     }
 
