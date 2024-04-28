@@ -44,40 +44,29 @@
     display: flex;
     flex-wrap: nowrap;
     position: absolute;
+    bottom: 0%;
     z-index: 1;
   }
 
   .buttonUI {
     margin: 10px;
-    border: none;
-    padding: 15px 30px;
-    font-weight: 500;
-    font-size: 16px;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1vw;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
     color: #fff;
-    background-color: #4caf50;
+    background-color: #007bff;
+    border: 2px solid #007bff;
     border-radius: 5px;
-    position: relative;
-    overflow: hidden;
     cursor: pointer;
+    transition: all 0.3s ease;
   }
 
-  .buttonUI::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 300%;
-    height: 300%;
-    background-color: rgba(255, 255, 255, 0.3);
-    transition: all 0.5s ease;
-    border-radius: 50%;
-    z-index: 0;
-    transform: translate(-50%, -50%);
-  }
-
-  .buttonUI:hover::before {
-    width: 0;
-    height: 0;
+  .buttonUI:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
   }
 
   .info {

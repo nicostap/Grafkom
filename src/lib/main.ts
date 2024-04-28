@@ -72,6 +72,21 @@ export function renderMain() {
     -45
   );
   farmer.main.translate(0, 25, 70);
+  farmer.body.rotate(-0.8, 0, 0);
+  farmer.body.translate(0, -12, -5);
+  farmer.head.rotate(0.3, 0, 0);
+  farmer.head.translate(0, 1, 1);
+  farmer.leftShoulder.rotate(1.5, 0.2, 0.2);
+  farmer.leftElbow.rotate(0, -1, 0);
+  farmer.rightShoulder.rotate(0.8, 0.5, 0);
+  farmer.rightElbow.rotate(0, 0, -1.0);
+  farmer.leftLeg.rotate(-0.2, 0, 0.2);
+  farmer.leftKnee.rotate(0.9, 0, 0);
+  farmer.rightLeg.rotate(-0.2, 0, -0.2);
+  farmer.rightKnee.rotate(0.9, 0, 0);
+  farmer.pizza.rotate(0, 0, 1.5);
+  farmer.pizza.translate(-2, -1, 2);
+
   bitzer.root.translate(0, 25, 90);
 
   // Making the animations
@@ -274,9 +289,17 @@ export function renderMain() {
 
     VIEWMATRIX = glMatrix.mat4.create();
     if (AppState.cameraMode == "Stationary") {
-      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -20, AppState.zoom]);
-      glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, AppState.PHI);
-      glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, AppState.THETA);
+      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
+        AppState.zoom * Math.cos(time * 0.0003),
+        80,
+        AppState.zoom * Math.sin(time * 0.0003),
+      ]);
+      glMatrix.mat4.lookAt(
+        VIEWMATRIX,
+        [VIEWMATRIX[12], VIEWMATRIX[13], VIEWMATRIX[14]],
+        [0, 0, 0],
+        [0, 1, 0]
+      );
     } else if (AppState.cameraMode == "FPS") {
       glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, AppState.PHI);
       glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, AppState.THETA);

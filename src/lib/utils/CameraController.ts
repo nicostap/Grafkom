@@ -47,8 +47,8 @@ export class CameraController {
     };
     const mouseScroll = (e: WheelEvent) => {
       const delta = Math.sign(e.deltaY);
-      this.state.zoom -= 3 * delta;
-      if (this.state.zoom <= -200) this.state.zoom = -200;
+      this.state.zoom -= 5 * delta;
+      if (this.state.zoom <= -300) this.state.zoom = -300;
       if (this.state.zoom >= -100) this.state.zoom = -100;
     };
 
@@ -169,7 +169,7 @@ export function modeFPS() {
   AppState.cameraMode = mode.FPS;
   AppState.THETA = 0;
   AppState.PHI = 0;
-  (AppState.cameraX = 0), (AppState.cameraY = -20), (AppState.cameraZ = -200);
+  (AppState.cameraX = 0), (AppState.cameraY = -20), (AppState.cameraZ = -300);
 }
 export function modeFollowShaun() {
   AppState.cameraMode = mode.Follow;
