@@ -244,9 +244,17 @@ export function renderMain() {
 
     VIEWMATRIX = glMatrix.mat4.create();
     if (AppState.cameraMode == "Stationary") {
-      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, -20, AppState.zoom]);
-      glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, AppState.PHI);
-      glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, AppState.THETA);
+      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
+        AppState.zoom * Math.cos(time * 0.0003),
+        80,
+        AppState.zoom * Math.sin(time * 0.0003),
+      ]);
+      glMatrix.mat4.lookAt(
+        VIEWMATRIX,
+        [VIEWMATRIX[12], VIEWMATRIX[13], VIEWMATRIX[14]],
+        [0, 0, 0],
+        [0, 1, 0]
+      );
     } else if (AppState.cameraMode == "FPS") {
       glMatrix.mat4.rotateX(VIEWMATRIX, VIEWMATRIX, AppState.PHI);
       glMatrix.mat4.rotateY(VIEWMATRIX, VIEWMATRIX, AppState.THETA);

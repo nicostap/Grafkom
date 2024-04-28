@@ -1,7 +1,7 @@
 import { AppState, mode } from "./State";
 
 export class CameraController {
-  AMORTIZATION = 0.95;
+  AMORTIZATION = 0.01;
   dX = 0;
   dY = 0;
   drag = false;
@@ -41,8 +41,8 @@ export class CameraController {
     };
     const mouseScroll = (e: WheelEvent) => {
       const delta = Math.sign(e.deltaY);
-      this.state.zoom -= 3 * delta;
-      if (this.state.zoom <= -200) this.state.zoom = -200;
+      this.state.zoom -= 5 * delta;
+      if (this.state.zoom <= -300) this.state.zoom = -300;
       if (this.state.zoom >= -100) this.state.zoom = -100;
     };
 
@@ -92,20 +92,20 @@ export class CameraController {
     // Camera control
     if (this.state.cameraMode == "FPS") {
       if (this.keyPressed["w"] || this.keyPressed["W"]) {
-        this.state.cameraZ += Math.cos(this.state.THETA) * 1.0;
-        this.state.cameraX += -Math.sin(this.state.THETA) * 1.0;
+        this.state.cameraZ += Math.cos(this.state.THETA) * 0.6;
+        this.state.cameraX += -Math.sin(this.state.THETA) * 0.6;
       }
       if (this.keyPressed["a"] || this.keyPressed["A"]) {
-        this.state.cameraZ += Math.cos(this.state.THETA - Math.PI / 2) * 1.0;
-        this.state.cameraX += -Math.sin(this.state.THETA - Math.PI / 2) * 1.0;
+        this.state.cameraZ += Math.cos(this.state.THETA - Math.PI / 2) * 0.6;
+        this.state.cameraX += -Math.sin(this.state.THETA - Math.PI / 2) * 0.6;
       }
       if (this.keyPressed["s"] || this.keyPressed["S"]) {
-        this.state.cameraZ += -Math.cos(this.state.THETA) * 1.0;
-        this.state.cameraX += Math.sin(this.state.THETA) * 1.0;
+        this.state.cameraZ += -Math.cos(this.state.THETA) * 0.6;
+        this.state.cameraX += Math.sin(this.state.THETA) * 0.6;
       }
       if (this.keyPressed["d"] || this.keyPressed["D"]) {
-        this.state.cameraZ += Math.cos(this.state.THETA + Math.PI / 2) * 1.0;
-        this.state.cameraX += -Math.sin(this.state.THETA + Math.PI / 2) * 1.0;
+        this.state.cameraZ += Math.cos(this.state.THETA + Math.PI / 2) * 0.6;
+        this.state.cameraX += -Math.sin(this.state.THETA + Math.PI / 2) * 0.6;
       }
       if (this.keyPressed["e"] || this.keyPressed["E"])
         this.state.cameraY -= 1.5;
@@ -126,7 +126,7 @@ export function modeFPS() {
   AppState.cameraMode = mode.FPS;
   AppState.THETA = 0;
   AppState.PHI = 0;
-  (AppState.cameraX = 0), (AppState.cameraY = -20), (AppState.cameraZ = -200);
+  (AppState.cameraX = 0), (AppState.cameraY = -20), (AppState.cameraZ = -300);
 }
 export function modeFollowShaun() {
   AppState.cameraMode = mode.Follow;

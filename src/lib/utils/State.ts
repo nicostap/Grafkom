@@ -9,7 +9,7 @@ export enum mode {
 export const AppState = {
   cameraX: 0,
   cameraY: -20,
-  cameraZ: -100,
+  cameraZ: -300,
   cameraMode: mode.FPS,
   zoom: -100,
   THETA: 0,
