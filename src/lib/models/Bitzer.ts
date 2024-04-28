@@ -292,10 +292,18 @@ export class Bitzer extends ObjectComponent {
             arm,
             elbow,
             forearm,
+            hand,
           },
         ];
       })
     ) as any;
+
+    const redBox = GEO.createBox(1, 1, 1, Color.fromHex("ff0000"));
+    const redCard = new Object3D(redBox.vertices, redBox.faces);
+    redCard.setLocalScale(3, 2, 0.1);
+    redCard.setLocalTranslation(-20, 4, 0.5);
+    redCard.setLocalRotation(0, 0, Math.PI / 6);
+    arms.left.hand.addChild(redCard);
 
     const whistle2DCurveArray = [
       -0.640625, 0.25520833333333337, 0.20833333333333326, 0.25520833333333337,
@@ -369,6 +377,25 @@ export class Bitzer extends ObjectComponent {
           new RotationAnimation(arms.left.elbow, 400, 1000, 0, 0, 20),
         ],
         true
+      )
+    );
+
+    // Make feet less dead
+    this.animations.push(
+      new AnimationList(
+        [
+          new RotationAnimation(legs.left.knee, 0, 500, 5, 0, 0),
+          new RotationAnimation(legs.left.knee, 800, 1300, -5, 0, 0),
+        ],
+        true
+      ),
+      new AnimationList(
+        [
+          new RotationAnimation(legs.right.knee, 0, 500, 5, 0, 0),
+          new RotationAnimation(legs.right.knee, 800, 1300, -5, 0, 0),
+        ],
+        true,
+        100
       )
     );
   }
