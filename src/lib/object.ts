@@ -407,6 +407,8 @@ export class Object3D {
   }
 
   rotateArbitraryAxis(m1: number, m2: number, m3: number, theta: number) {
+    let scaledOrigin = glMatrix.vec3.create();
+    glMatrix.vec3.transformMat4(scaledOrigin, this.origin, this.SCALEMATRIX);
     let a = m1;
     let b = m2;
     let c = m3;
@@ -425,9 +427,9 @@ export class Object3D {
       0,
       1,
       0,
-      -this.origin[0],
-      -this.origin[1],
-      -this.origin[2],
+      -scaledOrigin[0],
+      -scaledOrigin[1],
+      -scaledOrigin[2],
       1
     );
     let translateInv = glMatrix.mat4.fromValues(
@@ -443,7 +445,9 @@ export class Object3D {
       0,
       1,
       0,
-      ...this.origin,
+      scaledOrigin[0],
+      scaledOrigin[1],
+      scaledOrigin[2],
       1
     );
     let rotateX = glMatrix.mat4.fromValues(
@@ -543,7 +547,9 @@ export class Object3D {
 
     for (let i = 0; i < this.child.length; i++) {
       this.child[i].#rotateArbitraryAxisChildren(
-        ...this.origin,
+        scaledOrigin[0],
+        scaledOrigin[1],
+        scaledOrigin[2],
         m1,
         m2,
         m3,
