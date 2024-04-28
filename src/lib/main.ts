@@ -12,7 +12,6 @@ import { createCharacter_1 } from "./models/character1";
 import { createCharacter_3 } from "./models/character3";
 import { createFloor } from "./models/world";
 import { Object3D } from "./object";
-import { writable } from "svelte/store";
 import { DefaultShader } from "./shaders/default.shader";
 import { calculateFPS, calculateTick } from "./utils/StatCounter";
 import { AppState, mode } from "./utils/State";
@@ -87,7 +86,7 @@ export function renderMain() {
   farmer.pizza.rotate(0, 0, 1.5);
   farmer.pizza.translate(-2, -1, 2);
 
-  bitzer.root.translate(0, 25, 90);
+  bitzer.root.translate(0, 25, 120);
 
   // Making the animations
   var animations: AbstractAnimation[] = [];

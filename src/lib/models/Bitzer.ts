@@ -308,18 +308,16 @@ export class Bitzer {
     }
 
     const whistle = new Whistle();
-    arms.left.forearm.addChild(whistle.root);
     whistle.root.scale(2, 1.5, 1.5);
-    whistle.root.translate(0, 8, 4);
+    whistle.offsetLocalTranslate(0, 5.25, 2.5);
+    cheeks.addChild(whistle.root);
 
     const watch = new Watch();
-    watch.root.scale(1, 1, 1);
-    watch.root.translate(15, 3.8, 0);
+    watch.offsetLocalTranslate(15, 3.8, 0);
     arms.right.forearm.addChild(watch.root);
 
     const wristband = new Wristband();
-    wristband.root.scale(1, 1, 1);
-    wristband.root.translate(-15, 3.8, 0);
+    wristband.offsetLocalTranslate(-15, 3.8, 0);
     arms.left.forearm.addChild(wristband.root);
 
     arms.left.shoulder.rotate(0, Math.PI / 4, Math.PI / 4);

@@ -2,8 +2,9 @@ import type { AbstractAnimation } from "../../animation";
 import { GEO } from "../../geometry";
 import { Object3D } from "../../object";
 import { Color } from "../../utils/Color";
+import { ObjectComponent } from "../../utils/ObjectComponent";
 
-export class Wristband {
+export class Wristband extends ObjectComponent {
   public readonly animations: AbstractAnimation[] = [];
   public readonly root: Object3D;
 
@@ -13,6 +14,7 @@ export class Wristband {
   } as const;
 
   constructor() {
+    super();
     const bandCyl = GEO.createCylinder(1, 1, 32, this.colors.band);
     const accentCyl = GEO.createCylinder(1, 1, 32, this.colors.accent);
 
@@ -33,5 +35,7 @@ export class Wristband {
     accent2.setLocalTranslation(-0.25, 0, 0);
     accent2.setLocalRotation(0, 0, Math.PI / 2);
     band.addChild(accent2);
+
+    this.components.push(band, accent1, accent2);
   }
 }
