@@ -60,7 +60,7 @@ export function renderMain() {
   var bicycle = createCharacter_1();
   var floor = createFloor();
   var farmer = createCharacter_3();
-  const bitzer = new Bitzer();
+  // const bitzer = new Bitzer();
   const lawnmower = new Lawnmower();
 
   // Placing objects
@@ -92,13 +92,13 @@ export function renderMain() {
   farmer.pizza.rotate(-0.2, 0, 1.5);
   farmer.pizza.translate(-2, -1, 2);
 
-  bitzer.root.translate(0, 25, 120);
+  // bitzer.root.translate(0, 25, 120);
   lawnmower.root.translate(0, 15, 120);
 
   // Making the animations
   var animations: AbstractAnimation[] = [];
 
-  animations.push(...bitzer.animations);
+  // animations.push(...bitzer.animations);
   animations.push(...lawnmower.animations);
   var bicycleLoop = new AnimationList(
     [
@@ -280,7 +280,7 @@ export function renderMain() {
     );
     animations.push(treeBreathing);
   }
-  
+
   var farmerMotion = new AnimationList(
     [
       new RotationAnimation(farmer.rightElbow, 0, 1000, 0, 0, -37),
@@ -309,9 +309,23 @@ export function renderMain() {
   var farmerEatMotion = new AnimationList(
     [
       new ScaleAnimation(farmer.leftCheek, 0, 500, 2.75, 2.75, 2.75),
-      new ScaleAnimation(farmer.leftCheek, 500, 1000, 1/2.75, 1/2.75, 1/2.75),
+      new ScaleAnimation(
+        farmer.leftCheek,
+        500,
+        1000,
+        1 / 2.75,
+        1 / 2.75,
+        1 / 2.75
+      ),
       new ScaleAnimation(farmer.rightCheek, 0, 500, 2.75, 2.75, 2.75),
-      new ScaleAnimation(farmer.rightCheek, 500, 1000, 1/2.75, 1/2.75, 1/2.75),
+      new ScaleAnimation(
+        farmer.rightCheek,
+        500,
+        1000,
+        1 / 2.75,
+        1 / 2.75,
+        1 / 2.75
+      ),
       new TranslationAnimation(farmer.mouth, 0, 500, 0, 0.5, -0.3),
       new TranslationAnimation(farmer.mouth, 500, 1000, 0, -0.5, 0.3),
       new RotationAnimation(farmer.leftLeg, 250, 500, -15, 0, 0),
@@ -327,7 +341,14 @@ export function renderMain() {
   var farmerBreathingMotion = new AnimationList(
     [
       new ScaleAnimation(farmer.stomach, 0, 1500, 1.05, 1.05, 1.05),
-      new ScaleAnimation(farmer.stomach, 1500, 3000, 1/1.05, 1/1.05, 1/1.05),
+      new ScaleAnimation(
+        farmer.stomach,
+        1500,
+        3000,
+        1 / 1.05,
+        1 / 1.05,
+        1 / 1.05
+      ),
     ],
     true
   );
@@ -335,13 +356,27 @@ export function renderMain() {
   animations.push(farmerBreathingMotion);
 
   for (let i = 0; i < floor.bushes.length; i++) {
-    let randomNumber = Math.random()*15+5;
+    let randomNumber = Math.random() * 15 + 5;
     var bushWindyMotion = new AnimationList(
       [
         new RotationAnimation(floor.bushes[i], 0, 1000, -randomNumber, 0, 0),
-        new RotationAnimation(floor.bushes[i], 1000, 2000, randomNumber*1.5, 0, 0),
-        new RotationAnimation(floor.bushes[i], 2000, 2500, -randomNumber/2, 0, 0),
-      ], 
+        new RotationAnimation(
+          floor.bushes[i],
+          1000,
+          2000,
+          randomNumber * 1.5,
+          0,
+          0
+        ),
+        new RotationAnimation(
+          floor.bushes[i],
+          2000,
+          2500,
+          -randomNumber / 2,
+          0,
+          0
+        ),
+      ],
       true
     );
     bushWindyMotion.multiplySpeed(1);
@@ -350,20 +385,40 @@ export function renderMain() {
 
   for (let i = 0; i < floor.grass.length; i++) {
     for (let j = 0; j < floor.grass[i].length; j++) {
-      let randomNumber = Math.random()-0.2;
+      let randomNumber = Math.random() - 0.2;
       var grassWindyMotion = new AnimationList(
         [
-          new TranslationAnimation(floor.grass[i][j], 0, 500, 0, 0, -randomNumber),
-          new TranslationAnimation(floor.grass[i][j], 500, 1000, 0, 0, randomNumber*1.5),
-          new TranslationAnimation(floor.grass[i][j], 1000, 1250, 0, 0, -randomNumber/2),
-        ], 
+          new TranslationAnimation(
+            floor.grass[i][j],
+            0,
+            500,
+            0,
+            0,
+            -randomNumber
+          ),
+          new TranslationAnimation(
+            floor.grass[i][j],
+            500,
+            1000,
+            0,
+            0,
+            randomNumber * 1.5
+          ),
+          new TranslationAnimation(
+            floor.grass[i][j],
+            1000,
+            1250,
+            0,
+            0,
+            -randomNumber / 2
+          ),
+        ],
         true
       );
       grassWindyMotion.multiplySpeed(1);
       animations.push(grassWindyMotion);
     }
   }
-
 
   // Drawing
   GL.enable(GL.CULL_FACE);
@@ -427,37 +482,33 @@ export function renderMain() {
         ],
         [0, 1, 0]
       );
-    } else if(AppState.cameraMode == "Follow Farmer") {
-      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
-        0,
-        60,
-        70
-      ]);
+    } else if (AppState.cameraMode == "Follow Farmer") {
+      glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [0, 60, 70]);
       glMatrix.mat4.lookAt(
         VIEWMATRIX,
         [VIEWMATRIX[12], VIEWMATRIX[13], VIEWMATRIX[14]],
         [
           farmer.main.TRANSMATRIX[12],
           farmer.main.TRANSMATRIX[13],
-          farmer.main.TRANSMATRIX[14]
+          farmer.main.TRANSMATRIX[14],
         ],
         [0, 1, 0]
       );
-    } else if(AppState.cameraMode == "Follow Bitzer") {
+    } else if (AppState.cameraMode == "Follow Bitzer") {
       glMatrix.mat4.translate(VIEWMATRIX, VIEWMATRIX, [
-        bitzer.root.TRANSMATRIX[12] -
-          40 * Math.cos(bitzer.root.rotation.y + GEO.rad(45)),
+        lawnmower.root.TRANSMATRIX[12] -
+          40 * Math.cos(lawnmower.root.rotation.y + GEO.rad(45)),
         35,
-        bitzer.root.TRANSMATRIX[14] -
-          40 * Math.sin(bitzer.root.rotation.y + GEO.rad(45)),
+        lawnmower.root.TRANSMATRIX[14] -
+          40 * Math.sin(lawnmower.root.rotation.y + GEO.rad(45)),
       ]);
       glMatrix.mat4.lookAt(
         VIEWMATRIX,
         [VIEWMATRIX[12], VIEWMATRIX[13], VIEWMATRIX[14]],
         [
-          bitzer.root.TRANSMATRIX[12],
-          bitzer.root.TRANSMATRIX[13],
-          bitzer.root.TRANSMATRIX[14],
+          lawnmower.root.TRANSMATRIX[12],
+          lawnmower.root.TRANSMATRIX[13],
+          lawnmower.root.TRANSMATRIX[14],
         ],
         [0, 1, 0]
       );
@@ -471,7 +522,7 @@ export function renderMain() {
       bicycle.main,
       floor.main,
       farmer.main,
-      bitzer.root,
+      // bitzer.root,
       lawnmower.root,
     ].forEach((o) => {
       o.setUniform4(PROJMATRIX, VIEWMATRIX);
@@ -479,7 +530,7 @@ export function renderMain() {
 
     // Manual batch drawing
     Object3D.defaultShader.use();
-    [bicycle.main, floor.main, farmer.main, bitzer.root, lawnmower.root]
+    [bicycle.main, floor.main, farmer.main, lawnmower.root]
       .flatMap((o) => o.queueBatch())
       .forEach((o) => {
         o.drawBatch();

@@ -4,6 +4,8 @@ import { GEO } from "../geometry";
 import { Object3D } from "../object";
 import { Color } from "../utils/Color";
 import { ObjectComponent } from "../utils/ObjectComponent";
+import { SteeringWheel } from "./BitzerComponents/SteeringWheel";
+import { Bitzer } from "./Bitzer";
 
 export class Lawnmower extends ObjectComponent {
   public readonly animations: AbstractAnimation[] = [];
@@ -15,6 +17,7 @@ export class Lawnmower extends ObjectComponent {
     tires: Color.fromHex("000000"),
     wheelCaps: Color.fromHex("ffe24c"),
     chair: Color.fromHex("ffd308"),
+    exhaust: Color.fromHex("9fa4a8"),
   } as const;
 
   constructor() {
@@ -109,5 +112,31 @@ export class Lawnmower extends ObjectComponent {
       lawnmowerBase.addChild(wheelCap);
       this.components.push(wheelCap);
     });
+
+    const steeringWheel = new SteeringWheel();
+    this.animations.push(...steeringWheel.animations);
+
+    const steeringWheelObj = steeringWheel.root;
+    steeringWheel.offsetLocalTranslate(0, -1, 2);
+    lawnmowerUpperEngine.addChild(steeringWheelObj);
+
+    const exhaustGeometry = GEO.createCylinder(1, 1, 32, this.colors.exhaust);
+    const exhaust = new Object3D(
+      exhaustGeometry.vertices,
+      exhaustGeometry.faces
+    );
+    exhaust.setLocalScale(0.75, 2, 0.75);
+    exhaust.setLocalTranslation(5, -7, -6);
+    exhaust.setLocalRotation(Math.PI / 2, 0, 0);
+    lawnmowerBase.addChild(exhaust);
+    this.components.push(exhaust);
+
+    const bitzer = new Bitzer();
+    this.animations.push(...bitzer.animations);
+    // bitzer.root.scale(0.9, 0.9, 0.9);
+    bitzer.root.translate(0, 10, 0);
+    // bitzer.offsetLocalTranslate(0, 14, 0);
+
+    chairSeatBase.addChild(bitzer.root);
   }
 }

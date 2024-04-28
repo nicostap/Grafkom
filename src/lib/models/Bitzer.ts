@@ -2,11 +2,12 @@ import type { AbstractAnimation } from "../animation";
 import { GEO } from "../geometry";
 import { Object3D } from "../object";
 import { Color } from "../utils/Color";
+import { ObjectComponent } from "../utils/ObjectComponent";
 import { Watch } from "./BitzerComponents/Watch";
 import { Whistle } from "./BitzerComponents/Whistle";
 import { Wristband } from "./BitzerComponents/Wristband";
 
-export class Bitzer {
+export class Bitzer extends ObjectComponent {
   public readonly animations: AbstractAnimation[] = [];
   public readonly root: Object3D;
 
@@ -22,6 +23,7 @@ export class Bitzer {
   } as const;
 
   constructor() {
+    super();
     const skinStomach = GEO.createEllipticParaboloid(
       1.0,
       2.0,
@@ -40,18 +42,21 @@ export class Bitzer {
     this.root.setLocalScale(0, 0, 0);
     this.root.setLocalTranslation(0, 0, 0);
     this.root.setLocalRotation(0, 0, 0);
+    this.components.push(this.root);
 
     const stomach = new Object3D(skinStomach.vertices, skinStomach.faces);
     stomach.setLocalScale(5.5, 6, 4);
     stomach.setLocalTranslation(0, 10, 0);
     stomach.setLocalRotation(0, 0, 0);
     this.root.addChild(stomach, 0, 0, 0);
+    this.components.push(stomach);
 
     const butt = new Object3D(skinSphere.vertices, skinSphere.faces);
     butt.setLocalScale(6.8, 3, 4.9);
     butt.setLocalTranslation(0, -9, 0);
     butt.setLocalRotation(0, 0, 0);
     stomach.addChild(butt, 0, 0, 0);
+    this.components.push(butt);
 
     const legs: Record<
       "left" | "right",
@@ -74,10 +79,11 @@ export class Bitzer {
         femur.addChild(knee);
 
         const crus = new Object3D(skinCylinder.vertices, skinCylinder.faces);
-        crus.setLocalScale(2, 4, 2);
-        crus.setLocalTranslation(offset, -20, 0);
+        crus.setLocalScale(2, 5, 2);
+        crus.setLocalTranslation(offset, -21, 0);
         crus.setLocalRotation(0, 0, 0);
         knee.addChild(crus);
+        this.components.push(femur, knee, crus);
 
         return [
           side,
@@ -89,12 +95,6 @@ export class Bitzer {
         ];
       })
     ) as any;
-
-    legs.left.femur.rotate(0.25, 0, 0);
-    legs.right.femur.rotate(-0.25, 0, 0);
-
-    legs.left.knee.rotate(-0.25, 0, 0);
-    legs.right.knee.rotate(0.25, 0, 0);
 
     const neckAttachment = new Object3D(skinSphere.vertices, skinSphere.faces);
     neckAttachment.setLocalScale(3.5, 1.25, 2.5);
@@ -146,6 +146,17 @@ export class Bitzer {
     forehead.setLocalRotation(-Math.PI / 16, 0, 0);
     head.addChild(forehead);
 
+    this.components.push(
+      neckAttachment,
+      collar,
+      neck,
+      head,
+      cheeks,
+      nose,
+      noseTip,
+      forehead
+    );
+
     const accent1Sphere = GEO.createSphere(1.25, 40, this.colors.accent1);
     const accent1EllipticParaboloid = GEO.createEllipticParaboloid(
       1,
@@ -175,6 +186,8 @@ export class Bitzer {
     hatTop.setLocalRotation(0, 0, 0);
     hatCover.addChild(hatTop);
 
+    this.components.push(hatBase, hatCover, hatTop);
+
     const eyeSphere = GEO.createSphere(1, 40, this.colors.eyes);
     const retinaSphere = GEO.createSphere(0.3, 40, this.colors.retina);
 
@@ -201,6 +214,7 @@ export class Bitzer {
         retina.setLocalTranslation(retinaOffset, 13.5, 2.55);
         retina.setLocalRotation(0, 0, 0);
         head.addChild(retina);
+        this.components.push(eye, retina);
 
         return [side, { eye, retina }];
       })
@@ -263,6 +277,8 @@ export class Bitzer {
         hand.setLocalRotation(0, 0, 0);
         forearm.addChild(hand);
 
+        this.components.push(shoulder, armJoint, arm, elbow, forearm, hand);
+
         return [
           side,
           {
@@ -321,9 +337,21 @@ export class Bitzer {
     arms.left.forearm.addChild(wristband.root);
 
     arms.left.shoulder.rotate(0, Math.PI / 4, Math.PI / 4);
-    arms.right.shoulder.rotate(0, 0, -Math.PI / 4);
+    arms.right.shoulder.rotate(0, -Math.PI / 3, -Math.PI / 4);
 
     arms.left.elbow.rotate(0, (Math.PI * 8) / 10, (-Math.PI * 2) / 16);
-    // arms.right.elbow.rotate(Math.PI / 4, 0, Math.PI / 16);
+    arms.right.elbow.rotate(0, -Math.PI / 4, Math.PI / 12);
+
+    legs.left.femur.rotate(-Math.PI / 2, 0, 0);
+    legs.right.femur.rotate(-Math.PI / 2, 0, 0);
+
+    legs.left.knee.rotate((Math.PI * 2) / 6, 0, 0);
+    legs.right.knee.rotate((Math.PI * 2) / 6, 0, 0);
+
+    this.components.push(
+      ...whistle.components,
+      ...watch.components,
+      ...wristband.components
+    );
   }
 }
