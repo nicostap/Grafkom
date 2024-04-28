@@ -181,7 +181,7 @@ export class Bitzer {
         const offset = side === "left" ? -0.5 : 0.5;
 
         const eye = new Object3D(eyeSphere.vertices, eyeSphere.faces);
-        eye.setLocalScale(0.5, 0.5, 0.5);
+        eye.setLocalScale(0.55, 0.55, 0.55);
         eye.setLocalTranslation(offset, 13.5, 2);
         eye.setLocalRotation(0, 0, 0);
         head.addChild(eye);
@@ -190,7 +190,7 @@ export class Bitzer {
 
         const retina = new Object3D(retinaSphere.vertices, retinaSphere.faces);
         retina.setLocalScale(0.5, 0.5, 0.1);
-        retina.setLocalTranslation(retinaOffset, 13.5, 2.5);
+        retina.setLocalTranslation(retinaOffset, 13.5, 2.55);
         retina.setLocalRotation(0, 0, 0);
         head.addChild(retina);
 
