@@ -401,10 +401,6 @@ export function createFloor() {
     bush.setLocalTranslation(-6, -35, -40);
     houseMain.addChild(bush);
 
-    floor.addChild(houseMain);
-    houseMain.translate(0, 30, 0);
-    houseMain.scale(0.85, 0.8, 0.8);
-
     var whiteSphere = GEO.createSphere(50.0, 15, [1, 1, 1]);
     var cloudInstance = instanceRandomiser(whiteSphere.vertices, whiteSphere.faces, 0, 0, 1000, 1000, 6, 6);
     var cloud = new Object3D(cloudInstance.vertices, cloudInstance.faces);
@@ -474,25 +470,29 @@ export function createFloor() {
     }
 
     let whitePipe = GEO.createPipe(
-        GEO.createCurve([0, -3, -1, 0, 15, 0, 0, 19, -5, 0, 27, -15], 20, 2),
+        GEO.createCurve([0, -3, -1, 0, 15, 0, 0, 19, -5, 0, 27, -22], 20, 2),
         1,
         10,
         [0.8, 0.8, 0.8]
     );
     pillar = new Object3D(whitePipe.vertices, whitePipe.faces);
-    pillar.setLocalTranslation(14.75, 0, 66.5);
-    floor.addChild(pillar);
+    pillar.setLocalTranslation(17.5, -30, 82.5);
+    houseMain.addChild(pillar);
     pillar = new Object3D(whitePipe.vertices, whitePipe.faces);
-    pillar.setLocalTranslation(-14.75, 0, 66.5);
-    floor.addChild(pillar);
+    pillar.setLocalTranslation(-17.5, -30, 82.5);
+    houseMain.addChild(pillar);
     pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
-    pillar.setLocalScale(1, 15, 1);
-    pillar.setLocalTranslation(-14.75, 13.5, 59.3);
-    floor.addChild(pillar);
+    pillar.setLocalScale(1, 20, 1);
+    pillar.setLocalTranslation(-17.5, -20, 74.3);
+    houseMain.addChild(pillar);
     pillar = new Object3D(whiteCylinder.vertices, whiteCylinder.faces);
-    pillar.setLocalScale(1, 15, 1);
-    pillar.setLocalTranslation(14.75, 13.5, 59.3);
-    floor.addChild(pillar);
+    pillar.setLocalScale(1, 20, 1);
+    pillar.setLocalTranslation(17.5, -20, 74.3);
+    houseMain.addChild(pillar);
+
+    floor.addChild(houseMain);
+    houseMain.translate(0, 45, 0);
+    houseMain.scale(1.1, 1.1, 1.1);
 
 
     return { main: floor, trees: trees, smokes: smokes, clouds: clouds, butterflies: butterflies };
