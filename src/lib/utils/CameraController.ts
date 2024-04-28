@@ -2,9 +2,15 @@ import { AppState, mode } from "./State";
 
 export class CameraController {
   AMORTIZATION = 0.95;
+  MOVE_SPEED = 0.02;
+
   dX = 0;
   dY = 0;
   drag = false;
+
+  dxTranslate = 0;
+  dyTranslate = 0;
+  dzTranslate = 0;
 
   xPrev: number = 0;
   yPrev: number = 0;
@@ -41,8 +47,8 @@ export class CameraController {
     };
     const mouseScroll = (e: WheelEvent) => {
       const delta = Math.sign(e.deltaY);
-      this.state.zoom -= 3 * delta;
-      if (this.state.zoom <= -200) this.state.zoom = -200;
+      this.state.zoom -= 5 * delta;
+      if (this.state.zoom <= -300) this.state.zoom = -300;
       if (this.state.zoom >= -100) this.state.zoom = -100;
     };
 
@@ -62,10 +68,18 @@ export class CameraController {
       signal: this.abort.signal,
     });
 
+    const capture = ["w", "a", "s", "d", "e", "q", "shift"];
+
     window.addEventListener(
       "keydown",
       (e) => {
-        this.keyPressed[e.key] = true;
+        const key = e.key.toLowerCase();
+        if (capture.includes(key)) {
+          e.preventDefault();
+        }
+
+        if (e.repeat) return;
+        this.keyPressed[key] = true;
       },
       { signal: this.abort.signal }
     );
@@ -73,7 +87,12 @@ export class CameraController {
     window.addEventListener(
       "keyup",
       (e) => {
-        this.keyPressed[e.key] = false;
+        const key = e.key.toLowerCase();
+        if (capture.includes(key)) {
+          e.preventDefault();
+        }
+
+        this.keyPressed[key] = false;
       },
       { signal: this.abort.signal }
     );
@@ -83,7 +102,7 @@ export class CameraController {
     this.abort.abort();
   }
 
-  public tick() {
+  public tick(dt: number) {
     if (!this.drag) {
       (this.dX *= this.AMORTIZATION), (this.dY *= this.AMORTIZATION);
       (this.state.THETA += this.dX), (this.state.PHI += this.dY);
@@ -91,26 +110,50 @@ export class CameraController {
 
     // Camera control
     if (this.state.cameraMode == "FPS") {
-      if (this.keyPressed["w"] || this.keyPressed["W"]) {
-        this.state.cameraZ += Math.cos(this.state.THETA) * 1.0;
-        this.state.cameraX += -Math.sin(this.state.THETA) * 1.0;
+      const speedModifier = this.keyPressed["shift"] ? 1.25 : 0.5;
+
+      let dxTarget = 0;
+      let dyTarget = 0;
+      let dzTarget = 0;
+
+      if (this.keyPressed["w"]) {
+        dzTarget += Math.cos(this.state.THETA) * 1.0 * speedModifier;
+        dxTarget += -Math.sin(this.state.THETA) * 1.0 * speedModifier;
       }
-      if (this.keyPressed["a"] || this.keyPressed["A"]) {
-        this.state.cameraZ += Math.cos(this.state.THETA - Math.PI / 2) * 1.0;
-        this.state.cameraX += -Math.sin(this.state.THETA - Math.PI / 2) * 1.0;
+
+      if (this.keyPressed["a"]) {
+        dzTarget +=
+          Math.cos(this.state.THETA - Math.PI / 2) * 1.0 * speedModifier;
+        dxTarget +=
+          -Math.sin(this.state.THETA - Math.PI / 2) * 1.0 * speedModifier;
       }
-      if (this.keyPressed["s"] || this.keyPressed["S"]) {
-        this.state.cameraZ += -Math.cos(this.state.THETA) * 1.0;
-        this.state.cameraX += Math.sin(this.state.THETA) * 1.0;
+
+      if (this.keyPressed["s"]) {
+        dzTarget += -Math.cos(this.state.THETA) * 1.0 * speedModifier;
+        dxTarget += Math.sin(this.state.THETA) * 1.0 * speedModifier;
       }
-      if (this.keyPressed["d"] || this.keyPressed["D"]) {
-        this.state.cameraZ += Math.cos(this.state.THETA + Math.PI / 2) * 1.0;
-        this.state.cameraX += -Math.sin(this.state.THETA + Math.PI / 2) * 1.0;
+
+      if (this.keyPressed["d"]) {
+        dzTarget +=
+          Math.cos(this.state.THETA + Math.PI / 2) * 1.0 * speedModifier;
+        dxTarget +=
+          -Math.sin(this.state.THETA + Math.PI / 2) * 1.0 * speedModifier;
       }
-      if (this.keyPressed["e"] || this.keyPressed["E"])
-        this.state.cameraY -= 1.5;
-      if (this.keyPressed["q"] || this.keyPressed["Q"])
-        this.state.cameraY += 1.5;
+
+      if (this.keyPressed["e"]) dyTarget -= 1.5 * speedModifier;
+      if (this.keyPressed["q"]) dyTarget += 1.5 * speedModifier;
+
+      this.dxTranslate +=
+        (dxTarget - this.dxTranslate) * (1 - Math.exp(dt * -this.MOVE_SPEED));
+      this.dyTranslate +=
+        (dyTarget - this.dyTranslate) * (1 - Math.exp(dt * -this.MOVE_SPEED));
+      this.dzTranslate +=
+        (dzTarget - this.dzTranslate) * (1 - Math.exp(dt * -this.MOVE_SPEED));
+
+      // Apply change
+      this.state.cameraX += this.dxTranslate;
+      this.state.cameraY += this.dyTranslate;
+      this.state.cameraZ += this.dzTranslate;
     }
   }
 }
@@ -126,7 +169,7 @@ export function modeFPS() {
   AppState.cameraMode = mode.FPS;
   AppState.THETA = 0;
   AppState.PHI = 0;
-  (AppState.cameraX = 0), (AppState.cameraY = -20), (AppState.cameraZ = -200);
+  (AppState.cameraX = 0), (AppState.cameraY = -20), (AppState.cameraZ = -300);
 }
 export function modeFollowShaun() {
   AppState.cameraMode = mode.Follow;
