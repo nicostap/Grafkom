@@ -118,10 +118,10 @@ export function createFloor() {
     var rock = new Object3D(rockInstance.vertices, rockInstance.faces);
     rock.setLocalTranslation(0, 0.75, 0);
     rock.setLocalScale(3, 4, 3.5);
-    randomiser(rock, floor, 0, 180, 1, 150, 2, 2);
-    randomiser(rock, floor, 0, -180, 1, 150, 2, 2);
-    randomiser(rock, floor, 200, 0, 1, 150, 1, 1);
-    randomiser(rock, floor, -200, 0, 1, 150, 1, 1);
+    randomiser(rock, floor, 0, 200, 150, 300, 2, 2);
+    randomiser(rock, floor, 0, -200, 150, 300, 2, 2);
+    randomiser(rock, floor, 200, 0, 1, 300, 1, 1);
+    randomiser(rock, floor, -200, 0, 1, 300, 1, 1);
 
     // House
     var whiteBox = GEO.createBox(1.0, 1.0, 1.0, [0.8, 0.8, 0.8]);
@@ -130,7 +130,6 @@ export function createFloor() {
     var whitePrism = GEO.createCylinder(1.0, 1.0, 3, [0.8, 0.8, 0.8]);
     var redBox = GEO.createBox(1.0, 1.0, 1.0, [0.3, 0, 0]);
     var blackBox = GEO.createBox(1.0, 1.0, 1.0, [0, 0, 0]);
-    var greenCylinder = GEO.createCylinder(1.0, 1.0, 15, [0, 0.2, 0]);
     var greenSphere = GEO.createSphere(1.0, 15, [0, 0.2, 0]);
 
     var houseMain = new Object3D(whiteBox.vertices, whiteBox.faces);
