@@ -22,6 +22,7 @@ export class Bitzer extends ObjectComponent {
     collar: Color.fromHex("20170d"),
     accent1: Color.fromHex("3394c1"),
     wristband: Color.fromHex("ece2cc"),
+    ears: Color.fromHex("5d3c1c"),
 
     eyes: Color.fromHex("ffffff"),
     retina: Color.fromHex("000000"),
@@ -398,5 +399,44 @@ export class Bitzer extends ObjectComponent {
         100
       )
     );
+
+    // Add ears
+    const earGeometry = GEO.combineLines(
+      this.colors.ears,
+      GEO.createCurve(
+        [-1.9, 0, 0, -2.62, -3, -3.36, 1.75, 4, -4.43, 3.31, 5, -1],
+        50,
+        3
+      ),
+      GEO.createCurve(
+        [-1.9, 0, 0, -2.62, -3, 3.36, 1.75, 4, 4.43, 3.31, 5, 1],
+        50,
+        3
+      ),
+      GEO.createCurve(
+        [-2.9, 0, 0, -2.62, 0, 3.36, 1.75, 9, 4.43, 3.31, 6, 1],
+        50,
+        3
+      ),
+      GEO.createCurve(
+        [-2.9, 0, 0, -2.62, 0, -3.36, 1.75, 9, -4.43, 3.31, 6, -1.9],
+        50,
+        3
+      )
+    );
+
+    const leftEar = new Object3D(earGeometry.vertices, earGeometry.faces);
+    leftEar.setLocalScale(0.5, 0.25, 0.5);
+    leftEar.setLocalTranslation(-2.5, 11.5, 0);
+    leftEar.setLocalRotation(0, 0, Math.PI / 5);
+    head.addChild(leftEar);
+    this.components.push(leftEar);
+
+    const rightEar = new Object3D(earGeometry.vertices, earGeometry.faces);
+    rightEar.setLocalScale(0.5, 0.25, 0.5);
+    rightEar.setLocalTranslation(2.5, 11.5, 0);
+    rightEar.setLocalRotation(0, Math.PI, Math.PI / 5);
+    head.addChild(rightEar);
+    this.components.push(rightEar);
   }
 }
