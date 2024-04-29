@@ -2,7 +2,7 @@ import { AppState, mode } from "./State";
 
 export class CameraController {
   AMORTIZATION = 0;
-  MOVE_SPEED = 0.02;
+  MOVE_SPEED = 0.005;
 
   dX = 0;
   dY = 0;
@@ -42,8 +42,8 @@ export class CameraController {
         (this.dY = ((e.pageY - this.yPrev) * 2 * Math.PI) / this.canvas.height);
       this.state.THETA += this.dX;
       this.state.PHI += this.dY;
-      if(this.state.PHI > Math.PI/2) this.state.PHI = Math.PI/2;
-      if(this.state.PHI < -Math.PI/2) this.state.PHI = -Math.PI/2;
+      if (this.state.PHI > Math.PI / 2) this.state.PHI = Math.PI / 2;
+      if (this.state.PHI < -Math.PI / 2) this.state.PHI = -Math.PI / 2;
       (this.xPrev = e.pageX), (this.yPrev = e.pageY);
       e.preventDefault();
     };

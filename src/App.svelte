@@ -7,35 +7,68 @@
     modeFPS,
     modeFollowShaun,
     modeFollowFarmer,
-    modeFollowBitzer
+    modeFollowBitzer,
   } from "./lib/utils/CameraController";
 
   onMount(() => {
     const renderTerminate = renderMain();
+
+    // if keypress h, then hide the settings button
+    window.addEventListener("keypress", (e) => {
+      if (e.key === "h") {
+        showToggleButton = !showToggleButton;
+        showStuff = showToggleButton;
+      }
+    });
+
     return () => {
       if (renderTerminate) {
         renderTerminate();
       }
     };
   });
+
+  let showToggleButton = true;
+  let showStuff = false;
 </script>
 
 <div>
   <div class="buttonNavbar">
-    <button class="buttonUI" on:click={modeStationary}> Stationary </button>
-    <button class="buttonUI" on:click={modeFPS}> FPS </button>
-    <button class="buttonUI" on:click={modeFollowShaun}> Follow Shaun </button>
-    <button class="buttonUI" on:click={modeFollowFarmer}> Follow Farmer </button>
-    <button class="buttonUI" on:click={modeFollowBitzer}> Follow Bitzer </button>
+    {#if showToggleButton}
+      <button
+        class="buttonUI"
+        on:click={() => {
+          showStuff = !showStuff;
+          console.log(showStuff);
+        }}
+      >
+        ⚙
+      </button>
+    {/if}
+    {#if showStuff}
+      <button class="buttonUI" on:click={modeStationary}> Stationary </button>
+      <button class="buttonUI" on:click={modeFPS}> FPS </button>
+      <button class="buttonUI" on:click={modeFollowShaun}>
+        Follow Shaun
+      </button>
+      <button class="buttonUI" on:click={modeFollowFarmer}>
+        Follow Farmer
+      </button>
+      <button class="buttonUI" on:click={modeFollowBitzer}>
+        Follow Bitzer
+      </button>
+    {/if}
   </div>
-  <div class="info">
-    <span style="width: 5em;">
-      FPS: <span>{$fpsStore.toFixed(1)}</span>
-    </span>
-    <span style="width: 9em;">
-      CPU Tick: <span>{$tickStore.toFixed(2)}ms</span>
-    </span>
-  </div>
+  {#if showStuff}
+    <div class="info">
+      <span style="width: 5em;">
+        FPS: <span>{$fpsStore.toFixed(1)}</span>
+      </span>
+      <span style="width: 9em;">
+        CPU Tick: <span>{$tickStore.toFixed(2)}ms</span>
+      </span>
+    </div>
+  {/if}
   <canvas
     id="your_canvas"
     style="position: relative;background-color: rgb(174, 185, 255);"
