@@ -425,18 +425,73 @@ export class Bitzer extends ObjectComponent {
       )
     );
 
+    const earRotation = 10;
+    const rotationAxis = [-4, 11.5, 0] as const;
+
     const leftEar = new Object3D(earGeometry.vertices, earGeometry.faces);
     leftEar.setLocalScale(0.5, 0.25, 0.5);
     leftEar.setLocalTranslation(-2.5, 11.5, 0);
     leftEar.setLocalRotation(0, 0, Math.PI / 5);
-    head.addChild(leftEar);
+
+    head.addChild(leftEar, -2, 13.5, 0);
     this.components.push(leftEar);
+    this.animations.push(
+      new AnimationList(
+        [
+          new ArbitraryAxisRotationAnimation(
+            leftEar,
+            0,
+            400,
+            0,
+            0,
+            Math.sin(GEO.rad(90)),
+            earRotation
+          ),
+          new ArbitraryAxisRotationAnimation(
+            leftEar,
+            400,
+            800,
+            0,
+            0,
+            Math.sin(GEO.rad(90)),
+            -earRotation
+          ),
+        ],
+        true
+      )
+    );
 
     const rightEar = new Object3D(earGeometry.vertices, earGeometry.faces);
     rightEar.setLocalScale(0.5, 0.25, 0.5);
     rightEar.setLocalTranslation(2.5, 11.5, 0);
     rightEar.setLocalRotation(0, Math.PI, Math.PI / 5);
-    head.addChild(rightEar);
+    head.addChild(rightEar, 2, 13.5, 0);
     this.components.push(rightEar);
+
+    this.animations.push(
+      new AnimationList(
+        [
+          new ArbitraryAxisRotationAnimation(
+            rightEar,
+            0,
+            400,
+            0,
+            0,
+            Math.sin(GEO.rad(90)),
+            -earRotation
+          ),
+          new ArbitraryAxisRotationAnimation(
+            rightEar,
+            400,
+            800,
+            0,
+            0,
+            Math.sin(GEO.rad(90)),
+            earRotation
+          ),
+        ],
+        true
+      )
+    );
   }
 }
